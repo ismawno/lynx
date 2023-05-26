@@ -1,6 +1,7 @@
-#include <iostream>
+#include "lynx/app.hpp"
 
 int main()
 {
-    std::cout << "Hello\n";
+    lynx::app app;
+    app.run();
 }

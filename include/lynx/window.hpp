@@ -11,11 +11,13 @@ namespace lynx
 class window
 {
   public:
-    window(std::size_t width, std::size_t height, const char *name = "window");
+    window(std::uint32_t width, std::uint32_t height, const char *name);
     ~window();
 
-    std::size_t width() const;
-    std::size_t height() const;
+    std::uint32_t width() const;
+    std::uint32_t height() const;
+
+    bool should_close() const;
 
   private:
     std::uint32_t m_width, m_height;

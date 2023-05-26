@@ -3,7 +3,7 @@
 
 namespace lynx
 {
-window::window(const std::size_t width, const std::size_t height, const char *name)
+window::window(const std::uint32_t width, const std::uint32_t height, const char *name)
     : m_width(width), m_height(height), m_name(name)
 {
     init_window();
@@ -17,7 +17,9 @@ window::~window()
 class bad_glfw_init : public std::runtime_error
 {
   public:
-    bad_glfw_init();
+    bad_glfw_init() : std::runtime_error("GLFW failed to initialize")
+    {
+    }
     const virtual char *what() const noexcept override
     {
         return "GLFW failed to initialize";
@@ -34,13 +36,18 @@ void window::init_window()
     m_window = glfwCreateWindow((int)m_width, (int)m_height, m_name, nullptr, nullptr);
 }
 
-std::size_t window::width() const
+std::uint32_t window::width() const
 {
     return m_width;
 }
-std::size_t window::height() const
+std::uint32_t window::height() const
 {
     return m_height;
+}
+
+bool window::should_close() const
+{
+    return glfwWindowShouldClose(m_window);
 }
 
 } // namespace lynx
