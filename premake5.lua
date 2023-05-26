@@ -34,6 +34,7 @@ files {
 }
 
 includedirs {
+   "include",
    "%{wks.location}/vendor/glfw/include",
    "%{wks.location}/vendor/glm",
    "%{wks.location}/vendor/vulkan-sdk/macOS/include"
