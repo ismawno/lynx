@@ -1,4 +1,6 @@
+#include <iostream>
+
 int main()
 {
-    std::size_t x;
+    std::cout << "Hello\n";
 }
