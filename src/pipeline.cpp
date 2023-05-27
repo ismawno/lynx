@@ -1,16 +1,18 @@
-#include "lynx/pipeline.hpp"
 #include "lynx/pch.hpp"
+#include "lynx/pipeline.hpp"
+#include "lynx/exceptions.hpp"
 
 #include <fstream>
 
 namespace lynx
 {
-pipeline::pipeline(const char *vert_path, const char *frag_path)
+pipeline::pipeline(const device &dev, const char *vert_path, const char *frag_path, const config_info &config)
+    : m_device(dev)
 {
-    init(vert_path, frag_path);
+    init(vert_path, frag_path, config);
 }
 
-void pipeline::init(const char *vert_path, const char *frag_path)
+void pipeline::init(const char *vert_path, const char *frag_path, const config_info &config) const
 {
     const std::vector<char> vert = read_file(vert_path);
     const std::vector<char> frag = read_file(frag_path);
@@ -18,21 +20,6 @@ void pipeline::init(const char *vert_path, const char *frag_path)
     DBG_INFO("Vertex shader code size: {0}", vert.size())
     DBG_INFO("Fragment shader code size: {0}", frag.size())
 }
-
-class file_not_found_error : public std::runtime_error
-{
-  public:
-    explicit file_not_found_error(const char *path) : std::runtime_error(path), m_path(path)
-    {
-    }
-    const virtual char *what() const noexcept override
-    {
-        return m_path;
-    }
-
-  private:
-    const char *m_path;
-};
 
 std::vector<char> pipeline::read_file(const char *path)
 {

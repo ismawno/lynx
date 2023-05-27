@@ -18,6 +18,7 @@ class window
     std::uint32_t height() const;
 
     bool should_close() const;
+    void create_surface(VkInstance instance, VkSurfaceKHR *surface) const;
 
   private:
     std::uint32_t m_width, m_height;

@@ -1,5 +1,6 @@
-#include "lynx/window.hpp"
 #include "lynx/pch.hpp"
+#include "lynx/window.hpp"
+#include "lynx/exceptions.hpp"
 
 namespace lynx
 {
@@ -14,26 +15,20 @@ window::~window()
     glfwDestroyWindow(m_window);
 }
 
-class bad_glfw_init : public std::runtime_error
-{
-  public:
-    bad_glfw_init() : std::runtime_error("GLFW failed to initialize")
-    {
-    }
-    const virtual char *what() const noexcept override
-    {
-        return "GLFW failed to initialize";
-    }
-};
-
 void window::init()
 {
     if (glfwInit() != GLFW_TRUE)
-        throw bad_glfw_init();
+        throw bad_init("GLFW failed to initialize");
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     m_window = glfwCreateWindow((int)m_width, (int)m_height, m_name, nullptr, nullptr);
+}
+
+void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
+{
+    if (glfwCreateWindowSurface(instance, m_window, nullptr, surface) != VK_SUCCESS)
+        throw bad_init("GLFW failed to initialize");
 }
 
 std::uint32_t window::width() const
