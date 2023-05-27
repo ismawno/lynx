@@ -6,7 +6,7 @@ namespace lynx
 window::window(const std::uint32_t width, const std::uint32_t height, const char *name)
     : m_width(width), m_height(height), m_name(name)
 {
-    init_window();
+    init();
 }
 
 window::~window()
@@ -26,7 +26,7 @@ class bad_glfw_init : public std::runtime_error
     }
 };
 
-void window::init_window()
+void window::init()
 {
     if (glfwInit() != GLFW_TRUE)
         throw bad_glfw_init();

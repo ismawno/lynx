@@ -6,7 +6,7 @@ app::app(const std::uint32_t width, const std::uint32_t height, const char *name
 {
 }
 
-void app::run()
+void app::run() const
 {
     while (!m_window.should_close())
     {

@@ -37,6 +37,9 @@ kind "ConsoleApp"
 targetdir("bin/" .. outputdir)
 objdir("build/" .. outputdir)
 
+pchheader "lynx/pch.hpp"
+pchsource "src/pch.cpp"
+
 files {
    "src/**.cpp",
    "include/**.hpp"
@@ -44,6 +47,8 @@ files {
 
 includedirs {
    "include",
+   "%{wks.location}/debug-log-tools/include",
+   "%{wks.location}/vendor/spdlog/include",
    "%{wks.location}/vendor/glfw/include",
    "%{wks.location}/vendor/glm",
    "%{wks.location}/vendor/vulkan-sdk/macOS/include"

@@ -24,7 +24,7 @@ class window
     const char *m_name;
     GLFWwindow *m_window;
 
-    void init_window();
+    void init();
 
     window(const window &we) = delete;
     window &operator=(const window &) = delete;
