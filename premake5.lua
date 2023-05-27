@@ -2,6 +2,14 @@ project "lynx"
 language "C++"
 cppdialect "C++17"
 
+function script_path()
+   local str = debug.getinfo(2, "S").source:sub(2)
+   return str:match("(.*/)")
+end
+
+shaderpath = script_path() .. "shaders/"
+defines {'SHADER_PATH="' .. shaderpath .. '"'}
+
 filter "system:macosx"
    buildoptions {
       "-Wall",
@@ -19,7 +27,8 @@ filter "system:macosx"
       "CoreFoundation.framework",
       "vulkan"
    }
-   linkoptions "-Wl,-rpath,%{wks.location}/vendor/vulkan-sdk/macOS/lib"
+   rpath = "-Wl,-rpath,".. rootpath .."vendor/vulkan-sdk/macOS/lib"
+   linkoptions {rpath}
 filter {}
 
 staticruntime "off"

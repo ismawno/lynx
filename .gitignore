@@ -19,3 +19,6 @@
 **.xcodeproj
 *.sln
 **.vcxproj*
+
+# Compiled shaders
+*.spv
