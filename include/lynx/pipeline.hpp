@@ -11,6 +11,7 @@ class pipeline
   public:
     struct config_info
     {
+        static config_info default_config(std::uint32_t width, std::uint32_t height);
     };
 
     pipeline(const device &dev, const char *vert_path, const char *frag_path, const config_info &config);
@@ -19,7 +20,7 @@ class pipeline
     const device &m_device;
 
     void init(const char *vert_path, const char *frag_path, const config_info &config) const;
-    void create_shader_module(const std::vector<char> &code, VkShaderModule *shader_module);
+    void create_shader_module(const std::vector<char> &code, VkShaderModule *shader_module) const;
 
     static std::vector<char> read_file(const char *path);
 

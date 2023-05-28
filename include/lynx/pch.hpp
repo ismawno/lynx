@@ -6,10 +6,10 @@
 #include <cstddef>
 #include <cstring>
 #include <iostream>
-#include <set>
 #include <stdexcept>
 #include <unordered_set>
 #include <vector>
+#include <array>
 #include <vulkan/vulkan.hpp>
 #ifdef HAS_DEBUG_LOG_TOOLS
 #include "dbg/log.hpp"

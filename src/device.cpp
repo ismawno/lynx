@@ -81,9 +81,12 @@ void device::create_instance()
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     create_info.pApplicationInfo = &app_info;
 
-    auto extensions = required_extensions();
+    const std::vector<const char *> extensions = required_extensions();
     create_info.enabledExtensionCount = static_cast<std::uint32_t>(extensions.size());
     create_info.ppEnabledExtensionNames = extensions.data();
+#ifdef __arm64__
+    create_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
 
 #ifdef DEBUG
     create_info.enabledLayerCount = static_cast<std::uint32_t>(s_validation_layers.size());
@@ -110,7 +113,7 @@ void device::pick_physical_device()
     if (device_count == 0)
         throw device_error("Failed to find GPUs with Vulkan support!");
 
-    std::cout << "Device count: " << device_count << std::endl;
+    DBG_INFO("Device count: {0}", device_count)
     std::vector<VkPhysicalDevice> devices(device_count);
     vkEnumeratePhysicalDevices(m_instance, &device_count, devices.data());
 
@@ -133,7 +136,7 @@ void device::create_logical_device()
     const queue_family_indices indices = find_queue_families(m_physical_device);
 
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
-    const std::set<std::uint32_t> unique_queue_family = {indices.graphics_family, indices.present_family};
+    const std::unordered_set<std::uint32_t> unique_queue_family = {indices.graphics_family, indices.present_family};
 
     const float queue_priority = 1.0f;
     for (std::uint32_t queue_family : unique_queue_family)
@@ -235,6 +238,7 @@ void device::setup_debug_messenger()
 }
 #endif
 
+#ifdef DEBUG
 bool device::check_validation_layer_support() const
 {
     std::uint32_t layer_count;
@@ -260,6 +264,7 @@ bool device::check_validation_layer_support() const
 
     return true;
 }
+#endif
 
 std::vector<const char *> device::required_extensions() const
 {
@@ -271,6 +276,10 @@ std::vector<const char *> device::required_extensions() const
 
 #ifdef DEBUG
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+#ifdef __arm64__
+    extensions.insert(extensions.end(), {VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME,
+                                         "VK_KHR_get_physical_device_properties2"});
 #endif
 
     return extensions;
@@ -292,7 +301,7 @@ void device::has_gflw_required_instance_extensions() const
     }
 
     DBG_INFO("Required extensions:")
-    auto req_extensions = required_extensions();
+    const std::vector<const char *> req_extensions = required_extensions();
     for (const auto &required : req_extensions)
     {
         DBG_INFO("\t{0}", required)
@@ -309,7 +318,7 @@ bool device::check_device_extension_support(VkPhysicalDevice device) const
     std::vector<VkExtensionProperties> availableExtensions(extension_count);
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, availableExtensions.data());
 
-    std::set<std::string> req_extensions(s_device_extensions.begin(), s_device_extensions.end());
+    std::unordered_set<std::string> req_extensions(s_device_extensions.begin(), s_device_extensions.end());
 
     for (const auto &extension : availableExtensions)
         req_extensions.erase(extension.extensionName);

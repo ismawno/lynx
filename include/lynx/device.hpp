@@ -71,7 +71,9 @@ class device
 
     bool is_device_suitable(VkPhysicalDevice device) const;
     std::vector<const char *> required_extensions() const;
+#ifdef DEBUG
     bool check_validation_layer_support() const;
+#endif
     queue_family_indices find_queue_families(VkPhysicalDevice device) const;
     void populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT &createInfo) const;
     void has_gflw_required_instance_extensions() const;
@@ -92,8 +94,15 @@ class device
     VkQueue m_graphics_queue;
     VkQueue m_present_queue;
 
-    static inline const std::vector<const char *> s_validation_layers = {"VK_LAYER_KHRONOS_validation"};
-    static inline const std::vector<const char *> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+#ifdef DEBUG
+    static inline constexpr std::array<const char *const, 1> s_validation_layers = {"VK_LAYER_KHRONOS_validation"};
+#endif
+#ifdef __arm64__
+    static inline constexpr std::array<const char *const, 2> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                                                                                    "VK_KHR_portability_subset"};
+#else
+    static inline constexpr std::array<const char *const, 2> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+#endif
 
     device(const device &) = delete;
     void operator=(const device &) = delete;
