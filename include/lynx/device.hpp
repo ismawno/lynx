@@ -10,7 +10,7 @@ namespace lynx
 
 class device
 {
-  private:
+  public:
     struct swap_chain_support_details
     {
         VkSurfaceCapabilitiesKHR capabilities;
@@ -27,7 +27,6 @@ class device
         bool is_complete() const;
     };
 
-  public:
     explicit device(window &win);
     ~device();
 

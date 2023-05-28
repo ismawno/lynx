@@ -69,7 +69,7 @@ void device::create_instance()
 {
     DBG_ASSERT_ERROR(check_validation_layer_support(), "Validation layers requested, but not available!")
 
-    VkApplicationInfo app_info = {};
+    VkApplicationInfo app_info{};
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     app_info.pApplicationName = "LittleVulkanEngine App";
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -77,7 +77,7 @@ void device::create_instance()
     app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.apiVersion = VK_API_VERSION_1_0;
 
-    VkInstanceCreateInfo create_info = {};
+    VkInstanceCreateInfo create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     create_info.pApplicationInfo = &app_info;
 
@@ -141,7 +141,7 @@ void device::create_logical_device()
     const float queue_priority = 1.0f;
     for (std::uint32_t queue_family : unique_queue_family)
     {
-        VkDeviceQueueCreateInfo queueCreateInfo = {};
+        VkDeviceQueueCreateInfo queueCreateInfo{};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queueCreateInfo.queueFamilyIndex = queue_family;
         queueCreateInfo.queueCount = 1;
@@ -149,10 +149,10 @@ void device::create_logical_device()
         queue_create_infos.push_back(queueCreateInfo);
     }
 
-    VkPhysicalDeviceFeatures device_features = {};
+    VkPhysicalDeviceFeatures device_features{};
     device_features.samplerAnisotropy = VK_TRUE;
 
-    VkDeviceCreateInfo create_info = {};
+    VkDeviceCreateInfo create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
     create_info.queueCreateInfoCount = static_cast<std::uint32_t>(queue_create_infos.size());
@@ -182,7 +182,7 @@ void device::create_command_pool()
 {
     const queue_family_indices indices = find_physical_queue_families();
 
-    VkCommandPoolCreateInfo pool_info = {};
+    VkCommandPoolCreateInfo pool_info{};
     pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     pool_info.queueFamilyIndex = indices.graphics_family;
     pool_info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
