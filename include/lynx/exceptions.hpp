@@ -35,6 +35,26 @@ class bad_init : public std::runtime_error
     const char *m_message;
 };
 
+class bad_deinit : public std::runtime_error
+{
+  public:
+    explicit bad_deinit(const char *message);
+    const virtual char *what() const noexcept override;
+
+  private:
+    const char *m_message;
+};
+
+class draw_error : public std::runtime_error
+{
+  public:
+    explicit draw_error(const char *message);
+    const virtual char *what() const noexcept override;
+
+  private:
+    const char *m_message;
+};
+
 } // namespace lynx
 
 #endif

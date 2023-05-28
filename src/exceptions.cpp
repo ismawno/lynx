@@ -28,4 +28,20 @@ const char *bad_init::what() const noexcept
     return m_message;
 }
 
+bad_deinit::bad_deinit(const char *message) : std::runtime_error(message), m_message(message)
+{
+}
+const char *bad_deinit::what() const noexcept
+{
+    return m_message;
+}
+
+draw_error::draw_error(const char *message) : std::runtime_error(message), m_message(message)
+{
+}
+const char *draw_error::what() const noexcept
+{
+    return m_message;
+}
+
 } // namespace lynx
