@@ -4,6 +4,7 @@
 #include "lynx/pipeline.hpp"
 #include "lynx/window.hpp"
 #include "lynx/device.hpp"
+#include "lynx/swap_chain.hpp"
 
 #define LYNX_VERTEX_SHADER_PATH SHADER_PATH "shader.vert.spv"
 #define LYNX_FRAGMENT_SHADER_PATH SHADER_PATH "shader.frag.spv"
@@ -14,13 +15,26 @@ class app
 {
   public:
     app(std::uint32_t width = 800, std::uint32_t height = 600, const char *m_name = "Window");
+    ~app();
 
-    void run() const;
+    void run();
 
+  private:
     window m_window;
     device m_device{m_window};
-    pipeline m_pipeline{m_device, LYNX_VERTEX_SHADER_PATH, LYNX_FRAGMENT_SHADER_PATH,
-                        pipeline::config_info::default_config(800, 600)};
+    swap_chain m_swap_chain{m_device, m_window.extent()};
+    std::unique_ptr<pipeline> m_pipeline;
+
+    VkPipelineLayout m_pipeline_layout;
+    std::vector<VkCommandBuffer> m_command_buffers;
+
+    void create_pipeline_layout();
+    void create_pipeline();
+    void create_command_buffers();
+    void draw_frame();
+
+    app(const app &) = delete;
+    app &operator=(const app &) = delete;
 };
 } // namespace lynx
 

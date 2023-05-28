@@ -40,6 +40,11 @@ std::uint32_t window::height() const
     return m_height;
 }
 
+VkExtent2D window::extent() const
+{
+    return {m_width, m_height};
+}
+
 bool window::should_close() const
 {
     return glfwWindowShouldClose(m_window);

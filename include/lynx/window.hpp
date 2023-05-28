@@ -16,6 +16,7 @@ class window
 
     std::uint32_t width() const;
     std::uint32_t height() const;
+    VkExtent2D extent() const;
 
     bool should_close() const;
     void create_surface(VkInstance instance, VkSurfaceKHR *surface) const;
@@ -27,8 +28,11 @@ class window
 
     void init();
 
-    window(const window &we) = delete;
+    window(const window &) = delete;
     window &operator=(const window &) = delete;
+
+    window(window &&) = default;
+    window &operator=(window &&) = default;
 };
 } // namespace lynx
 
