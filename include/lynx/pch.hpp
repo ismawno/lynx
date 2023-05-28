@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include <vector>
 #include <array>
+#include <memory>
 #include <vulkan/vulkan.hpp>
 #ifdef HAS_DEBUG_LOG_TOOLS
 #include "dbg/log.hpp"
