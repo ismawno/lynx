@@ -12,8 +12,7 @@ class pipeline
     struct config_info
     {
         config_info() = default;
-        VkViewport viewport;
-        VkRect2D scissor;
+
         VkPipelineViewportStateCreateInfo viewport_info;
         VkPipelineInputAssemblyStateCreateInfo input_assembly_info;
         VkPipelineRasterizationStateCreateInfo rasterization_info;
@@ -21,10 +20,14 @@ class pipeline
         VkPipelineColorBlendAttachmentState color_blend_attachment;
         VkPipelineColorBlendStateCreateInfo color_blend_info;
         VkPipelineDepthStencilStateCreateInfo depth_stencil_info;
+
+        std::vector<VkDynamicState> dynamic_state_enables;
+        VkPipelineDynamicStateCreateInfo dynamic_state_info;
+
         VkPipelineLayout pipeline_layout = nullptr;
         VkRenderPass render_pass = nullptr;
         std::uint32_t subpass = 0;
-        static void default_config(std::uint32_t width, std::uint32_t height, config_info &config);
+        static void default_config(config_info &config);
 
         config_info(const config_info &) = delete;
         config_info &operator=(const config_info &) = delete;

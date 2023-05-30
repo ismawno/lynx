@@ -71,7 +71,7 @@ void pipeline::init(const char *vert_path, const char *frag_path, const config_i
     pipeline_info.pMultisampleState = &config.multisample_info;
     pipeline_info.pColorBlendState = &config.color_blend_info;
     pipeline_info.pDepthStencilState = &config.depth_stencil_info;
-    pipeline_info.pDynamicState = nullptr;
+    pipeline_info.pDynamicState = &config.dynamic_state_info;
 
     pipeline_info.layout = config.pipeline_layout;
     pipeline_info.renderPass = config.render_pass;
@@ -94,27 +94,17 @@ void pipeline::create_shader_module(const std::vector<char> &code, VkShaderModul
         throw bad_init("Failed to create shader module");
 }
 
-void pipeline::config_info::default_config(const std::uint32_t width, const std::uint32_t height, config_info &config)
+void pipeline::config_info::default_config(config_info &config)
 {
     config.input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     config.input_assembly_info.primitiveRestartEnable = VK_FALSE;
 
-    config.viewport.x = 0.0f;
-    config.viewport.y = 0.0f;
-    config.viewport.width = (float)width;
-    config.viewport.height = (float)height;
-    config.viewport.minDepth = 0.0f;
-    config.viewport.maxDepth = 1.0f;
-
-    config.scissor.offset = {0, 0};
-    config.scissor.extent = {width, height};
-
     config.viewport_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     config.viewport_info.viewportCount = 1;
-    config.viewport_info.pViewports = &config.viewport;
+    config.viewport_info.pViewports = nullptr;
     config.viewport_info.scissorCount = 1;
-    config.viewport_info.pScissors = &config.scissor;
+    config.viewport_info.pScissors = nullptr;
 
     config.rasterization_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     config.rasterization_info.depthClampEnable = VK_FALSE;
@@ -174,6 +164,11 @@ void pipeline::config_info::default_config(const std::uint32_t width, const std:
     config.depth_stencil_info.back = {};  // Optional
     config.depth_stencil_info.pNext = nullptr;
     config.depth_stencil_info.flags = 0;
+
+    config.dynamic_state_enables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+    config.dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    config.dynamic_state_info.pDynamicStates = config.dynamic_state_enables.data();
+    config.dynamic_state_info.dynamicStateCount = (std::uint32_t)config.dynamic_state_enables.size();
 }
 
 std::vector<char> pipeline::read_file(const char *path)

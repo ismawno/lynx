@@ -49,7 +49,7 @@ void app::create_pipeline_layout()
 void app::create_pipeline()
 {
     pipeline::config_info pip_config{};
-    pipeline::config_info::default_config(m_swap_chain->width(), m_swap_chain->height(), pip_config);
+    pipeline::config_info::default_config(pip_config);
     pip_config.render_pass = m_swap_chain->render_pass();
     pip_config.pipeline_layout = m_pipeline_layout;
     m_pipeline = std::make_unique<pipeline>(m_device, LYNX_VERTEX_SHADER_PATH, LYNX_FRAGMENT_SHADER_PATH, pip_config);
@@ -92,6 +92,21 @@ void app::record_command_buffer(const std::size_t image_index)
 
     vkCmdBeginRenderPass(m_command_buffers[image_index], &pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
+    VkViewport viewport;
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = (float)m_swap_chain->width();
+    viewport.height = (float)m_swap_chain->height();
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    VkRect2D scissor;
+    scissor.offset = {0, 0};
+    scissor.extent = {m_swap_chain->width(), m_swap_chain->height()};
+
+    vkCmdSetViewport(m_command_buffers[image_index], 0, 1, &viewport);
+    vkCmdSetScissor(m_command_buffers[image_index], 0, 1, &scissor);
+
     m_pipeline->bind(m_command_buffers[image_index]);
     m_model->bind(m_command_buffers[image_index]);
     m_model->draw(m_command_buffers[image_index]);
@@ -112,7 +127,7 @@ void app::create_swap_chain()
 
     vkDeviceWaitIdle(m_device.vulkan_device());
     m_swap_chain = std::make_unique<swap_chain>(m_device, extent);
-    create_pipeline();
+    create_pipeline(); // If render passes are not compatible
 }
 
 void app::draw_frame()
