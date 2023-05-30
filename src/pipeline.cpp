@@ -1,6 +1,7 @@
 #include "lynx/pch.hpp"
 #include "lynx/pipeline.hpp"
 #include "lynx/exceptions.hpp"
+#include "lynx/model.hpp"
 
 #include <fstream>
 
@@ -49,12 +50,15 @@ void pipeline::init(const char *vert_path, const char *frag_path, const config_i
     shader_stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     shader_stages[1].module = m_frag_shader_module;
 
+    const auto binding_description = model::vertex::binding_descriptions();
+    const auto attribute_description = model::vertex::attribute_descriptions();
+
     VkPipelineVertexInputStateCreateInfo vertex_input_info{};
     vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertex_input_info.vertexAttributeDescriptionCount = 0;
-    vertex_input_info.vertexBindingDescriptionCount = 0;
-    vertex_input_info.pVertexAttributeDescriptions = nullptr;
-    vertex_input_info.pVertexBindingDescriptions = nullptr;
+    vertex_input_info.vertexAttributeDescriptionCount = (std::uint32_t)attribute_description.size();
+    vertex_input_info.vertexBindingDescriptionCount = (std::uint32_t)binding_description.size();
+    vertex_input_info.pVertexAttributeDescriptions = attribute_description.data();
+    vertex_input_info.pVertexBindingDescriptions = binding_description.data();
 
     VkPipelineViewportStateCreateInfo viewport_info{};
     viewport_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;

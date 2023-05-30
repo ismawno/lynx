@@ -155,7 +155,7 @@ void swap_chain::init()
     if (vkCreateSwapchainKHR(m_device.vulkan_device(), &createInfo, nullptr, &m_swap_chain) != VK_SUCCESS)
         throw bad_init("Failed to create swap chain!");
 
-    // we only specified a minimum number of images in the swap chain, so the implementation is
+    // We only specified a minimum number of images in the swap chain, so the implementation is
     // allowed to create a swap chain with more. That's why we'll first query the final number of
     // images with vkGetSwapchainImagesKHR, then resize the container and finally call it again to
     // retrieve the handles.
@@ -172,18 +172,19 @@ void swap_chain::create_image_views()
     m_swap_chain_image_views.resize(m_swap_chain_images.size());
     for (std::size_t i = 0; i < m_swap_chain_images.size(); i++)
     {
-        VkImageViewCreateInfo viewInfo{};
-        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        viewInfo.image = m_swap_chain_images[i];
-        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        viewInfo.format = m_swap_chain_image_format;
-        viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        viewInfo.subresourceRange.baseMipLevel = 0;
-        viewInfo.subresourceRange.levelCount = 1;
-        viewInfo.subresourceRange.baseArrayLayer = 0;
-        viewInfo.subresourceRange.layerCount = 1;
+        VkImageViewCreateInfo view_info{};
+        view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        view_info.image = m_swap_chain_images[i];
+        view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        view_info.format = m_swap_chain_image_format;
+        view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        view_info.subresourceRange.baseMipLevel = 0;
+        view_info.subresourceRange.levelCount = 1;
+        view_info.subresourceRange.baseArrayLayer = 0;
+        view_info.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(m_device.vulkan_device(), &viewInfo, nullptr, &m_swap_chain_image_views[i]) != VK_SUCCESS)
+        if (vkCreateImageView(m_device.vulkan_device(), &view_info, nullptr, &m_swap_chain_image_views[i]) !=
+            VK_SUCCESS)
             throw bad_init("Failed to create texture image view!");
     }
 }
@@ -255,26 +256,24 @@ void swap_chain::create_frame_buffers()
     {
         std::array<VkImageView, 2> attachments = {m_swap_chain_image_views[i], m_depth_image_views[i]};
 
-        VkExtent2D swapChainExtent = m_extent;
-        VkFramebufferCreateInfo framebufferInfo{};
-        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = m_render_pass;
-        framebufferInfo.attachmentCount = static_cast<std::uint32_t>(attachments.size());
-        framebufferInfo.pAttachments = attachments.data();
-        framebufferInfo.width = swapChainExtent.width;
-        framebufferInfo.height = swapChainExtent.height;
-        framebufferInfo.layers = 1;
+        VkFramebufferCreateInfo frame_buffer_info{};
+        frame_buffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        frame_buffer_info.renderPass = m_render_pass;
+        frame_buffer_info.attachmentCount = static_cast<std::uint32_t>(attachments.size());
+        frame_buffer_info.pAttachments = attachments.data();
+        frame_buffer_info.width = m_extent.width;
+        frame_buffer_info.height = m_extent.height;
+        frame_buffer_info.layers = 1;
 
-        if (vkCreateFramebuffer(m_device.vulkan_device(), &framebufferInfo, nullptr, &m_swap_chain_frame_buffers[i]) !=
-            VK_SUCCESS)
+        if (vkCreateFramebuffer(m_device.vulkan_device(), &frame_buffer_info, nullptr,
+                                &m_swap_chain_frame_buffers[i]) != VK_SUCCESS)
             throw bad_init("Failed to create frame_buffer!");
     }
 }
 
 void swap_chain::create_depth_resources()
 {
-    VkFormat depthFormat = find_depth_format();
-    VkExtent2D swapChainExtent = m_extent;
+    VkFormat depth_format = find_depth_format();
 
     m_depth_images.resize(m_swap_chain_images.size());
     m_depth_image_memories.resize(m_swap_chain_images.size());
@@ -285,12 +284,12 @@ void swap_chain::create_depth_resources()
         VkImageCreateInfo image_info{};
         image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         image_info.imageType = VK_IMAGE_TYPE_2D;
-        image_info.extent.width = swapChainExtent.width;
-        image_info.extent.height = swapChainExtent.height;
+        image_info.extent.width = m_extent.width;
+        image_info.extent.height = m_extent.height;
         image_info.extent.depth = 1;
         image_info.mipLevels = 1;
         image_info.arrayLayers = 1;
-        image_info.format = depthFormat;
+        image_info.format = depth_format;
         image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
         image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         image_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
@@ -301,18 +300,18 @@ void swap_chain::create_depth_resources()
         m_device.create_image_with_info(image_info, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_depth_images[i],
                                         m_depth_image_memories[i]);
 
-        VkImageViewCreateInfo viewInfo{};
-        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        viewInfo.image = m_depth_images[i];
-        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        viewInfo.format = depthFormat;
-        viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-        viewInfo.subresourceRange.baseMipLevel = 0;
-        viewInfo.subresourceRange.levelCount = 1;
-        viewInfo.subresourceRange.baseArrayLayer = 0;
-        viewInfo.subresourceRange.layerCount = 1;
+        VkImageViewCreateInfo view_info{};
+        view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        view_info.image = m_depth_images[i];
+        view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        view_info.format = depth_format;
+        view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        view_info.subresourceRange.baseMipLevel = 0;
+        view_info.subresourceRange.levelCount = 1;
+        view_info.subresourceRange.baseArrayLayer = 0;
+        view_info.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(m_device.vulkan_device(), &viewInfo, nullptr, &m_depth_image_views[i]) != VK_SUCCESS)
+        if (vkCreateImageView(m_device.vulkan_device(), &view_info, nullptr, &m_depth_image_views[i]) != VK_SUCCESS)
             throw bad_init("Failed to create texture image view!");
     }
 }
@@ -324,28 +323,28 @@ void swap_chain::create_sync_objects()
     m_in_flight_fences.resize(MAX_FRAMES_IN_FLIGHT);
     m_images_in_flight.resize(m_swap_chain_images.size(), VK_NULL_HANDLE);
 
-    VkSemaphoreCreateInfo semaphoreInfo{};
-    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    VkSemaphoreCreateInfo semaphore_info{};
+    semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-    VkFenceCreateInfo fenceInfo{};
-    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+    VkFenceCreateInfo fence_info{};
+    fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     for (std::size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-        if (vkCreateSemaphore(m_device.vulkan_device(), &semaphoreInfo, nullptr, &m_image_available_semaphores[i]) !=
+        if (vkCreateSemaphore(m_device.vulkan_device(), &semaphore_info, nullptr, &m_image_available_semaphores[i]) !=
                 VK_SUCCESS ||
-            vkCreateSemaphore(m_device.vulkan_device(), &semaphoreInfo, nullptr, &m_render_finished_semaphores[i]) !=
+            vkCreateSemaphore(m_device.vulkan_device(), &semaphore_info, nullptr, &m_render_finished_semaphores[i]) !=
                 VK_SUCCESS ||
-            vkCreateFence(m_device.vulkan_device(), &fenceInfo, nullptr, &m_in_flight_fences[i]) != VK_SUCCESS)
+            vkCreateFence(m_device.vulkan_device(), &fence_info, nullptr, &m_in_flight_fences[i]) != VK_SUCCESS)
             throw bad_init("failed to create synchronization objects for a frame!");
 }
 
 VkSurfaceFormatKHR swap_chain::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR> &available_formats)
 {
-    for (const auto &availableFormat : available_formats)
-        if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
-            availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-            return availableFormat;
+    for (const auto &available_format : available_formats)
+        if (available_format.format == VK_FORMAT_B8G8R8A8_UNORM &&
+            available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+            return available_format;
 
     return available_formats[0];
 }
@@ -375,13 +374,13 @@ VkExtent2D swap_chain::choose_swap_extent(const VkSurfaceCapabilitiesKHR &capabi
     if (capabilities.currentExtent.width != std::numeric_limits<std::uint32_t>::max())
         return capabilities.currentExtent;
 
-    VkExtent2D actualExtent = m_window_extent;
-    actualExtent.width =
-        std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
-    actualExtent.height =
-        std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
+    VkExtent2D actual_extent = m_window_extent;
+    actual_extent.width =
+        std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actual_extent.width));
+    actual_extent.height = std::max(capabilities.minImageExtent.height,
+                                    std::min(capabilities.maxImageExtent.height, actual_extent.height));
 
-    return actualExtent;
+    return actual_extent;
 }
 
 VkFormat swap_chain::find_depth_format() const
@@ -426,7 +425,7 @@ std::uint32_t swap_chain::height() const
 
 float swap_chain::extent_aspect_ratio() const
 {
-    return static_cast<float>(m_extent.width) / static_cast<float>(m_extent.height);
+    return (float)m_extent.width / (float)m_extent.height;
 }
 
 } // namespace lynx

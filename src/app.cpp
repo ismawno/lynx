@@ -6,6 +6,7 @@ namespace lynx
 {
 app::app(const std::uint32_t width, const std::uint32_t height, const char *name) : m_window(width, height, name)
 {
+    load_models();
     create_pipeline_layout();
     create_pipeline();
     create_command_buffers();
@@ -24,6 +25,13 @@ void app::run()
         draw_frame();
     }
     vkDeviceWaitIdle(m_device.vulkan_device());
+}
+
+void app::load_models()
+{
+    const std::vector<model::vertex> vertices = {{{0.f, -0.2f}}, {{0.2f, 0.2f}}, {{-0.2f, 0.2f}},
+                                                 {{0.5f, 0.3f}}, {{0.7f, 0.7f}}, {{0.3f, 0.7f}}};
+    m_model = std::make_unique<model>(m_device, vertices);
 }
 
 void app::create_pipeline_layout()
@@ -82,8 +90,11 @@ void app::create_command_buffers()
         pass_info.pClearValues = clear_values.data();
 
         vkCmdBeginRenderPass(m_command_buffers[i], &pass_info, VK_SUBPASS_CONTENTS_INLINE);
+
         m_pipeline->bind(m_command_buffers[i]);
-        vkCmdDraw(m_command_buffers[i], 3, 1, 0, 0);
+        m_model->bind(m_command_buffers[i]);
+        m_model->draw(m_command_buffers[i]);
+
         vkCmdEndRenderPass(m_command_buffers[i]);
         if (vkEndCommandBuffer(m_command_buffers[i]) != VK_SUCCESS)
             throw bad_deinit("Failed to end command buffer");

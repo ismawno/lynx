@@ -125,7 +125,7 @@ void device::pick_physical_device()
         }
 
     if (m_physical_device == VK_NULL_HANDLE)
-        throw device_error("failed to find a suitable GPU!");
+        throw device_error("Failed to find a suitable GPU!");
 
     vkGetPhysicalDeviceProperties(m_physical_device, &m_properties);
     DBG_INFO("Physical device: {0}", m_properties.deviceName)
@@ -202,17 +202,17 @@ bool device::is_device_suitable(VkPhysicalDevice device) const
 
     const bool extensions_supported = check_device_extension_support(device);
 
-    bool swapChainAdequate = false;
+    bool swap_chain_adequate = false;
     if (extensions_supported)
     {
         swap_chain_support_details swap_chain_support = query_swap_chain_support(device);
-        swapChainAdequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
+        swap_chain_adequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
     }
 
-    VkPhysicalDeviceFeatures supportedFeatures;
-    vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+    VkPhysicalDeviceFeatures supported_features;
+    vkGetPhysicalDeviceFeatures(device, &supported_features);
 
-    return indices.is_complete() && extensions_supported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
+    return indices.is_complete() && extensions_supported && swap_chain_adequate && supported_features.samplerAnisotropy;
 }
 
 void device::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT &create_info) const
