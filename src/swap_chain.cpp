@@ -5,7 +5,8 @@
 namespace lynx
 {
 
-swap_chain::swap_chain(const device &dev, VkExtent2D extent) : m_device(dev), m_window_extent(extent)
+swap_chain::swap_chain(const device &dev, VkExtent2D extent, std::unique_ptr<swap_chain> old_swap_chain)
+    : m_device(dev), m_old_swap_chain(std::move(old_swap_chain)), m_window_extent(extent)
 {
     init();
     create_image_views();
@@ -13,6 +14,7 @@ swap_chain::swap_chain(const device &dev, VkExtent2D extent) : m_device(dev), m_
     create_depth_resources();
     create_frame_buffers();
     create_sync_objects();
+    m_old_swap_chain = nullptr;
 }
 
 swap_chain::~swap_chain()
@@ -150,7 +152,7 @@ void swap_chain::init()
     createInfo.presentMode = present_mode;
     createInfo.clipped = VK_TRUE;
 
-    createInfo.oldSwapchain = VK_NULL_HANDLE;
+    createInfo.oldSwapchain = m_old_swap_chain ? m_old_swap_chain->m_swap_chain : VK_NULL_HANDLE;
 
     if (vkCreateSwapchainKHR(m_device.vulkan_device(), &createInfo, nullptr, &m_swap_chain) != VK_SUCCESS)
         throw bad_init("Failed to create swap chain!");

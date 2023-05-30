@@ -48,6 +48,8 @@ void app::create_pipeline_layout()
 
 void app::create_pipeline()
 {
+    DBG_ASSERT_ERROR(m_swap_chain, "Cannot create pipeline before swap chain!")
+    DBG_ASSERT_ERROR(m_pipeline_layout, "Cannot create pipeline before pipeline layout!")
     pipeline::config_info pip_config{};
     pipeline::config_info::default_config(pip_config);
     pip_config.render_pass = m_swap_chain->render_pass();
@@ -67,6 +69,12 @@ void app::create_command_buffers()
 
     if (vkAllocateCommandBuffers(m_device.vulkan_device(), &alloc_info, m_command_buffers.data()) != VK_SUCCESS)
         throw bad_init("Failed to create command buffers");
+}
+
+void app::free_command_buffers()
+{
+    vkFreeCommandBuffers(m_device.vulkan_device(), m_device.command_pool(), (std::uint32_t)m_command_buffers.size(),
+                         m_command_buffers.data());
 }
 
 void app::record_command_buffer(const std::size_t image_index)
@@ -126,7 +134,13 @@ void app::create_swap_chain()
     }
 
     vkDeviceWaitIdle(m_device.vulkan_device());
-    m_swap_chain = std::make_unique<swap_chain>(m_device, extent);
+    const bool command_buffer_check_required = m_swap_chain != nullptr;
+    m_swap_chain = std::make_unique<swap_chain>(m_device, extent, std::move(m_swap_chain));
+    if (command_buffer_check_required && m_swap_chain->image_count() != m_command_buffers.size())
+    {
+        free_command_buffers();
+        create_command_buffers();
+    }
     create_pipeline(); // If render passes are not compatible
 }
 

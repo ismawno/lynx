@@ -23,9 +23,9 @@ class app
   private:
     window m_window;
     device m_device{m_window};
-    std::unique_ptr<swap_chain> m_swap_chain;
-    std::unique_ptr<pipeline> m_pipeline;
-    std::unique_ptr<model> m_model;
+    std::unique_ptr<swap_chain> m_swap_chain = nullptr;
+    std::unique_ptr<pipeline> m_pipeline = nullptr;
+    std::unique_ptr<model> m_model = nullptr;
 
     VkPipelineLayout m_pipeline_layout;
     std::vector<VkCommandBuffer> m_command_buffers;
@@ -37,6 +37,8 @@ class app
     void create_command_buffers();
     void draw_frame();
     void record_command_buffer(std::size_t image_index);
+
+    void free_command_buffers();
 
     app(const app &) = delete;
     app &operator=(const app &) = delete;
