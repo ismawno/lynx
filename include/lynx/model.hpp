@@ -6,6 +6,7 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
 namespace lynx
 {
@@ -15,6 +16,7 @@ class model
     struct vertex
     {
         glm::vec2 position;
+        glm::vec3 color;
 
         static std::vector<VkVertexInputBindingDescription> binding_descriptions();
         static std::vector<VkVertexInputAttributeDescription> attribute_descriptions();

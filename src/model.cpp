@@ -40,20 +40,12 @@ void model::draw(VkCommandBuffer command_buffer)
 
 std::vector<VkVertexInputBindingDescription> model::vertex::binding_descriptions()
 {
-    std::vector<VkVertexInputBindingDescription> binding_descriptions(1);
-    binding_descriptions[0].binding = 0;
-    binding_descriptions[0].stride = sizeof(vertex);
-    binding_descriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-    return binding_descriptions;
+    return {{0, sizeof(vertex), VK_VERTEX_INPUT_RATE_VERTEX}};
 }
 std::vector<VkVertexInputAttributeDescription> model::vertex::attribute_descriptions()
 {
-    std::vector<VkVertexInputAttributeDescription> attribute_descriptions(1);
-    attribute_descriptions[0].binding = 0;
-    attribute_descriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-    attribute_descriptions[0].location = 0;
-    attribute_descriptions[0].offset = 0;
-    return attribute_descriptions;
+    return {{0, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(vertex, position)},
+            {1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex, color)}};
 }
 
 } // namespace lynx

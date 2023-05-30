@@ -29,8 +29,8 @@ void app::run()
 
 void app::load_models()
 {
-    const std::vector<model::vertex> vertices = {{{0.f, -0.2f}}, {{0.2f, 0.2f}}, {{-0.2f, 0.2f}},
-                                                 {{0.5f, 0.3f}}, {{0.7f, 0.7f}}, {{0.3f, 0.7f}}};
+    const std::vector<model::vertex> vertices = {
+        {{0.f, -0.5f}, {1.f, 0.f, 0.f}}, {{0.5f, 0.5f}, {0.f, 1.f, 0.f}}, {{-0.5f, 0.5f}, {0.f, 0.f, 1.f}}};
     m_model = std::make_unique<model>(m_device, vertices);
 }
 

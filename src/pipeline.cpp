@@ -138,7 +138,7 @@ pipeline::config_info pipeline::config_info::default_config(const std::uint32_t 
     create_info.rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
     create_info.rasterization_info.lineWidth = 1.0f;
     create_info.rasterization_info.cullMode = VK_CULL_MODE_NONE;
-    create_info.rasterization_info.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    create_info.rasterization_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     create_info.rasterization_info.depthBiasEnable = VK_FALSE;
     create_info.rasterization_info.depthBiasConstantFactor = 0.0f; // Optional
     create_info.rasterization_info.depthBiasClamp = 0.0f;          // Optional
