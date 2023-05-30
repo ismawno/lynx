@@ -14,21 +14,20 @@ class pipeline
         config_info() = default;
         VkViewport viewport;
         VkRect2D scissor;
+        VkPipelineViewportStateCreateInfo viewport_info;
         VkPipelineInputAssemblyStateCreateInfo input_assembly_info;
         VkPipelineRasterizationStateCreateInfo rasterization_info;
         VkPipelineMultisampleStateCreateInfo multisample_info;
         VkPipelineColorBlendAttachmentState color_blend_attachment;
+        VkPipelineColorBlendStateCreateInfo color_blend_info;
         VkPipelineDepthStencilStateCreateInfo depth_stencil_info;
         VkPipelineLayout pipeline_layout = nullptr;
         VkRenderPass render_pass = nullptr;
         std::uint32_t subpass = 0;
-        static config_info default_config(std::uint32_t width, std::uint32_t height);
+        static void default_config(std::uint32_t width, std::uint32_t height, config_info &config);
 
         config_info(const config_info &) = delete;
         config_info &operator=(const config_info &) = delete;
-
-        config_info(config_info &&) = default;
-        config_info &operator=(config_info &&) = default;
     };
 
     pipeline(const device &dev, const char *vert_path, const char *frag_path, const config_info &config);

@@ -48,8 +48,8 @@ void app::create_pipeline_layout()
 
 void app::create_pipeline()
 {
-    pipeline::config_info pip_config =
-        pipeline::config_info::default_config(m_swap_chain->width(), m_swap_chain->height());
+    pipeline::config_info pip_config{};
+    pipeline::config_info::default_config(m_swap_chain->width(), m_swap_chain->height(), pip_config);
     pip_config.render_pass = m_swap_chain->render_pass();
     pip_config.pipeline_layout = m_pipeline_layout;
     m_pipeline = std::make_unique<pipeline>(m_device, LYNX_VERTEX_SHADER_PATH, LYNX_FRAGMENT_SHADER_PATH, pip_config);
