@@ -69,7 +69,7 @@ class swap_chain
     std::size_t m_current_frame = 0;
 
     swap_chain(const swap_chain &) = delete;
-    void operator=(const swap_chain &) = delete;
+    swap_chain &operator=(const swap_chain &) = delete;
 };
 
 } // namespace lynx

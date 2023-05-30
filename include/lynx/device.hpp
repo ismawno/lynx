@@ -104,7 +104,7 @@ class device
 #endif
 
     device(const device &) = delete;
-    void operator=(const device &) = delete;
+    device &operator=(const device &) = delete;
 
     device(device &&) = delete;
     device &operator=(device &&) = delete;

@@ -48,7 +48,7 @@ class pipeline
     static std::vector<char> read_file(const char *path);
 
     pipeline(const pipeline &) = delete;
-    void operator=(const pipeline &) = delete;
+    pipeline &operator=(const pipeline &) = delete;
 };
 } // namespace lynx
 
