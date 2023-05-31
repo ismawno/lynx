@@ -37,7 +37,7 @@ void app::load_models()
 {
     const std::vector<model::vertex> vertices = {
         {{0.f, -0.5f}, {1.f, 0.f, 0.f}}, {{0.5f, 0.5f}, {0.f, 1.f, 0.f}}, {{-0.5f, 0.5f}, {0.f, 0.f, 1.f}}};
-    m_model = std::make_unique<model>(m_device, vertices);
+    m_model = make_scope<model>(m_device, vertices);
 }
 
 void app::create_pipeline_layout()
@@ -65,7 +65,7 @@ void app::create_pipeline()
     pipeline::config_info::default_config(pip_config);
     pip_config.render_pass = m_swap_chain->render_pass();
     pip_config.pipeline_layout = m_pipeline_layout;
-    m_pipeline = std::make_unique<pipeline>(m_device, LYNX_VERTEX_SHADER_PATH, LYNX_FRAGMENT_SHADER_PATH, pip_config);
+    m_pipeline = make_scope<pipeline>(m_device, LYNX_VERTEX_SHADER_PATH, LYNX_FRAGMENT_SHADER_PATH, pip_config);
 }
 
 void app::create_command_buffers()
@@ -157,7 +157,7 @@ void app::create_swap_chain()
 
     vkDeviceWaitIdle(m_device.vulkan_device());
     const bool command_buffer_check_required = m_swap_chain != nullptr;
-    m_swap_chain = std::make_unique<swap_chain>(m_device, extent, std::move(m_swap_chain));
+    m_swap_chain = make_scope<swap_chain>(m_device, extent, std::move(m_swap_chain));
     if (command_buffer_check_required && m_swap_chain->image_count() != m_command_buffers.size())
     {
         free_command_buffers();

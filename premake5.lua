@@ -48,6 +48,7 @@ files {
 includedirs {
    "include",
    "%{wks.location}/debug-log-tools/include",
+   "%{wks.location}/allocators/include",
    "%{wks.location}/vendor/spdlog/include",
    "%{wks.location}/vendor/glfw/include",
    "%{wks.location}/vendor/glm",

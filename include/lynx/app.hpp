@@ -1,6 +1,7 @@
 #ifndef LYNX_APP_HPP
 #define LYNX_APP_HPP
 
+#include "lynx/core.hpp"
 #include "lynx/pipeline.hpp"
 #include "lynx/window.hpp"
 #include "lynx/device.hpp"
@@ -23,9 +24,9 @@ class app
   private:
     window m_window;
     device m_device{m_window};
-    std::unique_ptr<swap_chain> m_swap_chain = nullptr;
-    std::unique_ptr<pipeline> m_pipeline = nullptr;
-    std::unique_ptr<model> m_model = nullptr;
+    scope<swap_chain> m_swap_chain = nullptr;
+    scope<pipeline> m_pipeline = nullptr;
+    scope<model> m_model = nullptr;
 
     VkPipelineLayout m_pipeline_layout;
     std::vector<VkCommandBuffer> m_command_buffers;

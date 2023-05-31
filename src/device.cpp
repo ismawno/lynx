@@ -1,6 +1,7 @@
 #include "lynx/pch.hpp"
 #include "lynx/device.hpp"
 #include "lynx/exceptions.hpp"
+#include "lynx/core.hpp"
 
 namespace lynx
 {
@@ -114,7 +115,7 @@ void device::pick_physical_device()
         throw device_error("Failed to find GPUs with Vulkan support!");
 
     DBG_INFO("Device count: {0}", device_count)
-    std::vector<VkPhysicalDevice> devices(device_count);
+    stk_vector<VkPhysicalDevice> devices(device_count);
     vkEnumeratePhysicalDevices(m_instance, &device_count, devices.data());
 
     for (const auto &device : devices)
@@ -155,17 +156,17 @@ void device::create_logical_device()
     VkDeviceCreateInfo create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
-    create_info.queueCreateInfoCount = static_cast<std::uint32_t>(queue_create_infos.size());
+    create_info.queueCreateInfoCount = (std::uint32_t)queue_create_infos.size();
     create_info.pQueueCreateInfos = queue_create_infos.data();
 
     create_info.pEnabledFeatures = &device_features;
-    create_info.enabledExtensionCount = static_cast<std::uint32_t>(s_device_extensions.size());
+    create_info.enabledExtensionCount = (std::uint32_t)s_device_extensions.size();
     create_info.ppEnabledExtensionNames = s_device_extensions.data();
 
     // might not really be necessary anymore because device specific validation layers
     // have been deprecated
 #ifdef DEBUG
-    create_info.enabledLayerCount = static_cast<std::uint32_t>(s_validation_layers.size());
+    create_info.enabledLayerCount = (std::uint32_t)s_validation_layers.size();
     create_info.ppEnabledLayerNames = s_validation_layers.data();
 #else
     create_info.enabledLayerCount = 0;
@@ -244,7 +245,7 @@ bool device::check_validation_layer_support() const
     std::uint32_t layer_count;
     vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
 
-    std::vector<VkLayerProperties> available_layers(layer_count);
+    stk_vector<VkLayerProperties> available_layers(layer_count);
     vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
 
     for (const char *layer_name : s_validation_layers)
@@ -289,7 +290,7 @@ void device::has_gflw_required_instance_extensions() const
 {
     std::uint32_t extension_count = 0;
     vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, nullptr);
-    std::vector<VkExtensionProperties> extensions(extension_count);
+    stk_vector<VkExtensionProperties> extensions(extension_count);
     vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, extensions.data());
 
     DBG_INFO("Available extensions:")
@@ -315,7 +316,7 @@ bool device::check_device_extension_support(VkPhysicalDevice device) const
     std::uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, nullptr);
 
-    std::vector<VkExtensionProperties> availableExtensions(extension_count);
+    stk_vector<VkExtensionProperties> availableExtensions(extension_count);
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, availableExtensions.data());
 
     std::unordered_set<std::string> req_extensions(s_device_extensions.begin(), s_device_extensions.end());
@@ -333,7 +334,7 @@ device::queue_family_indices device::find_queue_families(VkPhysicalDevice device
     std::uint32_t queue_family_count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, nullptr);
 
-    std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
+    stk_vector<VkQueueFamilyProperties> queue_families(queue_family_count);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, queue_families.data());
 
     for (std::uint32_t i = 0; i < queue_families.size(); i++)

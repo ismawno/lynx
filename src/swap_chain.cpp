@@ -5,7 +5,7 @@
 namespace lynx
 {
 
-swap_chain::swap_chain(const device &dev, VkExtent2D extent, std::unique_ptr<swap_chain> old_swap_chain)
+swap_chain::swap_chain(const device &dev, VkExtent2D extent, scope<swap_chain> old_swap_chain)
     : m_device(dev), m_old_swap_chain(std::move(old_swap_chain)), m_window_extent(extent)
 {
     init();
