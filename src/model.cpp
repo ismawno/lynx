@@ -29,8 +29,8 @@ void model::create_vertex_buffers(const std::vector<vertex> &vertices)
 
 void model::bind(VkCommandBuffer command_buffer)
 {
-    std::array<VkBuffer, 1> buffers = {m_vertex_buffer};
-    std::array<VkDeviceSize, 1> offsets = {0};
+    const std::array<VkBuffer, 1> buffers = {m_vertex_buffer};
+    const std::array<VkDeviceSize, 1> offsets = {0};
     vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers.data(), offsets.data());
 }
 void model::draw(VkCommandBuffer command_buffer)

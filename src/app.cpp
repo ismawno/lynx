@@ -4,6 +4,12 @@
 
 namespace lynx
 {
+struct push_constant_data // Needs to be restructured
+{
+    glm::vec2 offset;
+    alignas(16) glm::vec3 color;
+};
+
 app::app(const std::uint32_t width, const std::uint32_t height, const char *name) : m_window(width, height, name)
 {
     load_models();
@@ -36,12 +42,17 @@ void app::load_models()
 
 void app::create_pipeline_layout()
 {
+    VkPushConstantRange push_constant_range{};
+    push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    push_constant_range.offset = 0;
+    push_constant_range.size = sizeof(push_constant_data);
+
     VkPipelineLayoutCreateInfo layout_info{};
     layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     layout_info.setLayoutCount = 0;
     layout_info.pSetLayouts = nullptr;
-    layout_info.pushConstantRangeCount = 0;
-    layout_info.pPushConstantRanges = nullptr;
+    layout_info.pushConstantRangeCount = 1;
+    layout_info.pPushConstantRanges = &push_constant_range;
     if (vkCreatePipelineLayout(m_device.vulkan_device(), &layout_info, nullptr, &m_pipeline_layout) != VK_SUCCESS)
         throw bad_init("Failed to create pipeline layout");
 }
@@ -79,6 +90,9 @@ void app::free_command_buffers()
 
 void app::record_command_buffer(const std::size_t image_index)
 {
+    static std::uint32_t frame = 0;
+    frame = (frame + 1) % 1000;
+
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     if (vkBeginCommandBuffer(m_command_buffers[image_index], &begin_info) != VK_SUCCESS)
@@ -92,7 +106,7 @@ void app::record_command_buffer(const std::size_t image_index)
     pass_info.renderArea.extent = m_swap_chain->extent();
 
     std::array<VkClearValue, 2> clear_values;
-    clear_values[0].color = {{0.1f, 0.1f, 0.1f, 1.f}};
+    clear_values[0].color = {{0.01f, 0.01f, 0.01f, 1.f}};
     clear_values[1].depthStencil = {1, 0};
 
     pass_info.clearValueCount = 2;
@@ -117,7 +131,15 @@ void app::record_command_buffer(const std::size_t image_index)
 
     m_pipeline->bind(m_command_buffers[image_index]);
     m_model->bind(m_command_buffers[image_index]);
-    m_model->draw(m_command_buffers[image_index]);
+
+    for (std::size_t i = 0; i < 4; i++)
+    {
+        const push_constant_data push_data{{-0.5f + frame * 0.0005f, -0.4f + i * 0.25f}, {0.f, 0.f, 0.2f + i * 0.2f}};
+        vkCmdPushConstants(m_command_buffers[image_index], m_pipeline_layout,
+                           VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(push_constant_data),
+                           &push_data);
+        m_model->draw(m_command_buffers[image_index]);
+    }
 
     vkCmdEndRenderPass(m_command_buffers[image_index]);
     if (vkEndCommandBuffer(m_command_buffers[image_index]) != VK_SUCCESS)
