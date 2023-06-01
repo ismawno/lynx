@@ -1,0 +1,43 @@
+#ifndef LYNX_RENDERER_HPP
+#define LYNX_RENDERER_HPP
+
+#include "lynx/core.hpp"
+#include <vulkan/vulkan.hpp>
+
+namespace lynx
+{
+class window;
+class device;
+class swap_chain;
+class renderer
+{
+  public:
+    renderer(const ref<const device> &dev, window &win);
+    ~renderer();
+
+    VkCommandBuffer begin_frame();
+    void end_frame();
+
+    void begin_swap_chain_render_pass(VkCommandBuffer command_buffer) const;
+    void end_swap_chain_render_pass(VkCommandBuffer command_buffer) const;
+
+    bool frame_in_progress() const;
+    VkCommandBuffer current_command_buffer() const;
+
+    VkRenderPass swap_chain_render_pass() const;
+
+  private:
+    window &m_window;
+    ref<const device> m_device;
+    scope<swap_chain> m_swap_chain;
+    std::vector<VkCommandBuffer> m_command_buffers;
+    std::uint32_t m_image_index;
+    bool m_frame_started = false;
+
+    void create_command_buffers();
+    void create_swap_chain();
+    void free_command_buffers();
+};
+} // namespace lynx
+
+#endif

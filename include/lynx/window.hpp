@@ -6,14 +6,13 @@
 #include <cstdint>
 
 #include "lynx/core.hpp"
-#include "lynx/pipeline.hpp"
-#include "lynx/window.hpp"
-#include "lynx/device.hpp"
-#include "lynx/swap_chain.hpp"
-#include "lynx/model.hpp"
 
 namespace lynx
 {
+class device;
+class pipeline;
+class model;
+class renderer;
 class window
 {
   public:
@@ -29,32 +28,30 @@ class window
     void create_surface(VkInstance instance, VkSurfaceKHR *surface) const;
 
     void poll_events();
-    void display();
+    bool display();
+
+    bool was_resized() const;
+    void complete_resize();
 
   private:
     std::uint32_t m_width, m_height;
     const char *m_name;
     GLFWwindow *m_window;
-    ref<const device> m_device = nullptr;
-    scope<swap_chain> m_swap_chain = nullptr;
-    scope<pipeline> m_pipeline = nullptr;
-    scope<model> m_model = nullptr;
+
+    ref<const device> m_device;
+    scope<pipeline> m_pipeline;
+    scope<model> m_model;
+    scope<renderer> m_renderer;
+
+    VkPipelineLayout m_pipeline_layout;
 
     bool m_frame_buffer_resized = false;
 
     void init();
 
-    VkPipelineLayout m_pipeline_layout;
-    std::vector<VkCommandBuffer> m_command_buffers;
-
     void load_models();
     void create_pipeline_layout();
-    void create_swap_chain();
     void create_pipeline();
-    void create_command_buffers();
-    void record_command_buffer(std::size_t image_index);
-
-    void free_command_buffers();
 
     static void frame_buffer_resize_callback(GLFWwindow *gwindow, int width, int height);
 
