@@ -21,6 +21,7 @@ filter "system:macosx"
 
    libdirs "%{wks.location}/vendor/vulkan-sdk/macOS/lib"
    links {
+      "shapes-2D",
       "glfw",
       "Cocoa.framework",
       "IOKit.framework",
@@ -47,6 +48,7 @@ files {
 
 includedirs {
    "include",
+   "%{wks.location}/shapes-2D/include",
    "%{wks.location}/debug-log-tools/include",
    "%{wks.location}/allocators/include",
    "%{wks.location}/vendor/spdlog/include",

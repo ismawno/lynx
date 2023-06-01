@@ -7,8 +7,9 @@
 
 namespace lynx
 {
-struct push_constant_data // Needs to be restructured
+struct push_constant_data2D // Needs to be restructured
 {
+    glm::mat2 transform{1.f};
     glm::vec2 offset;
     alignas(16) glm::vec3 color;
 };
@@ -60,7 +61,7 @@ void window::create_pipeline_layout()
     VkPushConstantRange push_constant_range{};
     push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     push_constant_range.offset = 0;
-    push_constant_range.size = sizeof(push_constant_data);
+    push_constant_range.size = sizeof(push_constant_data2D);
 
     VkPipelineLayoutCreateInfo layout_info{};
     layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -149,9 +150,12 @@ void window::record_command_buffer(const std::size_t image_index)
 
     for (std::size_t i = 0; i < 4; i++)
     {
-        const push_constant_data push_data{{-0.5f + frame * 0.0005f, -0.4f + i * 0.25f}, {0.f, 0.f, 0.2f + i * 0.2f}};
+        push_constant_data2D push_data{};
+        push_data.offset = {-0.5f + frame * 0.0005f, -0.4f + i * 0.25f};
+        push_data.color = {0.f, 0.f, 0.2f + i * 0.2f};
+
         vkCmdPushConstants(m_command_buffers[image_index], m_pipeline_layout,
-                           VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(push_constant_data),
+                           VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(push_constant_data2D),
                            &push_data);
         m_model->draw(m_command_buffers[image_index]);
     }
