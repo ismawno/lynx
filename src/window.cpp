@@ -82,6 +82,11 @@ void window::complete_resize()
     m_frame_buffer_resized = false;
 }
 
+const ref<const device> &window::gpu() const
+{
+    return m_device;
+}
+
 std::uint32_t window::width() const
 {
     return m_width;

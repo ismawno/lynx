@@ -407,7 +407,7 @@ std::uint32_t device::find_memory_type(std::uint32_t typeFilter, VkMemoryPropert
         if ((typeFilter & (1 << i)) && (mem_properties.memoryTypes[i].propertyFlags & properties) == properties)
             return i;
 
-    throw device_error("failed to find suitable memory type!");
+    throw device_error("Failed to find suitable memory type!");
 }
 
 void device::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
@@ -420,7 +420,7 @@ void device::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemory
     buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     if (vkCreateBuffer(m_device, &buffer_info, nullptr, &buffer) != VK_SUCCESS)
-        throw device_error("failed to create vertex buffer!");
+        throw device_error("Failed to create vertex buffer!");
 
     VkMemoryRequirements mem_reqs;
     vkGetBufferMemoryRequirements(m_device, buffer, &mem_reqs);
@@ -431,7 +431,7 @@ void device::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemory
     alloc_info.memoryTypeIndex = find_memory_type(mem_reqs.memoryTypeBits, properties);
 
     if (vkAllocateMemory(m_device, &alloc_info, nullptr, &buffer_memory) != VK_SUCCESS)
-        throw device_error("failed to allocate vertex buffer memory!");
+        throw device_error("Failed to allocate vertex buffer memory!");
 
     vkBindBufferMemory(m_device, buffer, buffer_memory, 0);
 }
@@ -509,7 +509,7 @@ void device::create_image_with_info(const VkImageCreateInfo &image_info, VkMemor
                                     VkImage &image, VkDeviceMemory &image_memory) const
 {
     if (vkCreateImage(m_device, &image_info, nullptr, &image) != VK_SUCCESS)
-        throw device_error("failed to create image!");
+        throw device_error("Failed to create image!");
 
     VkMemoryRequirements mem_reqs;
     vkGetImageMemoryRequirements(m_device, image, &mem_reqs);
@@ -520,10 +520,10 @@ void device::create_image_with_info(const VkImageCreateInfo &image_info, VkMemor
     alloc_info.memoryTypeIndex = find_memory_type(mem_reqs.memoryTypeBits, properties);
 
     if (vkAllocateMemory(m_device, &alloc_info, nullptr, &image_memory) != VK_SUCCESS)
-        throw device_error("failed to allocate image memory!");
+        throw device_error("Failed to allocate image memory!");
 
     if (vkBindImageMemory(m_device, image, image_memory, 0) != VK_SUCCESS)
-        throw device_error("failed to bind image memory!");
+        throw device_error("Failed to bind image memory!");
 }
 
 VkCommandPool device::command_pool() const

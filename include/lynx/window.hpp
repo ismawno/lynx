@@ -33,6 +33,8 @@ class window
     bool was_resized() const;
     void complete_resize();
 
+    const ref<const device> &gpu() const;
+
   private:
     std::uint32_t m_width, m_height;
     const char *m_name;
