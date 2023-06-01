@@ -1,6 +1,7 @@
 #ifndef LYNX_PIPELINE_HPP
 #define LYNX_PIPELINE_HPP
 
+#include "lynx/core.hpp"
 #include "lynx/device.hpp"
 #include <vector>
 
@@ -33,13 +34,13 @@ class pipeline
         config_info &operator=(const config_info &) = delete;
     };
 
-    pipeline(const device &dev, const char *vert_path, const char *frag_path, const config_info &config);
+    pipeline(const ref<const device> &dev, const char *vert_path, const char *frag_path, const config_info &config);
     ~pipeline();
 
     void bind(VkCommandBuffer command_buffer) const;
 
   private:
-    const device &m_device;
+    ref<const device> m_device;
     VkPipeline m_graphics_pipeline;
     VkShaderModule m_vert_shader_module;
     VkShaderModule m_frag_shader_module;

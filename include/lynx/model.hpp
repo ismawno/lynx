@@ -2,6 +2,7 @@
 #define LYNX_MODEL_HPP
 
 #include "lynx/device.hpp"
+#include "lynx/core.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -22,14 +23,14 @@ class model
         static std::vector<VkVertexInputAttributeDescription> attribute_descriptions();
     };
 
-    model(const device &dev, const std::vector<vertex> &vertices);
+    model(const ref<const device> &dev, const std::vector<vertex> &vertices);
     ~model();
 
     void bind(VkCommandBuffer command_buffer);
     void draw(VkCommandBuffer command_buffer);
 
   private:
-    const device &m_device;
+    ref<const device> m_device;
     VkBuffer m_vertex_buffer;
     VkDeviceMemory m_vertex_buffer_memory;
     std::size_t m_vertex_count;

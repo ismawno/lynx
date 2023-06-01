@@ -8,7 +8,7 @@ function script_path()
 end
 
 shaderpath = script_path() .. "shaders/"
-defines {'SHADER_PATH="' .. shaderpath .. '"'}
+defines {'LYNX_SHADER_PATH="' .. shaderpath .. '"'}
 
 filter "system:macosx"
    buildoptions {

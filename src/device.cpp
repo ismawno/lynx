@@ -1,4 +1,5 @@
 #include "lynx/pch.hpp"
+#include "lynx/window.hpp"
 #include "lynx/device.hpp"
 #include "lynx/exceptions.hpp"
 #include "lynx/core.hpp"

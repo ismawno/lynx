@@ -43,6 +43,7 @@
 #endif
 
 #include <vector>
+#include <new>
 
 namespace lynx
 {

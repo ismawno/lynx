@@ -7,7 +7,8 @@
 
 namespace lynx
 {
-pipeline::pipeline(const device &dev, const char *vert_path, const char *frag_path, const config_info &config)
+pipeline::pipeline(const ref<const device> &dev, const char *vert_path, const char *frag_path,
+                   const config_info &config)
     : m_device(dev)
 {
     init(vert_path, frag_path, config);
@@ -15,9 +16,9 @@ pipeline::pipeline(const device &dev, const char *vert_path, const char *frag_pa
 
 pipeline::~pipeline()
 {
-    vkDestroyShaderModule(m_device.vulkan_device(), m_vert_shader_module, nullptr);
-    vkDestroyShaderModule(m_device.vulkan_device(), m_frag_shader_module, nullptr);
-    vkDestroyPipeline(m_device.vulkan_device(), m_graphics_pipeline, nullptr);
+    vkDestroyShaderModule(m_device->vulkan_device(), m_vert_shader_module, nullptr);
+    vkDestroyShaderModule(m_device->vulkan_device(), m_frag_shader_module, nullptr);
+    vkDestroyPipeline(m_device->vulkan_device(), m_graphics_pipeline, nullptr);
 }
 
 void pipeline::bind(VkCommandBuffer command_buffer) const
@@ -79,7 +80,7 @@ void pipeline::init(const char *vert_path, const char *frag_path, const config_i
 
     pipeline_info.basePipelineIndex = -1;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
-    if (vkCreateGraphicsPipelines(m_device.vulkan_device(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr,
+    if (vkCreateGraphicsPipelines(m_device->vulkan_device(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr,
                                   &m_graphics_pipeline) != VK_SUCCESS)
         throw bad_init("Failed to create graphics pipeline");
 }
@@ -90,7 +91,7 @@ void pipeline::create_shader_module(const std::vector<char> &code, VkShaderModul
     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     create_info.codeSize = code.size();
     create_info.pCode = (const std::uint32_t *)code.data();
-    if (vkCreateShaderModule(m_device.vulkan_device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
+    if (vkCreateShaderModule(m_device->vulkan_device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
         throw bad_init("Failed to create shader module");
 }
 

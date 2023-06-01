@@ -1,15 +1,15 @@
 #pragma once
 
-#include "lynx/window.hpp"
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
 namespace lynx
 {
-
+class window;
 class device
 {
+
   public:
     struct swap_chain_support_details
     {
@@ -59,6 +59,20 @@ class device
     VkPhysicalDeviceProperties m_properties;
 
   private:
+    window &m_window;
+
+    VkInstance m_instance;
+#ifdef DEBUG
+    VkDebugUtilsMessengerEXT m_debug_messenger;
+#endif
+    VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
+    VkCommandPool m_command_pool;
+
+    VkDevice m_device;
+    VkSurfaceKHR m_surface;
+    VkQueue m_graphics_queue;
+    VkQueue m_present_queue;
+
     void create_instance();
 #ifdef DEBUG
     void setup_debug_messenger();
@@ -78,20 +92,6 @@ class device
     void has_gflw_required_instance_extensions() const;
     bool check_device_extension_support(VkPhysicalDevice device) const;
     swap_chain_support_details query_swap_chain_support(VkPhysicalDevice device) const;
-
-    window &m_window;
-
-    VkInstance m_instance;
-#ifdef DEBUG
-    VkDebugUtilsMessengerEXT m_debug_messenger;
-#endif
-    VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
-    VkCommandPool m_command_pool;
-
-    VkDevice m_device;
-    VkSurfaceKHR m_surface;
-    VkQueue m_graphics_queue;
-    VkQueue m_present_queue;
 
 #ifdef DEBUG
     static inline constexpr std::array<const char *const, 1> s_validation_layers = {"VK_LAYER_KHRONOS_validation"};
