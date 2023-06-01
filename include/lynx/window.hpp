@@ -4,13 +4,13 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <cstdint>
+#include <vulkan/vulkan.hpp>
 
 #include "lynx/core.hpp"
 
 namespace lynx
 {
 class device;
-class pipeline;
 class model;
 class renderer;
 class window
@@ -39,19 +39,14 @@ class window
     GLFWwindow *m_window;
 
     ref<const device> m_device;
-    scope<pipeline> m_pipeline;
     scope<model> m_model;
     scope<renderer> m_renderer;
-
-    VkPipelineLayout m_pipeline_layout;
 
     bool m_frame_buffer_resized = false;
 
     void init();
 
     void load_models();
-    void create_pipeline_layout();
-    void create_pipeline();
 
     static void frame_buffer_resize_callback(GLFWwindow *gwindow, int width, int height);
 

@@ -23,6 +23,7 @@ class renderer
 
     bool frame_in_progress() const;
     VkCommandBuffer current_command_buffer() const;
+    std::uint32_t frame_index() const;
 
     VkRenderPass swap_chain_render_pass() const;
 
@@ -31,12 +32,17 @@ class renderer
     ref<const device> m_device;
     scope<swap_chain> m_swap_chain;
     std::vector<VkCommandBuffer> m_command_buffers;
+
     std::uint32_t m_image_index;
+    std::uint32_t m_frame_index = 0;
     bool m_frame_started = false;
 
     void create_command_buffers();
     void create_swap_chain();
     void free_command_buffers();
+
+    renderer(const renderer &) = delete;
+    renderer &operator=(const renderer &) = delete;
 };
 } // namespace lynx
 

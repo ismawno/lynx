@@ -8,6 +8,8 @@ namespace lynx
 swap_chain::swap_chain(const ref<const device> &dev, VkExtent2D extent, scope<swap_chain> old_swap_chain)
     : m_device(dev), m_old_swap_chain(std::move(old_swap_chain)), m_window_extent(extent)
 {
+    if (old_swap_chain && !compare_swap_formats(*old_swap_chain))
+        throw bad_init("Swap chain image (or depth) has changed!");
     init();
     create_image_views();
     create_render_pass();
@@ -104,6 +106,12 @@ VkResult swap_chain::submit_command_buffers(const VkCommandBuffer *buffers, std:
     m_current_frame = (m_current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 
     return result;
+}
+
+bool swap_chain::compare_swap_formats(const swap_chain &swpc) const
+{
+    return m_swap_chain_depth_format == swpc.m_swap_chain_depth_format &&
+           m_swap_chain_image_format == swpc.m_swap_chain_image_format;
 }
 
 void swap_chain::init()
@@ -275,7 +283,7 @@ void swap_chain::create_frame_buffers()
 
 void swap_chain::create_depth_resources()
 {
-    VkFormat depth_format = find_depth_format();
+    m_swap_chain_depth_format = find_depth_format();
 
     m_depth_images.resize(m_swap_chain_images.size());
     m_depth_image_memories.resize(m_swap_chain_images.size());
@@ -291,7 +299,7 @@ void swap_chain::create_depth_resources()
         image_info.extent.depth = 1;
         image_info.mipLevels = 1;
         image_info.arrayLayers = 1;
-        image_info.format = depth_format;
+        image_info.format = m_swap_chain_depth_format;
         image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
         image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         image_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
@@ -306,7 +314,7 @@ void swap_chain::create_depth_resources()
         view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         view_info.image = m_depth_images[i];
         view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        view_info.format = depth_format;
+        view_info.format = m_swap_chain_depth_format;
         view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
         view_info.subresourceRange.baseMipLevel = 0;
         view_info.subresourceRange.levelCount = 1;

@@ -42,11 +42,14 @@ class swap_chain
     void create_frame_buffers();
     void create_sync_objects();
 
+    bool compare_swap_formats(const swap_chain &swpc) const;
+
     VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR> &available_formats);
     VkPresentModeKHR choose_swap_present_mode(const std::vector<VkPresentModeKHR> &available_present_modes);
     VkExtent2D choose_swap_extent(const VkSurfaceCapabilitiesKHR &capabilities);
 
     VkFormat m_swap_chain_image_format;
+    VkFormat m_swap_chain_depth_format;
     VkExtent2D m_extent;
 
     std::vector<VkFramebuffer> m_swap_chain_frame_buffers;

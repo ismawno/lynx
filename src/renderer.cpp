@@ -25,7 +25,13 @@ bool renderer::frame_in_progress() const
 VkCommandBuffer renderer::current_command_buffer() const
 {
     DBG_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve command buffer")
-    return m_command_buffers[m_image_index];
+    return m_command_buffers[m_frame_index];
+}
+
+std::uint32_t renderer::frame_index() const
+{
+    DBG_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve frame index")
+    return m_frame_index;
 }
 
 VkRenderPass renderer::swap_chain_render_pass() const
@@ -43,19 +49,13 @@ void renderer::create_swap_chain()
     }
 
     vkDeviceWaitIdle(m_device->vulkan_device());
-    const bool command_buffer_check_required = m_swap_chain != nullptr;
     m_swap_chain = make_scope<swap_chain>(m_device, ext, std::move(m_swap_chain));
-    if (command_buffer_check_required && m_swap_chain->image_count() != m_command_buffers.size())
-    {
-        free_command_buffers();
-        create_command_buffers();
-    }
     // create_pipeline(); // If render passes are not compatible
 }
 
 void renderer::create_command_buffers()
 {
-    m_command_buffers.resize(m_swap_chain->image_count());
+    m_command_buffers.resize(swap_chain::MAX_FRAMES_IN_FLIGHT);
 
     VkCommandBufferAllocateInfo alloc_info{};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -89,17 +89,17 @@ VkCommandBuffer renderer::begin_frame()
     m_frame_started = true;
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    if (vkBeginCommandBuffer(m_command_buffers[m_image_index], &begin_info) != VK_SUCCESS)
+    if (vkBeginCommandBuffer(m_command_buffers[m_frame_index], &begin_info) != VK_SUCCESS)
         throw bad_init("Failed to begin command buffer");
-    return m_command_buffers[m_image_index];
+    return m_command_buffers[m_frame_index];
 }
 void renderer::end_frame()
 {
     DBG_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
-    if (vkEndCommandBuffer(m_command_buffers[m_image_index]) != VK_SUCCESS)
+    if (vkEndCommandBuffer(m_command_buffers[m_frame_index]) != VK_SUCCESS)
         throw bad_deinit("Failed to end command buffer");
 
-    const VkResult result = m_swap_chain->submit_command_buffers(&m_command_buffers[m_image_index], &m_image_index);
+    const VkResult result = m_swap_chain->submit_command_buffers(&m_command_buffers[m_frame_index], &m_image_index);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.was_resized())
     {
         create_swap_chain();
@@ -108,12 +108,13 @@ void renderer::end_frame()
     else if (result != VK_SUCCESS)
         throw draw_error("Failed to submit command buffers");
     m_frame_started = false;
+    m_frame_index = (m_frame_index + 1) % swap_chain::MAX_FRAMES_IN_FLIGHT;
 }
 
 void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer) const
 {
     DBG_ASSERT_ERROR(m_frame_started, "Cannot begin render pass if a frame is not in progress")
-    DBG_ASSERT_ERROR(m_command_buffers[m_image_index] == command_buffer,
+    DBG_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
                      "Cannot begin render pass with a command buffer from another frame")
 
     VkRenderPassBeginInfo pass_info{};
@@ -130,7 +131,7 @@ void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer) cons
     pass_info.clearValueCount = 2;
     pass_info.pClearValues = clear_values.data();
 
-    vkCmdBeginRenderPass(m_command_buffers[m_image_index], &pass_info, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(m_command_buffers[m_frame_index], &pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
     VkViewport viewport;
     viewport.x = 0.0f;
@@ -144,15 +145,15 @@ void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer) cons
     scissor.offset = {0, 0};
     scissor.extent = {m_swap_chain->width(), m_swap_chain->height()};
 
-    vkCmdSetViewport(m_command_buffers[m_image_index], 0, 1, &viewport);
-    vkCmdSetScissor(m_command_buffers[m_image_index], 0, 1, &scissor);
+    vkCmdSetViewport(m_command_buffers[m_frame_index], 0, 1, &viewport);
+    vkCmdSetScissor(m_command_buffers[m_frame_index], 0, 1, &scissor);
 }
 void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer) const
 {
     DBG_ASSERT_ERROR(m_frame_started, "Cannot end render pass if a frame is not in progress")
-    DBG_ASSERT_ERROR(m_command_buffers[m_image_index] == command_buffer,
+    DBG_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
                      "Cannot end render pass with a command buffer from another frame")
 
-    vkCmdEndRenderPass(m_command_buffers[m_image_index]);
+    vkCmdEndRenderPass(m_command_buffers[m_frame_index]);
 }
 } // namespace lynx
