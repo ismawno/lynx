@@ -61,7 +61,7 @@ void render_system::create_pipeline(const VkRenderPass render_pass)
 {
     DBG_ASSERT_ERROR(m_pipeline_layout, "Cannot create pipeline before pipeline layout!")
     pipeline::config_info pip_config{};
-    pipeline::config_info::default_config(pip_config);
+    pipeline_config(pip_config);
     pip_config.render_pass = render_pass;
     pip_config.pipeline_layout = m_pipeline_layout;
     m_pipeline = make_scope<pipeline>(m_device, VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH, pip_config);

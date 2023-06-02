@@ -8,14 +8,16 @@ namespace lynx
 {
 class device;
 class pipeline;
+class pipeline::config_info;
 class model;
 class render_system
 {
   public:
     render_system(const ref<const device> &dev, VkRenderPass render_pass);
-    ~render_system();
+    virtual ~render_system();
 
     void render(VkCommandBuffer command_buffer, const model &mdl) const;
+    virtual void pipeline_config(pipeline::config_info &config) const = 0;
 
   private:
     ref<const device> m_device;
