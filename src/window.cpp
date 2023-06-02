@@ -4,7 +4,7 @@
 #include "lynx/device.hpp"
 #include "lynx/renderer.hpp"
 #include "lynx/model.hpp"
-#include "lynx/render_system.hpp"
+#include "lynx/render_systems.hpp"
 
 namespace lynx
 {
@@ -56,7 +56,7 @@ void window::poll_events()
 
 bool window::display()
 {
-    static render_system system{m_device, m_renderer->swap_chain_render_pass()};
+    static line_render_system system{m_device, m_renderer->swap_chain_render_pass()};
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         m_renderer->begin_swap_chain_render_pass(command_buffer);

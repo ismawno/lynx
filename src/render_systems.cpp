@@ -1,5 +1,5 @@
 #include "lynx/pch.hpp"
-#include "lynx/render_system.hpp"
+#include "lynx/render_systems.hpp"
 #include "lynx/device.hpp"
 #include "lynx/pipeline.hpp"
 #include "lynx/exceptions.hpp"
@@ -17,10 +17,8 @@ struct push_constant_data2D
     alignas(16) glm::vec3 color{1.f};
 };
 
-render_system::render_system(const ref<const device> &dev, const VkRenderPass render_pass) : m_device(dev)
+render_system::render_system(const ref<const device> &dev) : m_device(dev)
 {
-    create_pipeline_layout();
-    create_pipeline(render_pass);
 }
 
 render_system::~render_system()
@@ -65,5 +63,17 @@ void render_system::create_pipeline(const VkRenderPass render_pass)
     pip_config.render_pass = render_pass;
     pip_config.pipeline_layout = m_pipeline_layout;
     m_pipeline = make_scope<pipeline>(m_device, VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH, pip_config);
+}
+
+line_render_system::line_render_system(const ref<const device> &dev, VkRenderPass render_pass) : render_system(dev)
+{
+    create_pipeline_layout();
+    create_pipeline(render_pass);
+}
+
+void line_render_system::pipeline_config(pipeline::config_info &config) const
+{
+    pipeline::config_info::default_config(config);
+    config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 }
 } // namespace lynx
