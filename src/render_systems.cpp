@@ -1,7 +1,6 @@
 #include "lynx/pch.hpp"
 #include "lynx/render_systems.hpp"
 #include "lynx/device.hpp"
-#include "lynx/pipeline.hpp"
 #include "lynx/exceptions.hpp"
 #include "lynx/model.hpp"
 
@@ -17,18 +16,23 @@ struct push_constant_data2D
     alignas(16) glm::vec3 color{1.f};
 };
 
-render_system::render_system(const ref<const device> &dev) : m_device(dev)
-{
-}
-
 render_system::~render_system()
 {
-    vkDestroyPipelineLayout(m_device->vulkan_device(), m_pipeline_layout, nullptr);
+    if (m_device)
+        vkDestroyPipelineLayout(m_device->vulkan_device(), m_pipeline_layout, nullptr);
+}
+
+void render_system::init(const ref<const device> &dev, VkRenderPass render_pass)
+{
+    m_device = dev;
+    create_pipeline_layout();
+    create_pipeline(render_pass);
 }
 
 // Hacer render2D aqui con model2D y render3D con model3D
 void render_system::render(const VkCommandBuffer command_buffer, const model &mdl) const
 {
+    DBG_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")
     m_pipeline->bind(command_buffer);
     push_constant_data2D push_data{};
     vkCmdPushConstants(command_buffer, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
@@ -65,15 +69,15 @@ void render_system::create_pipeline(const VkRenderPass render_pass)
     m_pipeline = make_scope<pipeline>(m_device, VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH, pip_config);
 }
 
-line_render_system::line_render_system(const ref<const device> &dev, VkRenderPass render_pass) : render_system(dev)
-{
-    create_pipeline_layout();
-    create_pipeline(render_pass);
-}
-
 void line_render_system::pipeline_config(pipeline::config_info &config) const
 {
     pipeline::config_info::default_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+}
+
+void line_strip_render_system::pipeline_config(pipeline::config_info &config) const
+{
+    pipeline::config_info::default_config(config);
+    config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
 }
 } // namespace lynx

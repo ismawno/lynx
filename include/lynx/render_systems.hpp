@@ -12,9 +12,9 @@ class model;
 class render_system
 {
   public:
-    render_system(const ref<const device> &dev);
     virtual ~render_system();
 
+    void init(const ref<const device> &dev, VkRenderPass render_pass);
     void render(VkCommandBuffer command_buffer, const model &mdl) const;
 
   protected:
@@ -31,10 +31,11 @@ class render_system
 
 class line_render_system : public render_system
 {
-  public:
-    line_render_system(const ref<const device> &dev, VkRenderPass render_pass);
+    void pipeline_config(pipeline::config_info &config) const override;
+};
 
-  private:
+class line_strip_render_system : public render_system
+{
     void pipeline_config(pipeline::config_info &config) const override;
 };
 } // namespace lynx

@@ -3,7 +3,6 @@
 #include "lynx/exceptions.hpp"
 #include "lynx/window.hpp"
 #include "lynx/device.hpp"
-#include "lynx/swap_chain.hpp"
 
 namespace lynx
 {
@@ -32,11 +31,6 @@ std::uint32_t renderer::frame_index() const
 {
     DBG_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve frame index")
     return m_frame_index;
-}
-
-VkRenderPass renderer::swap_chain_render_pass() const
-{
-    return m_swap_chain->render_pass();
 }
 
 void renderer::create_swap_chain()

@@ -36,7 +36,6 @@ void destroy_debug_utils_messenger_EXT(VkInstance m_instance, VkDebugUtilsMessen
 }
 #endif
 
-// class member functions
 device::device(window &window) : m_window{window}
 {
     create_instance();
