@@ -26,8 +26,8 @@ class model
     model(const ref<const device> &dev, const std::vector<vertex> &vertices);
     ~model();
 
-    void bind(VkCommandBuffer command_buffer);
-    void draw(VkCommandBuffer command_buffer);
+    void bind(VkCommandBuffer command_buffer) const;
+    void draw(VkCommandBuffer command_buffer) const;
 
   private:
     ref<const device> m_device;

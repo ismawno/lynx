@@ -3,6 +3,7 @@
 #include "lynx/device.hpp"
 #include "lynx/pipeline.hpp"
 #include "lynx/exceptions.hpp"
+#include "lynx/model.hpp"
 
 #define VERTEX_SHADER_PATH LYNX_SHADER_PATH "shader.vert.spv"
 #define FRAGMENT_SHADER_PATH LYNX_SHADER_PATH "shader.frag.spv"
@@ -12,8 +13,8 @@ namespace lynx
 struct push_constant_data2D
 {
     glm::mat2 transform{1.f};
-    glm::vec2 offset;
-    alignas(16) glm::vec3 color;
+    glm::vec2 offset{0.f};
+    alignas(16) glm::vec3 color{1.f};
 };
 
 render_system::render_system(const ref<const device> &dev, const VkRenderPass render_pass) : m_device(dev)
@@ -25,6 +26,18 @@ render_system::render_system(const ref<const device> &dev, const VkRenderPass re
 render_system::~render_system()
 {
     vkDestroyPipelineLayout(m_device->vulkan_device(), m_pipeline_layout, nullptr);
+}
+
+// Hacer render2D aqui con model2D y render3D con model3D
+void render_system::render(const VkCommandBuffer command_buffer, const model &mdl) const
+{
+    m_pipeline->bind(command_buffer);
+    push_constant_data2D push_data{};
+    vkCmdPushConstants(command_buffer, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
+                       sizeof(push_constant_data2D), &push_data);
+
+    mdl.bind(command_buffer);
+    mdl.draw(command_buffer);
 }
 
 void render_system::create_pipeline_layout()

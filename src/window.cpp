@@ -4,6 +4,7 @@
 #include "lynx/device.hpp"
 #include "lynx/renderer.hpp"
 #include "lynx/model.hpp"
+#include "lynx/render_system.hpp"
 
 namespace lynx
 {
@@ -44,7 +45,7 @@ void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
 void window::load_models()
 {
     const std::vector<model::vertex> vertices = {
-        {{0.f, -0.5f}, {1.f, 0.f, 0.f}}, {{0.5f, 0.5f}, {0.f, 1.f, 0.f}}, {{-0.5f, 0.5f}, {0.f, 0.f, 1.f}}};
+        {{0.f, -0.25f}, {1.f, 0.f, 0.f}}, {{0.25f, 0.25f}, {0.f, 1.f, 0.f}}, {{-0.25f, 0.25f}, {0.f, 0.f, 1.f}}};
     m_model = make_scope<model>(m_device, vertices);
 }
 
@@ -55,9 +56,11 @@ void window::poll_events()
 
 bool window::display()
 {
+    static render_system system{m_device, m_renderer->swap_chain_render_pass()};
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         m_renderer->begin_swap_chain_render_pass(command_buffer);
+        system.render(command_buffer, *m_model);
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
         return true;
