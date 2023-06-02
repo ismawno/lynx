@@ -34,13 +34,13 @@ class pipeline
         config_info &operator=(const config_info &) = delete;
     };
 
-    pipeline(const ref<const device> &dev, const char *vert_path, const char *frag_path, const config_info &config);
+    pipeline(const device &dev, const char *vert_path, const char *frag_path, const config_info &config);
     ~pipeline();
 
     void bind(VkCommandBuffer command_buffer) const;
 
   private:
-    ref<const device> m_device;
+    const device &m_device;
     VkPipeline m_graphics_pipeline;
     VkShaderModule m_vert_shader_module;
     VkShaderModule m_frag_shader_module;

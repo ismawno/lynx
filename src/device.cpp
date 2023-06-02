@@ -36,13 +36,13 @@ void destroy_debug_utils_messenger_EXT(VkInstance m_instance, VkDebugUtilsMessen
 }
 #endif
 
-device::device(window &window) : m_window{window}
+device::device(const window &win)
 {
     create_instance();
 #ifdef DEBUG
     setup_debug_messenger();
 #endif
-    create_surface();
+    win.create_surface(m_instance, &m_surface);
     pick_physical_device();
     create_logical_device();
     create_command_pool();
@@ -190,11 +190,6 @@ void device::create_command_pool()
 
     if (vkCreateCommandPool(m_device, &pool_info, nullptr, &m_command_pool) != VK_SUCCESS)
         throw device_error("Failed to create command pool");
-}
-
-void device::create_surface()
-{
-    m_window.create_surface(m_instance, &m_surface);
 }
 
 bool device::is_device_suitable(VkPhysicalDevice device) const

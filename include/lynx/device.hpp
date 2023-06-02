@@ -27,7 +27,7 @@ class device
         bool is_complete() const;
     };
 
-    explicit device(window &win);
+    explicit device(const window &win);
     ~device();
 
     VkCommandPool command_pool() const;
@@ -59,8 +59,6 @@ class device
     VkPhysicalDeviceProperties m_properties;
 
   private:
-    window &m_window;
-
     VkInstance m_instance;
 #ifdef DEBUG
     VkDebugUtilsMessengerEXT m_debug_messenger;
@@ -77,7 +75,6 @@ class device
 #ifdef DEBUG
     void setup_debug_messenger();
 #endif
-    void create_surface();
     void pick_physical_device();
     void create_logical_device();
     void create_command_pool();

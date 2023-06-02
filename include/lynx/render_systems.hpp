@@ -14,7 +14,7 @@ class render_system
   public:
     virtual ~render_system();
 
-    void init(const ref<const device> &dev, VkRenderPass render_pass);
+    void init(const device *dev, VkRenderPass render_pass);
     void render(VkCommandBuffer command_buffer, const model &mdl) const;
 
   protected:
@@ -22,7 +22,7 @@ class render_system
     void create_pipeline(VkRenderPass render_pass);
 
   private:
-    ref<const device> m_device;
+    const device *m_device = nullptr;
     scope<pipeline> m_pipeline;
     VkPipelineLayout m_pipeline_layout;
 

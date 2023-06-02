@@ -6,7 +6,7 @@
 
 namespace lynx
 {
-renderer::renderer(const ref<const device> &dev, window &win) : m_window(win), m_device(dev)
+renderer::renderer(const device &dev, window &win) : m_window(win), m_device(dev)
 {
     create_swap_chain();
     create_command_buffers();
@@ -42,7 +42,7 @@ void renderer::create_swap_chain()
         glfwWaitEvents();
     }
 
-    vkDeviceWaitIdle(m_device->vulkan_device());
+    vkDeviceWaitIdle(m_device.vulkan_device());
     m_swap_chain = make_scope<swap_chain>(m_device, ext, std::move(m_swap_chain));
     // create_pipeline(); // If render passes are not compatible
 }
@@ -54,16 +54,16 @@ void renderer::create_command_buffers()
     VkCommandBufferAllocateInfo alloc_info{};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    alloc_info.commandPool = m_device->command_pool();
+    alloc_info.commandPool = m_device.command_pool();
     alloc_info.commandBufferCount = (std::uint32_t)m_command_buffers.size();
 
-    if (vkAllocateCommandBuffers(m_device->vulkan_device(), &alloc_info, m_command_buffers.data()) != VK_SUCCESS)
+    if (vkAllocateCommandBuffers(m_device.vulkan_device(), &alloc_info, m_command_buffers.data()) != VK_SUCCESS)
         throw bad_init("Failed to create command buffers");
 }
 
 void renderer::free_command_buffers()
 {
-    vkFreeCommandBuffers(m_device->vulkan_device(), m_device->command_pool(), (std::uint32_t)m_command_buffers.size(),
+    vkFreeCommandBuffers(m_device.vulkan_device(), m_device.command_pool(), (std::uint32_t)m_command_buffers.size(),
                          m_command_buffers.data());
 }
 

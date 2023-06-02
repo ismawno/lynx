@@ -13,7 +13,7 @@ class device;
 class renderer
 {
   public:
-    renderer(const ref<const device> &dev, window &win);
+    renderer(const device &dev, window &win);
     ~renderer();
 
     VkCommandBuffer begin_frame();
@@ -37,7 +37,7 @@ class renderer
 
   private:
     window &m_window;
-    ref<const device> m_device;
+    const device &m_device;
     scope<swap_chain> m_swap_chain;
     std::vector<VkCommandBuffer> m_command_buffers;
     std::vector<ref<render_system>> m_render_systems;

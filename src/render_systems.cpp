@@ -22,7 +22,7 @@ render_system::~render_system()
         vkDestroyPipelineLayout(m_device->vulkan_device(), m_pipeline_layout, nullptr);
 }
 
-void render_system::init(const ref<const device> &dev, VkRenderPass render_pass)
+void render_system::init(const device *dev, VkRenderPass render_pass)
 {
     m_device = dev;
     create_pipeline_layout();
@@ -66,7 +66,7 @@ void render_system::create_pipeline(const VkRenderPass render_pass)
     pipeline_config(pip_config);
     pip_config.render_pass = render_pass;
     pip_config.pipeline_layout = m_pipeline_layout;
-    m_pipeline = make_scope<pipeline>(m_device, VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH, pip_config);
+    m_pipeline = make_scope<pipeline>(*m_device, VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH, pip_config);
 }
 
 void line_render_system::pipeline_config(pipeline::config_info &config) const

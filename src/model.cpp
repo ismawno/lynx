@@ -3,8 +3,7 @@
 
 namespace lynx
 {
-model::model(const ref<const device> &dev, const std::vector<vertex> &vertices)
-    : m_device(dev), m_vertex_count(vertices.size())
+model::model(const device &dev, const std::vector<vertex> &vertices) : m_device(dev), m_vertex_count(vertices.size())
 {
     DBG_ASSERT_ERROR(m_vertex_count >= 3, "Amount of vertices must be at least 3. Current amount: {0}", m_vertex_count)
     create_vertex_buffers(vertices);
@@ -12,20 +11,20 @@ model::model(const ref<const device> &dev, const std::vector<vertex> &vertices)
 
 model::~model()
 {
-    vkDestroyBuffer(m_device->vulkan_device(), m_vertex_buffer, nullptr);
-    vkFreeMemory(m_device->vulkan_device(), m_vertex_buffer_memory, nullptr);
+    vkDestroyBuffer(m_device.vulkan_device(), m_vertex_buffer, nullptr);
+    vkFreeMemory(m_device.vulkan_device(), m_vertex_buffer_memory, nullptr);
 }
 
 void model::create_vertex_buffers(const std::vector<vertex> &vertices)
 {
     VkDeviceSize buffer_size = sizeof(vertex) * m_vertex_count;
-    m_device->create_buffer(buffer_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_vertex_buffer,
-                            m_vertex_buffer_memory);
+    m_device.create_buffer(buffer_size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_vertex_buffer,
+                           m_vertex_buffer_memory);
     void *data;
-    vkMapMemory(m_device->vulkan_device(), m_vertex_buffer_memory, 0, buffer_size, 0, &data);
+    vkMapMemory(m_device.vulkan_device(), m_vertex_buffer_memory, 0, buffer_size, 0, &data);
     memcpy(data, vertices.data(), (std::size_t)buffer_size);
-    vkUnmapMemory(m_device->vulkan_device(), m_vertex_buffer_memory);
+    vkUnmapMemory(m_device.vulkan_device(), m_vertex_buffer_memory);
 }
 
 void model::bind(VkCommandBuffer command_buffer) const

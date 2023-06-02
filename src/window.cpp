@@ -1,10 +1,10 @@
 #include "lynx/pch.hpp"
 #include "lynx/window.hpp"
 #include "lynx/exceptions.hpp"
-#include "lynx/device.hpp"
 #include "lynx/renderer.hpp"
 #include "lynx/model.hpp"
 #include "lynx/render_systems.hpp"
+#include "lynx/device.hpp"
 
 namespace lynx
 {
@@ -32,8 +32,8 @@ void window::init()
     m_window = glfwCreateWindow((int)m_width, (int)m_height, m_name, nullptr, nullptr);
     glfwSetWindowUserPointer(m_window, this);
     glfwSetFramebufferSizeCallback(m_window, frame_buffer_resize_callback);
-    m_device = make_ref<device>(*this);
-    m_renderer = make_scope<renderer>(m_device, *this);
+    m_device = make_scope<device>(*this);
+    m_renderer = make_scope<renderer>(*m_device, *this);
 }
 
 void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
@@ -46,7 +46,7 @@ void window::load_models()
 {
     const std::vector<model::vertex> vertices = {
         {{0.f, -0.25f}, {1.f, 0.f, 0.f}}, {{0.25f, 0.25f}, {0.f, 1.f, 0.f}}, {{-0.25f, 0.25f}, {0.f, 0.f, 1.f}}};
-    m_model = make_scope<model>(m_device, vertices);
+    m_model = make_scope<model>(*m_device, vertices);
 }
 
 void window::poll_events()
@@ -56,11 +56,9 @@ void window::poll_events()
 
 bool window::display()
 {
-    static line_render_system system{m_device, m_renderer->swap_chain_render_pass()};
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         m_renderer->begin_swap_chain_render_pass(command_buffer);
-        system.render(command_buffer, *m_model);
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
         return true;
@@ -85,9 +83,9 @@ void window::complete_resize()
     m_frame_buffer_resized = false;
 }
 
-const ref<const device> &window::gpu() const
+const device &window::gpu() const
 {
-    return m_device;
+    return *m_device;
 }
 
 std::uint32_t window::width() const

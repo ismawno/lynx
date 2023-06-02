@@ -23,14 +23,14 @@ class model
         static std::vector<VkVertexInputAttributeDescription> attribute_descriptions();
     };
 
-    model(const ref<const device> &dev, const std::vector<vertex> &vertices);
+    model(const device &dev, const std::vector<vertex> &vertices);
     ~model();
 
     void bind(VkCommandBuffer command_buffer) const;
     void draw(VkCommandBuffer command_buffer) const;
 
   private:
-    ref<const device> m_device;
+    const device &m_device;
     VkBuffer m_vertex_buffer;
     VkDeviceMemory m_vertex_buffer_memory;
     std::size_t m_vertex_count;

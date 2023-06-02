@@ -10,8 +10,8 @@
 
 namespace lynx
 {
-class device;
 class model;
+class device;
 class renderer;
 class window
 {
@@ -33,14 +33,14 @@ class window
     bool was_resized() const;
     void complete_resize();
 
-    const ref<const device> &gpu() const;
+    const device &gpu() const;
 
   private:
     std::uint32_t m_width, m_height;
     const char *m_name;
     GLFWwindow *m_window;
 
-    ref<const device> m_device;
+    scope<const device> m_device;
     scope<model> m_model;
     scope<renderer> m_renderer;
 
