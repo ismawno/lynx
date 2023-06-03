@@ -66,7 +66,9 @@ void render_system::create_pipeline(const VkRenderPass render_pass)
     pipeline_config(pip_config);
     pip_config.render_pass = render_pass;
     pip_config.pipeline_layout = m_pipeline_layout;
-    m_pipeline = make_scope<pipeline>(*m_device, VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH, pip_config);
+    pip_config.vertex_shader_path = VERTEX_SHADER_PATH;
+    pip_config.fragment_shader_path = FRAGMENT_SHADER_PATH;
+    m_pipeline = make_scope<pipeline>(*m_device, pip_config);
 }
 
 void line_render_system::pipeline_config(pipeline::config_info &config) const

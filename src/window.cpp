@@ -44,7 +44,7 @@ void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
 
 void window::load_models()
 {
-    const std::vector<model::vertex2D> vertices = {
+    const std::vector<model2D::vertex> vertices = {
         {{0.f, -0.25f}, {1.f, 0.f, 0.f}}, {{0.25f, 0.25f}, {0.f, 1.f, 0.f}}, {{-0.25f, 0.25f}, {0.f, 0.f, 1.f}}};
     m_model = make_scope<model>(*m_device, vertices);
 }
@@ -56,9 +56,11 @@ void window::poll_events()
 
 bool window::display()
 {
+    static const auto &system = m_renderer->add_render_system<line_strip_render_system>();
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         m_renderer->begin_swap_chain_render_pass(command_buffer);
+        system.render(command_buffer, *m_model);
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
         return true;
