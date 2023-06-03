@@ -28,13 +28,18 @@ class pipeline
         VkPipelineLayout pipeline_layout = nullptr;
         VkRenderPass render_pass = nullptr;
         std::uint32_t subpass = 0;
+
+        const char *vertex_shader_path = nullptr;
+        const char *fragment_shader_path = nullptr;
+        bool is_2D = true;
+
         static void default_config(config_info &config);
 
         config_info(const config_info &) = delete;
         config_info &operator=(const config_info &) = delete;
     };
 
-    pipeline(const device &dev, const char *vert_path, const char *frag_path, const config_info &config);
+    pipeline(const device &dev, const config_info &config);
     ~pipeline();
 
     void bind(VkCommandBuffer command_buffer) const;
@@ -45,7 +50,7 @@ class pipeline
     VkShaderModule m_vert_shader_module;
     VkShaderModule m_frag_shader_module;
 
-    void init(const char *vert_path, const char *frag_path, const config_info &config);
+    void init(const config_info &config);
     void create_shader_module(const std::vector<char> &code, VkShaderModule *shader_module) const;
 
     static std::vector<char> read_file(const char *path);

@@ -7,10 +7,11 @@
 
 namespace lynx
 {
-pipeline::pipeline(const device &dev, const char *vert_path, const char *frag_path, const config_info &config)
-    : m_device(dev)
+pipeline::pipeline(const device &dev, const config_info &config) : m_device(dev)
 {
-    init(vert_path, frag_path, config);
+    DBG_ASSERT_CRITICAL(config.vertex_shader_path && config.fragment_shader_path,
+                        "Vertex and fragment shader paths must not be null pointers!")
+    init(config);
 }
 
 pipeline::~pipeline()
@@ -25,13 +26,13 @@ void pipeline::bind(VkCommandBuffer command_buffer) const
     vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphics_pipeline);
 }
 
-void pipeline::init(const char *vert_path, const char *frag_path, const config_info &config)
+void pipeline::init(const config_info &config)
 {
     DBG_ASSERT_ERROR(config.pipeline_layout, "Pipeline layout must be provided to create graphics pipeline!")
     DBG_ASSERT_ERROR(config.render_pass, "Render pass must be provided to create graphics pipeline!")
 
-    const std::vector<char> vert_code = read_file(vert_path);
-    const std::vector<char> frag_code = read_file(frag_path);
+    const std::vector<char> vert_code = read_file(config.vertex_shader_path);
+    const std::vector<char> frag_code = read_file(config.fragment_shader_path);
 
     create_shader_module(vert_code, &m_vert_shader_module);
     create_shader_module(frag_code, &m_frag_shader_module);
@@ -50,8 +51,10 @@ void pipeline::init(const char *vert_path, const char *frag_path, const config_i
     shader_stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     shader_stages[1].module = m_frag_shader_module;
 
-    const auto binding_description = model::vertex2D::binding_descriptions();
-    const auto attribute_description = model::vertex2D::attribute_descriptions();
+    const auto binding_description =
+        config.is_2D ? model2D::vertex::binding_descriptions() : model3D::vertex::binding_descriptions();
+    const auto attribute_description =
+        config.is_2D ? model2D::vertex::attribute_descriptions() : model3D::vertex::attribute_descriptions();
 
     VkPipelineVertexInputStateCreateInfo vertex_input_info{};
     vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
