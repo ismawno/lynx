@@ -4,8 +4,11 @@
 #include "lynx/exceptions.hpp"
 #include "lynx/model.hpp"
 
-#define VERTEX_SHADER_PATH LYNX_SHADER_PATH "shader.vert.spv"
-#define FRAGMENT_SHADER_PATH LYNX_SHADER_PATH "shader.frag.spv"
+#define VERTEX_SHADER_2D_PATH LYNX_SHADER_PATH "shader.vert.spv"
+#define FRAGMENT_SHADER_2D_PATH LYNX_SHADER_PATH "shader.frag.spv"
+
+#define VERTEX_SHADER_3D_PATH LYNX_SHADER_PATH "shader.vert.spv"
+#define FRAGMENT_SHADER_3D_PATH LYNX_SHADER_PATH "shader.frag.spv"
 
 namespace lynx
 {
@@ -13,7 +16,7 @@ struct push_constant_data2D
 {
     glm::mat2 transform{1.f};
     glm::vec2 offset{0.f};
-    alignas(16) glm::vec3 color{1.f};
+    alignas(16) glm::vec3 color{.2f};
 };
 
 render_system::~render_system()
@@ -66,20 +69,56 @@ void render_system::create_pipeline(const VkRenderPass render_pass)
     pipeline_config(pip_config);
     pip_config.render_pass = render_pass;
     pip_config.pipeline_layout = m_pipeline_layout;
-    pip_config.vertex_shader_path = VERTEX_SHADER_PATH;
-    pip_config.fragment_shader_path = FRAGMENT_SHADER_PATH;
     m_pipeline = make_scope<pipeline>(*m_device, pip_config);
 }
 
-void line_render_system::pipeline_config(pipeline::config_info &config) const
+void render_system2D::render(VkCommandBuffer command_buffer, const model2D &mdl) const
+{
+    render_system::render(command_buffer, mdl);
+}
+
+void render_system2D::pipeline_config(pipeline::config_info &config) const
 {
     pipeline::config_info::default_config(config);
+    config.vertex_shader_path = VERTEX_SHADER_2D_PATH;
+    config.fragment_shader_path = FRAGMENT_SHADER_2D_PATH;
+    config.is_2D = true;
+}
+
+void render_system3D::render(VkCommandBuffer command_buffer, const model3D &mdl) const
+{
+    render_system::render(command_buffer, mdl);
+}
+
+void render_system3D::pipeline_config(pipeline::config_info &config) const
+{
+    pipeline::config_info::default_config(config);
+    config.vertex_shader_path = VERTEX_SHADER_3D_PATH;
+    config.fragment_shader_path = FRAGMENT_SHADER_3D_PATH;
+    config.is_2D = false;
+}
+
+void line_render_system2D::pipeline_config(pipeline::config_info &config) const
+{
+    render_system2D::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 }
 
-void line_strip_render_system::pipeline_config(pipeline::config_info &config) const
+void line_strip_render_system2D::pipeline_config(pipeline::config_info &config) const
 {
-    pipeline::config_info::default_config(config);
+    render_system2D::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+}
+
+void triangle_render_system2D::pipeline_config(pipeline::config_info &config) const
+{
+    render_system2D::pipeline_config(config);
+    config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+}
+
+void triangle_strip_render_system2D::pipeline_config(pipeline::config_info &config) const
+{
+    render_system2D::pipeline_config(config);
+    config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
 }
 } // namespace lynx

@@ -26,12 +26,12 @@ class renderer
     VkCommandBuffer current_command_buffer() const;
     std::uint32_t frame_index() const;
 
-    template <typename T, class... Args> const T &add_render_system(Args &&...args)
+    template <typename T, class... Args> const T *add_render_system(Args &&...args)
     {
         static_assert(std::is_base_of<render_system, T>::value, "Type must inherit from render system!");
 
         auto system = make_scope<T>(std::forward<Args>(args)...);
-        const T &ref = *system;
+        const T *ref = system.get();
 
         system->init(&m_device, m_swap_chain->render_pass());
         m_render_systems.push_back(std::move(system));
