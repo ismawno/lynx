@@ -14,7 +14,7 @@ namespace lynx
 class model
 {
   public:
-    struct vertex
+    struct vertex2D
     {
         glm::vec2 position;
         glm::vec3 color;
@@ -23,7 +23,7 @@ class model
         static std::vector<VkVertexInputAttributeDescription> attribute_descriptions();
     };
 
-    model(const device &dev, const std::vector<vertex> &vertices);
+    model(const device &dev, const std::vector<vertex2D> &vertices);
     ~model();
 
     void bind(VkCommandBuffer command_buffer) const;
@@ -35,7 +35,7 @@ class model
     VkDeviceMemory m_vertex_buffer_memory;
     std::size_t m_vertex_count;
 
-    void create_vertex_buffers(const std::vector<vertex> &vertices);
+    void create_vertex_buffers(const std::vector<vertex2D> &vertices);
 
     model(const model &) = delete;
     void operator=(const model &) = delete;

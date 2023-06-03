@@ -44,7 +44,7 @@ void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
 
 void window::load_models()
 {
-    const std::vector<model::vertex> vertices = {
+    const std::vector<model::vertex2D> vertices = {
         {{0.f, -0.25f}, {1.f, 0.f, 0.f}}, {{0.25f, 0.25f}, {0.f, 1.f, 0.f}}, {{-0.25f, 0.25f}, {0.f, 0.f, 1.f}}};
     m_model = make_scope<model>(*m_device, vertices);
 }
