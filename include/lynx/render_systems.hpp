@@ -19,9 +19,10 @@ class render_system
     void init(const device *dev, VkRenderPass render_pass);
 
   protected:
-    void create_pipeline_layout();
-    void create_pipeline(VkRenderPass render_pass);
-    void render(VkCommandBuffer command_buffer, const model &mdl) const;
+    void create_pipeline_layout(const pipeline::config_info &config);
+    void create_pipeline(VkRenderPass render_pass, pipeline::config_info &config);
+
+    template <typename T> void render(VkCommandBuffer command_buffer, const model &mdl, const T &push_data) const;
 
   private:
     const device *m_device = nullptr;
