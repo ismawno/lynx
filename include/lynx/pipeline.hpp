@@ -31,8 +31,10 @@ class pipeline
 
         const char *vertex_shader_path = nullptr;
         const char *fragment_shader_path = nullptr;
+
+        std::vector<VkVertexInputBindingDescription> binding_descriptions;
+        std::vector<VkVertexInputAttributeDescription> attribute_descriptions;
         std::uint32_t constant_range_size = 0;
-        bool is_2D = true;
 
         static void default_config(config_info &config);
 

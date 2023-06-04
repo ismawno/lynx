@@ -2,28 +2,33 @@
 #include "lynx/render_systems.hpp"
 #include "lynx/device.hpp"
 #include "lynx/exceptions.hpp"
-#include "lynx/model.hpp"
 
-#define VERTEX_SHADER_2D_PATH LYNX_SHADER_PATH "shader.vert.spv"
-#define FRAGMENT_SHADER_2D_PATH LYNX_SHADER_PATH "shader.frag.spv"
+#define VERTEX_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.vert.spv"
+#define FRAGMENT_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.frag.spv"
 
-#define VERTEX_SHADER_3D_PATH LYNX_SHADER_PATH "shader.vert.spv"
-#define FRAGMENT_SHADER_3D_PATH LYNX_SHADER_PATH "shader.frag.spv"
+#define VERTEX_SHADER_3D_PATH LYNX_SHADER_PATH "bin/shader3D.vert.spv"
+#define FRAGMENT_SHADER_3D_PATH LYNX_SHADER_PATH "bin/shader3D.frag.spv"
 
 namespace lynx
 {
-struct push_constant_data2D
+struct push_constant_data
 {
-    glm::mat2 transform{1.f};
-    glm::vec2 offset{0.f};
+    glm::mat4 transform{1.f};
     alignas(16) glm::vec3 color{.2f};
 };
 
-struct push_constant_data3D
+struct transform2D
 {
-    glm::mat3 transform{1.f};
-    glm::vec3 offset{0.f};
-    alignas(16) glm::vec3 color{.2f};
+    glm::vec2 translation{0.f};
+    glm::vec2 scale{1.f};
+    float rotation = 0.f;
+    operator glm::mat3()
+    {
+        glm::mat3 transform = glm::translate(glm::mat3{1.f}, translation);
+        transform = glm::rotate(transform, rotation);
+        transform = glm::scale(transform, scale);
+        return transform;
+    }
 };
 
 render_system::~render_system()
@@ -35,23 +40,12 @@ render_system::~render_system()
 void render_system::init(const device *dev, VkRenderPass render_pass)
 {
     m_device = dev;
-    pipeline::config_info pip_config{};
-    pipeline_config(pip_config);
 
-    create_pipeline_layout(pip_config);
-    create_pipeline(render_pass, pip_config);
-}
+    pipeline::config_info config{};
+    pipeline_config(config);
 
-template <typename T>
-void render_system::render(const VkCommandBuffer command_buffer, const model &mdl, const T &push_data) const
-{
-    DBG_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")
-    m_pipeline->bind(command_buffer);
-    vkCmdPushConstants(command_buffer, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
-                       sizeof(T), &push_data);
-
-    mdl.bind(command_buffer);
-    mdl.draw(command_buffer);
+    create_pipeline_layout(config);
+    create_pipeline(render_pass, config);
 }
 
 void render_system::create_pipeline_layout(const pipeline::config_info &config)
@@ -73,45 +67,52 @@ void render_system::create_pipeline_layout(const pipeline::config_info &config)
 
 void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::config_info &config)
 {
-    DBG_ASSERT_ERROR(m_pipeline_layout, "Cannot create pipeline before pipeline layout!")
+    DBG_ASSERT_ERROR(m_pipeline_layout, "Cannot create pipeline before pipeline layout!");
+
     config.render_pass = render_pass;
     config.pipeline_layout = m_pipeline_layout;
     m_pipeline = make_scope<pipeline>(*m_device, config);
 }
 
+void render_system::pipeline_config(pipeline::config_info &config) const
+{
+    pipeline::config_info::default_config(config);
+    config.constant_range_size = sizeof(push_constant_data);
+}
+
 void render_system2D::render(VkCommandBuffer command_buffer, const model2D &mdl) const
 {
     static int frame = 0;
-    const float angle = frame++ / (20.f * (float)M_PI);
-    const float c = cosf(angle), s = sinf(angle);
-    push_constant_data2D push_data{};
-    push_data.transform = glm::mat2{{c, s}, {-s, c}};
-    push_data.offset = {0.4f, 0.f};
+    transform2D trans{};
+    // trans.rotation = frame++ / (20.f * (float)M_PI);
+
+    push_constant_data push_data{};
+    // push_data.transform = trans;
     render_system::render(command_buffer, mdl, push_data);
 }
 
 void render_system2D::pipeline_config(pipeline::config_info &config) const
 {
-    pipeline::config_info::default_config(config);
+    render_system::pipeline_config(config);
     config.vertex_shader_path = VERTEX_SHADER_2D_PATH;
     config.fragment_shader_path = FRAGMENT_SHADER_2D_PATH;
-    config.is_2D = true;
-    config.constant_range_size = sizeof(push_constant_data2D);
+    config.binding_descriptions = model2D::vertex::binding_descriptions();
+    config.attribute_descriptions = model2D::vertex::attribute_descriptions();
 }
 
 void render_system3D::render(VkCommandBuffer command_buffer, const model3D &mdl) const
 {
-    push_constant_data3D push_data{};
+    push_constant_data push_data{};
     render_system::render(command_buffer, mdl, push_data);
 }
 
 void render_system3D::pipeline_config(pipeline::config_info &config) const
 {
-    pipeline::config_info::default_config(config);
+    render_system::pipeline_config(config);
     config.vertex_shader_path = VERTEX_SHADER_3D_PATH;
     config.fragment_shader_path = FRAGMENT_SHADER_3D_PATH;
-    config.is_2D = false;
-    config.constant_range_size = sizeof(push_constant_data3D);
+    config.binding_descriptions = model3D::vertex::binding_descriptions();
+    config.attribute_descriptions = model3D::vertex::attribute_descriptions();
 }
 
 void line_render_system2D::pipeline_config(pipeline::config_info &config) const

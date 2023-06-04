@@ -51,17 +51,12 @@ void pipeline::init(const config_info &config)
     shader_stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     shader_stages[1].module = m_frag_shader_module;
 
-    const auto binding_description =
-        config.is_2D ? model2D::vertex::binding_descriptions() : model3D::vertex::binding_descriptions();
-    const auto attribute_description =
-        config.is_2D ? model2D::vertex::attribute_descriptions() : model3D::vertex::attribute_descriptions();
-
     VkPipelineVertexInputStateCreateInfo vertex_input_info{};
     vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertex_input_info.vertexAttributeDescriptionCount = (std::uint32_t)attribute_description.size();
-    vertex_input_info.vertexBindingDescriptionCount = (std::uint32_t)binding_description.size();
-    vertex_input_info.pVertexAttributeDescriptions = attribute_description.data();
-    vertex_input_info.pVertexBindingDescriptions = binding_description.data();
+    vertex_input_info.vertexAttributeDescriptionCount = (std::uint32_t)config.attribute_descriptions.size();
+    vertex_input_info.vertexBindingDescriptionCount = (std::uint32_t)config.binding_descriptions.size();
+    vertex_input_info.pVertexAttributeDescriptions = config.attribute_descriptions.data();
+    vertex_input_info.pVertexBindingDescriptions = config.binding_descriptions.data();
 
     VkGraphicsPipelineCreateInfo pipeline_info{};
     pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;

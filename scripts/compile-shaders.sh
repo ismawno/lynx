@@ -8,5 +8,8 @@ while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
 
-"$DIR/../../vendor/vulkan-sdk/macOS/bin/glslc" "$DIR/../shaders/shader.vert" -o "$DIR/../shaders/shader.vert.spv"
-"$DIR/../../vendor/vulkan-sdk/macOS/bin/glslc" "$DIR/../shaders/shader.frag" -o "$DIR/../shaders/shader.frag.spv"
+"$DIR/../../vendor/vulkan-sdk/macOS/bin/glslc" "$DIR/../shaders/shader2D.vert" -o "$DIR/../shaders/bin/shader2D.vert.spv"
+"$DIR/../../vendor/vulkan-sdk/macOS/bin/glslc" "$DIR/../shaders/shader2D.frag" -o "$DIR/../shaders/bin/shader2D.frag.spv"
+
+"$DIR/../../vendor/vulkan-sdk/macOS/bin/glslc" "$DIR/../shaders/shader3D.vert" -o "$DIR/../shaders/bin/shader3D.vert.spv"
+"$DIR/../../vendor/vulkan-sdk/macOS/bin/glslc" "$DIR/../shaders/shader3D.frag" -o "$DIR/../shaders/bin/shader3D.frag.spv"
