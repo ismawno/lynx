@@ -47,7 +47,6 @@ void window::poll_events()
 
 bool window::display()
 {
-
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         m_renderer->begin_swap_chain_render_pass(command_buffer);
