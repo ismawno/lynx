@@ -7,11 +7,13 @@
 namespace lynx
 {
 class device;
-
+struct vertex2D;
+struct vertex3D;
 class vertex_buffer
 {
   public:
-    template <typename T> vertex_buffer(const device &dev, const std::vector<T> &vertices);
+    vertex_buffer(const device &dev, const std::vector<vertex2D> &vertices);
+    vertex_buffer(const device &dev, const std::vector<vertex3D> &vertices);
     virtual ~vertex_buffer();
 
     void bind(VkCommandBuffer command_buffer) const;

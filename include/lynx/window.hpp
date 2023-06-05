@@ -1,17 +1,18 @@
 #ifndef LYNX_WINDOW_HPP
 #define LYNX_WINDOW_HPP
 
+#include "lynx/render_systems.hpp"
+#include "lynx/core.hpp"
+#include "lynx/renderer.hpp"
+#include "lynx/swap_chain.hpp"
+
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <vulkan/vulkan.hpp>
 
-#include "lynx/core.hpp"
-
 namespace lynx
 {
-class model2D;
-class model3D;
 class device;
 class renderer;
 class window
@@ -19,6 +20,22 @@ class window
   public:
     window(std::uint32_t width, std::uint32_t height, const char *name);
     ~window();
+
+    template <typename T, class... Args> T *add_render_system(Args &&...args)
+    {
+        static_assert(std::is_base_of<render_system2D, T>::value || std::is_base_of<render_system3D, T>::value,
+                      "Type must inherit from render_system2D or render_system3D!");
+
+        auto system = make_scope<T>(std::forward<Args>(args)...);
+        T *ref = system.get();
+
+        system->init(m_device.get(), m_renderer->swap_chain().render_pass());
+        if constexpr (std::is_base_of<render_system2D, T>::value)
+            m_render_systems2D.push_back(std::move(system));
+        else
+            m_render_systems3D.push_back(std::move(system));
+        return ref;
+    }
 
     std::uint32_t width() const;
     std::uint32_t height() const;
@@ -42,15 +59,13 @@ class window
     GLFWwindow *m_window;
 
     scope<const device> m_device;
-    scope<model2D> m_model2D;
-    scope<model3D> m_model3D;
     scope<renderer> m_renderer;
+    std::vector<scope<render_system2D>> m_render_systems2D;
+    std::vector<scope<render_system3D>> m_render_systems3D;
 
     bool m_frame_buffer_resized = false;
 
     void init();
-
-    void load_models();
 
     static void frame_buffer_resize_callback(GLFWwindow *gwindow, int width, int height);
 

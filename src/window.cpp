@@ -1,10 +1,9 @@
 #include "lynx/pch.hpp"
 #include "lynx/window.hpp"
 #include "lynx/exceptions.hpp"
-#include "lynx/renderer.hpp"
-#include "lynx/model.hpp"
 #include "lynx/render_systems.hpp"
 #include "lynx/device.hpp"
+#include "lynx/model.hpp"
 
 namespace lynx
 {
@@ -13,7 +12,6 @@ window::window(const std::uint32_t width, const std::uint32_t height, const char
     : m_width(width), m_height(height), m_name(name)
 {
     init();
-    load_models();
 }
 
 window::~window()
@@ -42,68 +40,6 @@ void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
         throw bad_init("GLFW failed to initialize");
 }
 
-void window::load_models()
-{
-    const std::vector<model2D::vertex> vertices2D = {{{0.f, -0.25f}, {1.f, 0.f, 0.f}},
-                                                     {{0.25f, 0.25f}, {0.f, 1.f, 0.f}},
-                                                     {{-0.25f, 0.25f}, {0.f, 0.f, 1.f}},
-                                                     {{0.f, 0.5f}, {1.f, 0.f, 0.f}}};
-    m_model2D = make_scope<model2D>(*m_device, vertices2D);
-
-    const std::vector<model3D::vertex> vertices3D = {
-
-        // left face (white)
-        {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-        {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
-        {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
-        {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-        {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
-        {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
-
-        // right face (yellow)
-        {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
-        {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
-        {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-        {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
-
-        // top face (orange, remember y axis points down)
-        {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-        {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-        {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-        {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-        {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-        {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-
-        // bottom face (red)
-        {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
-        {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
-        {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-        {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
-
-        // nose face (blue)
-        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-        {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-
-        // tail face (green)
-        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-        {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-
-    };
-    m_model3D = make_scope<model3D>(*m_device, vertices3D);
-}
-
 void window::poll_events()
 {
     glfwPollEvents();
@@ -111,13 +47,30 @@ void window::poll_events()
 
 bool window::display()
 {
-    static const auto &system = m_renderer->add_render_system<triangle_strip_render_system3D>();
+    static const auto system = add_render_system<triangle_strip_render_system3D>();
+    static int frame = 0;
+
+    model3D &mdl = system->push_model(model3D::cube());
+    mdl.transform.translation.z = 0.5f;
+    mdl.transform.scale = glm::vec3(0.5f);
+    mdl.transform.rotation.z = (float)frame / 25.f;
+    mdl.transform.rotation.y = 0.5f * (float)frame++ / 25.f;
+
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         m_renderer->begin_swap_chain_render_pass(command_buffer);
-        system->render(command_buffer, *m_model3D);
+        for (const auto &sys : m_render_systems2D)
+            sys->render(command_buffer);
+        for (const auto &sys : m_render_systems3D)
+            sys->render(command_buffer);
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
+
+        vkDeviceWaitIdle(m_device->vulkan_device());
+        for (const auto &sys : m_render_systems2D)
+            sys->clear_models();
+        for (const auto &sys : m_render_systems3D)
+            sys->clear_models();
         return true;
     }
     return false;

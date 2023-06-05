@@ -5,12 +5,15 @@
 
 namespace lynx
 {
-template <typename T> vertex_buffer::vertex_buffer(const device &dev, const std::vector<T> &vertices) : m_device(dev)
+vertex_buffer::vertex_buffer(const device &dev, const std::vector<vertex2D> &vertices) : m_device(dev)
 {
     create_vertex_buffers(vertices);
 }
-template vertex_buffer::vertex_buffer(const device &dev, const std::vector<model2D::vertex> &vertices);
-template vertex_buffer::vertex_buffer(const device &dev, const std::vector<model3D::vertex> &vertices);
+
+vertex_buffer::vertex_buffer(const device &dev, const std::vector<vertex3D> &vertices) : m_device(dev)
+{
+    create_vertex_buffers(vertices);
+}
 
 vertex_buffer::~vertex_buffer()
 {

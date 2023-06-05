@@ -9,14 +9,18 @@
 namespace lynx
 {
 class device;
+
 class render_system
 {
   public:
     virtual ~render_system();
 
     void init(const device *dev, VkRenderPass render_pass);
+    virtual void render(VkCommandBuffer command_buffer) const = 0;
 
   protected:
+    const device *m_device = nullptr;
+
     void create_pipeline_layout(const pipeline::config_info &config);
     void create_pipeline(VkRenderPass render_pass, pipeline::config_info &config);
 
@@ -34,7 +38,6 @@ class render_system
     virtual void pipeline_config(pipeline::config_info &config) const;
 
   private:
-    const device *m_device = nullptr;
     scope<pipeline> m_pipeline;
     VkPipelineLayout m_pipeline_layout;
 };
@@ -42,19 +45,31 @@ class render_system
 class render_system2D : public render_system
 {
   public:
-    void render(VkCommandBuffer command_buffer, const model2D &mdl) const;
+    model2D &push_model(const std::vector<vertex2D> &vertices);
+
+    void render(VkCommandBuffer command_buffer) const override;
+    void clear_models();
 
   protected:
     virtual void pipeline_config(pipeline::config_info &config) const override;
+
+  private:
+    std::vector<scope<model2D>> m_models;
 };
 
 class render_system3D : public render_system
 {
   public:
-    void render(VkCommandBuffer command_buffer, const model3D &mdl) const;
+    model3D &push_model(const std::vector<vertex3D> &vertices);
+
+    void render(VkCommandBuffer command_buffer) const override;
+    void clear_models();
 
   protected:
     virtual void pipeline_config(pipeline::config_info &config) const override;
+
+  private:
+    std::vector<scope<model3D>> m_models;
 };
 
 class line_render_system2D : public render_system2D

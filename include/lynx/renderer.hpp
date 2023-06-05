@@ -2,14 +2,13 @@
 #define LYNX_RENDERER_HPP
 
 #include "lynx/core.hpp"
-#include "lynx/render_systems.hpp"
-#include "lynx/swap_chain.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace lynx
 {
 class window;
 class device;
+class swap_chain;
 class renderer
 {
   public:
@@ -25,25 +24,13 @@ class renderer
     bool frame_in_progress() const;
     VkCommandBuffer current_command_buffer() const;
     std::uint32_t frame_index() const;
-
-    template <typename T, class... Args> const T *add_render_system(Args &&...args)
-    {
-        static_assert(std::is_base_of<render_system, T>::value, "Type must inherit from render system!");
-
-        auto system = make_scope<T>(std::forward<Args>(args)...);
-        const T *ref = system.get();
-
-        system->init(&m_device, m_swap_chain->render_pass());
-        m_render_systems.push_back(std::move(system));
-        return ref;
-    }
+    const swap_chain &swap_chain() const;
 
   private:
     window &m_window;
     const device &m_device;
-    scope<swap_chain> m_swap_chain;
+    scope<lynx::swap_chain> m_swap_chain;
     std::vector<VkCommandBuffer> m_command_buffers;
-    std::vector<scope<render_system>> m_render_systems;
 
     std::uint32_t m_image_index;
     std::uint32_t m_frame_index = 0;

@@ -3,6 +3,7 @@
 #include "lynx/exceptions.hpp"
 #include "lynx/window.hpp"
 #include "lynx/device.hpp"
+#include "lynx/swap_chain.hpp"
 
 namespace lynx
 {
@@ -33,6 +34,11 @@ std::uint32_t renderer::frame_index() const
     return m_frame_index;
 }
 
+const swap_chain &renderer::swap_chain() const
+{
+    return *m_swap_chain;
+}
+
 void renderer::create_swap_chain()
 {
     VkExtent2D ext = m_window.extent();
@@ -43,7 +49,7 @@ void renderer::create_swap_chain()
     }
 
     vkDeviceWaitIdle(m_device.vulkan_device());
-    m_swap_chain = make_scope<swap_chain>(m_device, ext, std::move(m_swap_chain));
+    m_swap_chain = make_scope<lynx::swap_chain>(m_device, ext, std::move(m_swap_chain));
     // create_pipeline(); // If render passes are not compatible
 }
 
