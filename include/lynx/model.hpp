@@ -37,6 +37,7 @@ class model2D : public model
     };
 
     model2D(const device &dev, const std::vector<vertex> &vertices);
+    static std::vector<vertex> triangle(const glm::vec3 &color = glm::vec3(1.f));
 };
 
 class model3D : public model
@@ -52,6 +53,7 @@ class model3D : public model
     };
 
     model3D(const device &dev, const std::vector<vertex> &vertices);
+    static std::vector<vertex> cube(const glm::vec3 &color = glm::vec3(1.f));
 };
 } // namespace lynx
 
