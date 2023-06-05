@@ -76,6 +76,26 @@ class triangle_strip_render_system2D : public render_system2D
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
+
+class line_render_system3D : public render_system3D
+{
+    void pipeline_config(pipeline::config_info &config) const override;
+};
+
+class line_strip_render_system3D : public render_system3D
+{
+    void pipeline_config(pipeline::config_info &config) const override;
+};
+
+class triangle_render_system3D : public render_system3D
+{
+    void pipeline_config(pipeline::config_info &config) const override;
+};
+
+class triangle_strip_render_system3D : public render_system3D
+{
+    void pipeline_config(pipeline::config_info &config) const override;
+};
 } // namespace lynx
 
 #endif

@@ -22,12 +22,64 @@ struct transform2D
     glm::vec2 translation{0.f};
     glm::vec2 scale{1.f};
     float rotation = 0.f;
-    operator glm::mat3()
+    operator glm::mat4()
     {
-        glm::mat3 transform = glm::translate(glm::mat3{1.f}, translation);
-        transform = glm::rotate(transform, rotation);
-        transform = glm::scale(transform, scale);
-        return transform;
+        const float c = cosf(rotation);
+        const float s = sinf(rotation);
+        return glm::mat4{{
+                             scale.x * c,
+                             scale.x * s,
+                             0.f,
+                             0.f,
+                         },
+                         {
+                             -scale.y * s,
+                             scale.y * c,
+                             0.f,
+                             0.f,
+                         },
+                         {
+                             0.f,
+                             0.f,
+                             0.f,
+                             0.f,
+                         },
+                         {translation.x, translation.y, 0.f, 1.0f}};
+    }
+};
+
+struct transform3D
+{
+    glm::vec3 translation{0.f};
+    glm::vec3 scale{1.f};
+    glm::vec3 rotation{0.f};
+    operator glm::mat4()
+    {
+        const float c3 = cosf(rotation.z);
+        const float s3 = sinf(rotation.z);
+        const float c2 = cosf(rotation.x);
+        const float s2 = sinf(rotation.x);
+        const float c1 = cosf(rotation.y);
+        const float s1 = sinf(rotation.y);
+        return glm::mat4{{
+                             scale.x * (c1 * c3 + s1 * s2 * s3),
+                             scale.x * (c2 * s3),
+                             scale.x * (c1 * s2 * s3 - c3 * s1),
+                             0.f,
+                         },
+                         {
+                             scale.y * (c3 * s1 * s2 - c1 * s3),
+                             scale.y * (c2 * c3),
+                             scale.y * (c1 * c3 * s2 + s1 * s3),
+                             0.f,
+                         },
+                         {
+                             scale.z * (c2 * s1),
+                             scale.z * (-s2),
+                             scale.z * (c1 * c2),
+                             0.f,
+                         },
+                         {translation.x, translation.y, translation.z, 1.0f}};
     }
 };
 
@@ -84,10 +136,10 @@ void render_system2D::render(VkCommandBuffer command_buffer, const model2D &mdl)
 {
     static int frame = 0;
     transform2D trans{};
-    // trans.rotation = frame++ / (20.f * (float)M_PI);
+    trans.rotation = frame++ / (20.f * (float)M_PI);
 
     push_constant_data push_data{};
-    // push_data.transform = trans;
+    push_data.transform = trans;
     render_system::render(command_buffer, mdl, push_data);
 }
 
@@ -102,7 +154,15 @@ void render_system2D::pipeline_config(pipeline::config_info &config) const
 
 void render_system3D::render(VkCommandBuffer command_buffer, const model3D &mdl) const
 {
+    static int frame = 0;
+    transform3D trans{};
+    trans.rotation.x = frame++ / (20.f * (float)M_PI);
+    trans.rotation.y = frame / (20.f * (float)M_PI);
+    trans.translation.z = 0.5f;
+    trans.scale = glm::vec3{0.5f};
+
     push_constant_data push_data{};
+    push_data.transform = trans;
     render_system::render(command_buffer, mdl, push_data);
 }
 
@@ -136,6 +196,30 @@ void triangle_render_system2D::pipeline_config(pipeline::config_info &config) co
 void triangle_strip_render_system2D::pipeline_config(pipeline::config_info &config) const
 {
     render_system2D::pipeline_config(config);
+    config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+}
+
+void line_render_system3D::pipeline_config(pipeline::config_info &config) const
+{
+    render_system3D::pipeline_config(config);
+    config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+}
+
+void line_strip_render_system3D::pipeline_config(pipeline::config_info &config) const
+{
+    render_system3D::pipeline_config(config);
+    config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+}
+
+void triangle_render_system3D::pipeline_config(pipeline::config_info &config) const
+{
+    render_system3D::pipeline_config(config);
+    config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+}
+
+void triangle_strip_render_system3D::pipeline_config(pipeline::config_info &config) const
+{
+    render_system3D::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
 }
 } // namespace lynx

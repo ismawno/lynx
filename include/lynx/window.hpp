@@ -11,6 +11,7 @@
 namespace lynx
 {
 class model2D;
+class model3D;
 class device;
 class renderer;
 class window
@@ -41,7 +42,8 @@ class window
     GLFWwindow *m_window;
 
     scope<const device> m_device;
-    scope<model2D> m_model;
+    scope<model2D> m_model2D;
+    scope<model3D> m_model3D;
     scope<renderer> m_renderer;
 
     bool m_frame_buffer_resized = false;

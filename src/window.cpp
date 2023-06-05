@@ -44,11 +44,64 @@ void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
 
 void window::load_models()
 {
-    const std::vector<model2D::vertex> vertices = {{{0.f, -0.25f}, {1.f, 0.f, 0.f}},
-                                                   {{0.25f, 0.25f}, {0.f, 1.f, 0.f}},
-                                                   {{-0.25f, 0.25f}, {0.f, 0.f, 1.f}},
-                                                   {{0.f, 0.5f}, {1.f, 0.f, 0.f}}};
-    m_model = make_scope<model2D>(*m_device, vertices);
+    const std::vector<model2D::vertex> vertices2D = {{{0.f, -0.25f}, {1.f, 0.f, 0.f}},
+                                                     {{0.25f, 0.25f}, {0.f, 1.f, 0.f}},
+                                                     {{-0.25f, 0.25f}, {0.f, 0.f, 1.f}},
+                                                     {{0.f, 0.5f}, {1.f, 0.f, 0.f}}};
+    m_model2D = make_scope<model2D>(*m_device, vertices2D);
+
+    const std::vector<model3D::vertex> vertices3D = {
+
+        // left face (white)
+        {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+        {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+        {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+        {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+        {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
+        {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+
+        // right face (yellow)
+        {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+        {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+        {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+        {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+        {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
+        {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+
+        // top face (orange, remember y axis points down)
+        {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+        {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+        {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+        {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+        {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+        {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+
+        // bottom face (red)
+        {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+        {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+        {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+        {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+        {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+        {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+
+        // nose face (blue)
+        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+        {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+        {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+
+        // tail face (green)
+        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+        {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+        {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+
+    };
+    m_model3D = make_scope<model3D>(*m_device, vertices3D);
 }
 
 void window::poll_events()
@@ -58,11 +111,11 @@ void window::poll_events()
 
 bool window::display()
 {
-    static const auto &system = m_renderer->add_render_system<triangle_strip_render_system2D>();
+    static const auto &system = m_renderer->add_render_system<triangle_strip_render_system3D>();
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         m_renderer->begin_swap_chain_render_pass(command_buffer);
-        system->render(command_buffer, *m_model);
+        system->render(command_buffer, *m_model3D);
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
         return true;
