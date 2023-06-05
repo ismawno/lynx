@@ -47,14 +47,6 @@ void window::poll_events()
 
 bool window::display()
 {
-    static const auto system = add_render_system<triangle_strip_render_system3D>();
-    static int frame = 0;
-
-    model3D &mdl = system->push_model(model3D::cube());
-    mdl.transform.translation.z = 0.5f;
-    mdl.transform.scale = glm::vec3(0.5f);
-    mdl.transform.rotation.z = (float)frame / 25.f;
-    mdl.transform.rotation.y = 0.5f * (float)frame++ / 25.f;
 
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
@@ -67,10 +59,10 @@ bool window::display()
         m_renderer->end_frame();
 
         vkDeviceWaitIdle(m_device->vulkan_device());
-        for (const auto &sys : m_render_systems2D)
-            sys->clear_models();
-        for (const auto &sys : m_render_systems3D)
-            sys->clear_models();
+        // for (const auto &sys : m_render_systems2D)
+        //     sys->clear_models();
+        // for (const auto &sys : m_render_systems3D)
+        //     sys->clear_models();
         return true;
     }
     return false;
