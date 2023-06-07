@@ -10,7 +10,7 @@ app::app(const std::uint32_t width, const std::uint32_t height, const char *name
 
 void app::run()
 {
-    const auto system = m_window.add_render_system<triangle_strip_render_system3D>();
+    // const auto system = m_window.get_render_system<line_render_system2D>();
     int frame = 0;
 
     while (!m_window.should_close())
@@ -23,7 +23,11 @@ void app::run()
 
         m_window.poll_events();
         m_window.clear();
-        system->draw(model3D::cube(), transform);
+        line2D line{{-.5f, 0.8f}, {.5f, 0.8f}};
+
+        // system->draw(line);
+        m_window.draw(model3D::cube(), TRIANGLE, transform);
+        m_window.draw(line);
         m_window.display();
     }
 }

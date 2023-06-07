@@ -5,6 +5,7 @@
 #include "lynx/core.hpp"
 #include "lynx/renderer.hpp"
 #include "lynx/swap_chain.hpp"
+#include "lynx/primitives.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -36,6 +37,29 @@ class window
             m_render_systems3D.push_back(std::move(system));
         return ref;
     }
+
+    template <typename T> T *get_render_system() const noexcept
+    {
+        for (auto &rs : m_render_systems2D)
+        {
+            auto cast = dynamic_cast<T *>(rs.get());
+            if (cast)
+                return cast;
+        }
+        for (auto &rs : m_render_systems3D)
+        {
+            auto cast = dynamic_cast<T *>(rs.get());
+            if (cast)
+                return cast;
+        }
+        return nullptr;
+    }
+
+    void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {}) const;
+    void draw(const std::vector<vertex3D> &vertices, topology tplg, const transform3D &transform = {}) const;
+
+    void draw(const drawable2D &drawable) const;
+    void draw(const drawable3D &drawable) const;
 
     std::uint32_t width() const;
     std::uint32_t height() const;

@@ -115,8 +115,6 @@ void pipeline::config_info::default_config(config_info &config)
     config.rasterization_info.depthBiasConstantFactor = 0.0f; // Optional
     config.rasterization_info.depthBiasClamp = 0.0f;          // Optional
     config.rasterization_info.depthBiasSlopeFactor = 0.0f;    // Optional
-    config.rasterization_info.pNext = nullptr;
-    config.rasterization_info.flags = 0;
 
     config.multisample_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     config.multisample_info.sampleShadingEnable = VK_FALSE;
@@ -125,8 +123,6 @@ void pipeline::config_info::default_config(config_info &config)
     config.multisample_info.pSampleMask = nullptr;            // Optional
     config.multisample_info.alphaToCoverageEnable = VK_FALSE; // Optional
     config.multisample_info.alphaToOneEnable = VK_FALSE;      // Optional
-    config.multisample_info.pNext = nullptr;
-    config.multisample_info.flags = 0;
 
     config.color_blend_attachment.colorWriteMask =
         VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -147,8 +143,6 @@ void pipeline::config_info::default_config(config_info &config)
     config.color_blend_info.blendConstants[1] = 0.0f; // Optional
     config.color_blend_info.blendConstants[2] = 0.0f; // Optional
     config.color_blend_info.blendConstants[3] = 0.0f; // Optional
-    config.color_blend_info.pNext = nullptr;
-    config.color_blend_info.flags = 0;
 
     config.depth_stencil_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     config.depth_stencil_info.depthTestEnable = VK_TRUE;
@@ -160,8 +154,6 @@ void pipeline::config_info::default_config(config_info &config)
     config.depth_stencil_info.stencilTestEnable = VK_FALSE;
     config.depth_stencil_info.front = {}; // Optional
     config.depth_stencil_info.back = {};  // Optional
-    config.depth_stencil_info.pNext = nullptr;
-    config.depth_stencil_info.flags = 0;
 
     config.dynamic_state_enables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     config.dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;

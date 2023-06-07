@@ -13,17 +13,21 @@ class render_system3D;
 class drawable2D
 {
   public:
-    transform2D transform;
     virtual void draw(render_system2D &rs) const = 0;
     virtual topology primitive_topology() const = 0;
+
+  protected:
+    transform2D m_transform;
 };
 
 class drawable3D
 {
   public:
-    transform3D transform;
     virtual void draw(const render_system3D &rs) const = 0;
     virtual topology primitive_topology() const = 0;
+
+  protected:
+    transform3D m_transform;
 };
 
 class line2D : public drawable2D

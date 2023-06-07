@@ -32,6 +32,38 @@ void window::init()
     glfwSetFramebufferSizeCallback(m_window, frame_buffer_resize_callback);
     m_device = make_ref<device>(*this);
     m_renderer = make_scope<renderer>(m_device, *this);
+
+    add_render_system<point_render_system2D>();
+    add_render_system<line_render_system2D>();
+    add_render_system<line_strip_render_system2D>();
+    add_render_system<triangle_render_system2D>();
+    add_render_system<triangle_strip_render_system2D>();
+
+    add_render_system<point_render_system3D>();
+    add_render_system<line_render_system3D>();
+    add_render_system<line_strip_render_system3D>();
+    add_render_system<triangle_render_system3D>();
+    add_render_system<triangle_strip_render_system3D>();
+}
+
+void window::draw(const std::vector<vertex2D> &vertices, const topology tplg, const transform2D &transform) const
+{
+    m_render_systems2D[(std::size_t)tplg]->draw(vertices, transform);
+}
+void window::draw(const std::vector<vertex3D> &vertices, const topology tplg, const transform3D &transform) const
+{
+    m_render_systems3D[(std::size_t)tplg]->draw(vertices, transform);
+}
+
+void window::draw(const drawable2D &drawable) const
+{
+    const topology top = drawable.primitive_topology();
+    drawable.draw(*m_render_systems2D[(std::size_t)top]);
+}
+void window::draw(const drawable3D &drawable) const
+{
+    const topology top = drawable.primitive_topology();
+    drawable.draw(*m_render_systems3D[(std::size_t)top]);
 }
 
 void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const

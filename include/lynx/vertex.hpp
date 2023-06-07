@@ -13,11 +13,10 @@ namespace lynx
 enum topology
 {
     POINT = 0,
-    POINT_STRIP = 1,
-    LINE = 2,
-    LINE_STRIP = 3,
-    TRIANGLE = 4,
-    TRIANGLE_STRIP = 5
+    LINE = 1,
+    LINE_STRIP = 2,
+    TRIANGLE = 3,
+    TRIANGLE_STRIP = 4
 };
 
 struct vertex2D

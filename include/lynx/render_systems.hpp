@@ -11,6 +11,8 @@
 namespace lynx
 {
 class device;
+class drawable2D;
+class drawable3D;
 
 struct push_constant_data
 {
@@ -52,6 +54,7 @@ class render_system2D : public render_system
 {
   public:
     void draw(const std::vector<vertex2D> &vertices, const transform2D &transform = {});
+    void draw(const drawable2D &drawable);
     ref<model2D> model_from_vertices(const std::vector<vertex2D> &vertices) const;
 
   protected:
@@ -62,10 +65,16 @@ class render_system3D : public render_system
 {
   public:
     void draw(const std::vector<vertex3D> &vertices, const transform3D &transform = {});
+    void draw(const drawable3D &drawable);
     ref<model3D> model_from_vertices(const std::vector<vertex3D> &vertices) const;
 
   protected:
     virtual void pipeline_config(pipeline::config_info &config) const override;
+};
+
+class point_render_system2D : public render_system2D
+{
+    void pipeline_config(pipeline::config_info &config) const override;
 };
 
 class line_render_system2D : public render_system2D
@@ -84,6 +93,11 @@ class triangle_render_system2D : public render_system2D
 };
 
 class triangle_strip_render_system2D : public render_system2D
+{
+    void pipeline_config(pipeline::config_info &config) const override;
+};
+
+class point_render_system3D : public render_system3D
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };

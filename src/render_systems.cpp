@@ -3,6 +3,7 @@
 #include "lynx/device.hpp"
 #include "lynx/exceptions.hpp"
 #include "lynx/vertex.hpp"
+#include "lynx/primitives.hpp"
 
 #define VERTEX_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.vert.spv"
 #define FRAGMENT_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.frag.spv"
@@ -90,6 +91,11 @@ void render_system2D::draw(const std::vector<vertex2D> &vertices, const transfor
     push_render_data({make_ref<model2D>(m_device, vertices), {transform}});
 }
 
+void render_system2D::draw(const drawable2D &drawable)
+{
+    drawable.draw(*this);
+}
+
 ref<model2D> render_system2D::model_from_vertices(const std::vector<vertex2D> &vertices) const
 {
     return make_ref<model2D>(m_device, vertices);
@@ -109,6 +115,11 @@ void render_system3D::draw(const std::vector<vertex3D> &vertices, const transfor
     push_render_data({make_ref<model3D>(m_device, vertices), {transform}});
 }
 
+void render_system3D::draw(const drawable3D &drawable)
+{
+    drawable.draw(*this);
+}
+
 ref<model3D> render_system3D::model_from_vertices(const std::vector<vertex3D> &vertices) const
 {
     return make_ref<model3D>(m_device, vertices);
@@ -121,6 +132,12 @@ void render_system3D::pipeline_config(pipeline::config_info &config) const
     config.fragment_shader_path = FRAGMENT_SHADER_3D_PATH;
     config.binding_descriptions = vertex3D::binding_descriptions();
     config.attribute_descriptions = vertex3D::attribute_descriptions();
+}
+
+void point_render_system2D::pipeline_config(pipeline::config_info &config) const
+{
+    render_system2D::pipeline_config(config);
+    config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
 }
 
 void line_render_system2D::pipeline_config(pipeline::config_info &config) const
@@ -145,6 +162,12 @@ void triangle_strip_render_system2D::pipeline_config(pipeline::config_info &conf
 {
     render_system2D::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+}
+
+void point_render_system3D::pipeline_config(pipeline::config_info &config) const
+{
+    render_system3D::pipeline_config(config);
+    config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
 }
 
 void line_render_system3D::pipeline_config(pipeline::config_info &config) const

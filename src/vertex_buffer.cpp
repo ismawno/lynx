@@ -2,6 +2,7 @@
 #include "lynx/vertex_buffer.hpp"
 #include "lynx/device.hpp"
 #include "lynx/model.hpp"
+#include "lynx/vertex.hpp"
 
 namespace lynx
 {

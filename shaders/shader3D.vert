@@ -16,4 +16,5 @@ void main()
 {
     gl_Position = push.transform * vec4(position, 1.0);
     frag_color = color;
+    gl_PointSize = 1.0;
 }
