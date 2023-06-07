@@ -65,9 +65,9 @@ void window::clear()
 {
     vkDeviceWaitIdle(m_device->vulkan_device());
     for (const auto &sys : m_render_systems2D)
-        sys->clear_models();
+        sys->clear_render_data();
     for (const auto &sys : m_render_systems3D)
-        sys->clear_models();
+        sys->clear_render_data();
 }
 
 void window::frame_buffer_resize_callback(GLFWwindow *gwindow, const int width, const int height)

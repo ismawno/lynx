@@ -2,7 +2,6 @@
 #include "lynx/render_systems.hpp"
 #include "lynx/device.hpp"
 #include "lynx/exceptions.hpp"
-#include "lynx/model.hpp"
 
 #define VERTEX_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.vert.spv"
 #define FRAGMENT_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.frag.spv"
@@ -55,15 +54,18 @@ void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::co
     m_pipeline = make_scope<pipeline>(m_device, config);
 }
 
-void render_system::render(VkCommandBuffer command_buffer, const render_data &rdata) const
+void render_system::render(VkCommandBuffer command_buffer) const
 {
-    DBG_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")
-    m_pipeline->bind(command_buffer);
-    vkCmdPushConstants(command_buffer, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
-                       sizeof(push_constant_data), &rdata.push_data);
+    for (const auto &[mdl, push_data] : m_render_data)
+    {
+        DBG_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")
+        m_pipeline->bind(command_buffer);
+        vkCmdPushConstants(command_buffer, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                           0, sizeof(push_constant_data), &push_data);
 
-    rdata.mdl->bind(command_buffer);
-    rdata.mdl->draw(command_buffer);
+        mdl->bind(command_buffer);
+        mdl->draw(command_buffer);
+    }
 }
 
 void render_system::push_render_data(const render_data &rdata)
@@ -82,24 +84,9 @@ void render_system::pipeline_config(pipeline::config_info &config) const
     config.constant_range_size = sizeof(push_constant_data);
 }
 
-void render_system2D::render(VkCommandBuffer command_buffer) const
+void render_system2D::draw(const std::vector<vertex2D> &vertices, const transform2D &transform)
 {
-    for (const auto &mdl : m_models)
-    {
-        push_constant_data push_data{};
-        push_data.transform = mdl->transform;
-        render_system::render(command_buffer, *mdl, push_data);
-    }
-}
-
-model2D &render_system2D::push_model(const std::vector<vertex2D> &vertices)
-{
-    return *m_models.emplace_back(make_scope<model2D>(m_device, vertices));
-}
-
-void render_system2D::clear_models()
-{
-    m_models.clear();
+    push_render_data({make_ref<model2D>(m_device, vertices), {transform}});
 }
 
 void render_system2D::pipeline_config(pipeline::config_info &config) const
@@ -111,24 +98,9 @@ void render_system2D::pipeline_config(pipeline::config_info &config) const
     config.attribute_descriptions = vertex2D::attribute_descriptions();
 }
 
-void render_system3D::render(VkCommandBuffer command_buffer) const
+void render_system3D::draw(const std::vector<vertex3D> &vertices, const transform3D &transform)
 {
-    for (const auto &mdl : m_models)
-    {
-        push_constant_data push_data{};
-        push_data.transform = mdl->transform;
-        render_system::render(command_buffer, *mdl, push_data);
-    }
-}
-
-model3D &render_system3D::push_model(const std::vector<vertex3D> &vertices)
-{
-    return *m_models.emplace_back(make_scope<model3D>(m_device, vertices));
-}
-
-void render_system3D::clear_models()
-{
-    m_models.clear();
+    push_render_data({make_ref<model3D>(m_device, vertices), {transform}});
 }
 
 void render_system3D::pipeline_config(pipeline::config_info &config) const

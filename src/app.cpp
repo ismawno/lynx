@@ -13,16 +13,17 @@ void app::run()
     const auto system = m_window.add_render_system<triangle_strip_render_system3D>();
     int frame = 0;
 
-    model3D &mdl = system->push_model(model3D::cube());
     while (!m_window.should_close())
     {
-        mdl.transform.translation.z = 0.5f;
-        mdl.transform.scale = glm::vec3(0.5f);
-        mdl.transform.rotation.z = (float)frame / 25.f;
-        mdl.transform.rotation.y = 0.5f * (float)frame++ / 25.f;
+        transform3D transform;
+        transform.translation.z = 0.5f;
+        transform.scale = glm::vec3(0.5f);
+        transform.rotation.z = (float)frame / 25.f;
+        transform.rotation.y = 0.5f * (float)frame++ / 25.f;
 
         m_window.poll_events();
-        // m_window.clear();
+        m_window.clear();
+        system->draw(model3D::cube(), transform);
         m_window.display();
     }
 }
