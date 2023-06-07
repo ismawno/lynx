@@ -29,6 +29,8 @@ class render_system
 
     void init(const ref<const device> &dev, VkRenderPass render_pass);
     void render(VkCommandBuffer command_buffer) const;
+
+    void push_render_data(const render_data &rdata);
     void clear_render_data();
 
   protected:
@@ -36,8 +38,6 @@ class render_system
 
     void create_pipeline_layout(const pipeline::config_info &config);
     void create_pipeline(VkRenderPass render_pass, pipeline::config_info &config);
-
-    void push_render_data(const render_data &rdata);
 
     virtual void pipeline_config(pipeline::config_info &config) const;
 
