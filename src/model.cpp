@@ -3,12 +3,12 @@
 
 namespace lynx
 {
-model::model(const device &dev, const std::vector<vertex2D> &vertices)
+model::model(const ref<const device> &dev, const std::vector<vertex2D> &vertices)
     : m_vertex_buffer(dev, vertices), m_vertex_count(vertices.size())
 {
 }
 
-model::model(const device &dev, const std::vector<vertex3D> &vertices)
+model::model(const ref<const device> &dev, const std::vector<vertex3D> &vertices)
     : m_vertex_buffer(dev, vertices), m_vertex_count(vertices.size())
 {
 }
@@ -22,7 +22,7 @@ void model::draw(VkCommandBuffer command_buffer) const
     vkCmdDraw(command_buffer, (std::uint32_t)m_vertex_count, 1, 0, 0);
 }
 
-model2D::model2D(const device &dev, const std::vector<vertex2D> &vertices) : model(dev, vertices)
+model2D::model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices) : model(dev, vertices)
 {
 }
 
@@ -66,7 +66,7 @@ std::vector<VkVertexInputAttributeDescription> vertex2D::attribute_descriptions(
             {1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex2D, color)}};
 }
 
-model3D::model3D(const device &dev, const std::vector<vertex3D> &vertices) : model(dev, vertices)
+model3D::model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices) : model(dev, vertices)
 {
 }
 

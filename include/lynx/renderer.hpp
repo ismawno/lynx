@@ -12,7 +12,7 @@ class swap_chain;
 class renderer
 {
   public:
-    renderer(const device &dev, window &win);
+    renderer(const ref<const device> &dev, window &win);
     ~renderer();
 
     VkCommandBuffer begin_frame();
@@ -28,7 +28,7 @@ class renderer
 
   private:
     window &m_window;
-    const device &m_device;
+    ref<const device> m_device;
     scope<lynx::swap_chain> m_swap_chain;
     std::vector<VkCommandBuffer> m_command_buffers;
 

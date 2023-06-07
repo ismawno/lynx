@@ -49,8 +49,8 @@ struct transform3D
 class model
 {
   public:
-    model(const device &dev, const std::vector<vertex2D> &vertices);
-    model(const device &dev, const std::vector<vertex3D> &vertices);
+    model(const ref<const device> &dev, const std::vector<vertex2D> &vertices);
+    model(const ref<const device> &dev, const std::vector<vertex3D> &vertices);
 
     void bind(VkCommandBuffer command_buffer) const;
     void draw(VkCommandBuffer command_buffer) const;
@@ -63,7 +63,7 @@ class model
 class model2D : public model
 {
   public:
-    model2D(const device &dev, const std::vector<vertex2D> &vertices);
+    model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices);
 
     static std::vector<vertex2D> triangle(const glm::vec3 &color = glm::vec3(1.f));
 
@@ -73,7 +73,7 @@ class model2D : public model
 class model3D : public model
 {
   public:
-    model3D(const device &dev, const std::vector<vertex3D> &vertices);
+    model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices);
 
     static std::vector<vertex3D> cube(const glm::vec3 &color = glm::vec3(1.f));
 

@@ -29,7 +29,7 @@ class window
         auto system = make_scope<T>(std::forward<Args>(args)...);
         T *ref = system.get();
 
-        system->init(m_device.get(), m_renderer->swap_chain().render_pass());
+        system->init(m_device, m_renderer->swap_chain().render_pass());
         if constexpr (std::is_base_of<render_system2D, T>::value)
             m_render_systems2D.push_back(std::move(system));
         else
@@ -58,7 +58,7 @@ class window
     const char *m_name;
     GLFWwindow *m_window;
 
-    scope<const device> m_device;
+    ref<const device> m_device;
     scope<renderer> m_renderer;
     std::vector<scope<render_system2D>> m_render_systems2D;
     std::vector<scope<render_system3D>> m_render_systems3D;

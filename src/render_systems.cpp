@@ -23,7 +23,7 @@ render_system::~render_system()
         vkDestroyPipelineLayout(m_device->vulkan_device(), m_pipeline_layout, nullptr);
 }
 
-void render_system::init(const device *dev, VkRenderPass render_pass)
+void render_system::init(const ref<const device> &dev, VkRenderPass render_pass)
 {
     m_device = dev;
 
@@ -57,7 +57,7 @@ void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::co
 
     config.render_pass = render_pass;
     config.pipeline_layout = m_pipeline_layout;
-    m_pipeline = make_scope<pipeline>(*m_device, config);
+    m_pipeline = make_scope<pipeline>(m_device, config);
 }
 
 void render_system::pipeline_config(pipeline::config_info &config) const
@@ -78,7 +78,7 @@ void render_system2D::render(VkCommandBuffer command_buffer) const
 
 model2D &render_system2D::push_model(const std::vector<vertex2D> &vertices)
 {
-    return *m_models.emplace_back(make_scope<model2D>(*m_device, vertices));
+    return *m_models.emplace_back(make_scope<model2D>(m_device, vertices));
 }
 
 void render_system2D::clear_models()
@@ -107,7 +107,7 @@ void render_system3D::render(VkCommandBuffer command_buffer) const
 
 model3D &render_system3D::push_model(const std::vector<vertex3D> &vertices)
 {
-    return *m_models.emplace_back(make_scope<model3D>(*m_device, vertices));
+    return *m_models.emplace_back(make_scope<model3D>(m_device, vertices));
 }
 
 void render_system3D::clear_models()

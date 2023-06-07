@@ -16,7 +16,7 @@ class swap_chain
   public:
     static constexpr std::uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 
-    swap_chain(const device &dev, VkExtent2D window_extentm, scope<swap_chain> old_swap_chain);
+    swap_chain(const ref<const device> &dev, VkExtent2D window_extentm, scope<swap_chain> old_swap_chain);
     ~swap_chain();
 
     VkFramebuffer frame_buffer(std::size_t index) const;
@@ -61,7 +61,7 @@ class swap_chain
     std::vector<VkImage> m_swap_chain_images;
     std::vector<VkImageView> m_swap_chain_image_views;
 
-    const device &m_device;
+    ref<const device> m_device;
     scope<swap_chain> m_old_swap_chain;
 
     VkExtent2D m_window_extent;

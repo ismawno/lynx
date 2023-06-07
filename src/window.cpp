@@ -30,8 +30,8 @@ void window::init()
     m_window = glfwCreateWindow((int)m_width, (int)m_height, m_name, nullptr, nullptr);
     glfwSetWindowUserPointer(m_window, this);
     glfwSetFramebufferSizeCallback(m_window, frame_buffer_resize_callback);
-    m_device = make_scope<device>(*this);
-    m_renderer = make_scope<renderer>(*m_device, *this);
+    m_device = make_ref<device>(*this);
+    m_renderer = make_scope<renderer>(m_device, *this);
 }
 
 void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const

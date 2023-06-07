@@ -15,11 +15,11 @@ class render_system
   public:
     virtual ~render_system();
 
-    void init(const device *dev, VkRenderPass render_pass);
+    void init(const ref<const device> &dev, VkRenderPass render_pass);
     virtual void render(VkCommandBuffer command_buffer) const = 0;
 
   protected:
-    const device *m_device = nullptr;
+    ref<const device> m_device;
 
     void create_pipeline_layout(const pipeline::config_info &config);
     void create_pipeline(VkRenderPass render_pass, pipeline::config_info &config);
