@@ -4,6 +4,7 @@
 #include "lynx/core.hpp"
 #include "lynx/pipeline.hpp"
 #include "lynx/model.hpp"
+#include "lynx/transform.hpp"
 #include <vulkan/vulkan.hpp>
 #include <utility>
 
@@ -51,6 +52,7 @@ class render_system2D : public render_system
 {
   public:
     void draw(const std::vector<vertex2D> &vertices, const transform2D &transform = {});
+    ref<model2D> model_from_vertices(const std::vector<vertex2D> &vertices) const;
 
   protected:
     virtual void pipeline_config(pipeline::config_info &config) const override;
@@ -60,6 +62,7 @@ class render_system3D : public render_system
 {
   public:
     void draw(const std::vector<vertex3D> &vertices, const transform3D &transform = {});
+    ref<model3D> model_from_vertices(const std::vector<vertex3D> &vertices) const;
 
   protected:
     virtual void pipeline_config(pipeline::config_info &config) const override;

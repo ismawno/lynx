@@ -2,6 +2,7 @@
 #include "lynx/render_systems.hpp"
 #include "lynx/device.hpp"
 #include "lynx/exceptions.hpp"
+#include "lynx/vertex.hpp"
 
 #define VERTEX_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.vert.spv"
 #define FRAGMENT_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.frag.spv"
@@ -89,6 +90,11 @@ void render_system2D::draw(const std::vector<vertex2D> &vertices, const transfor
     push_render_data({make_ref<model2D>(m_device, vertices), {transform}});
 }
 
+ref<model2D> render_system2D::model_from_vertices(const std::vector<vertex2D> &vertices) const
+{
+    return make_ref<model2D>(m_device, vertices);
+}
+
 void render_system2D::pipeline_config(pipeline::config_info &config) const
 {
     render_system::pipeline_config(config);
@@ -101,6 +107,11 @@ void render_system2D::pipeline_config(pipeline::config_info &config) const
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const transform3D &transform)
 {
     push_render_data({make_ref<model3D>(m_device, vertices), {transform}});
+}
+
+ref<model3D> render_system3D::model_from_vertices(const std::vector<vertex3D> &vertices) const
+{
+    return make_ref<model3D>(m_device, vertices);
 }
 
 void render_system3D::pipeline_config(pipeline::config_info &config) const

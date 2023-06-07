@@ -1,5 +1,6 @@
 #include "lynx/pch.hpp"
 #include "lynx/model.hpp"
+#include "lynx/vertex.hpp"
 
 namespace lynx
 {
@@ -26,53 +27,25 @@ model2D::model2D(const ref<const device> &dev, const std::vector<vertex2D> &vert
 {
 }
 
-std::vector<vertex2D> model2D::triangle(const glm::vec3 &color)
+const std::vector<vertex2D> &model2D::triangle(const glm::vec3 &color)
 {
-    return {{{0.f, -0.25f}, color}, {{0.25f, 0.25f}, color}, {{-0.25f, 0.25f}, color}};
+    static std::vector<vertex2D> vertices = {{{0.f, -0.25f}, color}, {{0.25f, 0.25f}, color}, {{-0.25f, 0.25f}, color}};
+    return vertices;
 }
 
-transform2D::operator glm::mat4() const
+const std::vector<vertex2D> &model2D::line(const glm::vec3 &color)
 {
-    const float c = cosf(rotation);
-    const float s = sinf(rotation);
-    return glm::mat4{{
-                         scale.x * c,
-                         scale.x * s,
-                         0.f,
-                         0.f,
-                     },
-                     {
-                         -scale.y * s,
-                         scale.y * c,
-                         0.f,
-                         0.f,
-                     },
-                     {
-                         0.f,
-                         0.f,
-                         0.f,
-                         0.f,
-                     },
-                     {translation.x, translation.y, 0.f, 1.0f}};
-}
-
-std::vector<VkVertexInputBindingDescription> vertex2D::binding_descriptions()
-{
-    return {{0, sizeof(vertex2D), VK_VERTEX_INPUT_RATE_VERTEX}};
-}
-std::vector<VkVertexInputAttributeDescription> vertex2D::attribute_descriptions()
-{
-    return {{0, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(vertex2D, position)},
-            {1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex2D, color)}};
+    static std::vector<vertex2D> vertices = {{{-1.f, 0.f}, color}, {{1.f, 0.f}, color}};
+    return vertices;
 }
 
 model3D::model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices) : model(dev, vertices)
 {
 }
 
-std::vector<vertex3D> model3D::cube(const glm::vec3 &color)
+const std::vector<vertex3D> &model3D::cube(const glm::vec3 &color)
 {
-    return {
+    static std::vector<vertex3D> vertices = {
         // left face (white)
         {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
         {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
@@ -121,45 +94,6 @@ std::vector<vertex3D> model3D::cube(const glm::vec3 &color)
         {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
         {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
     };
+    return vertices;
 }
-
-std::vector<VkVertexInputBindingDescription> vertex3D::binding_descriptions()
-{
-    return {{0, sizeof(vertex3D), VK_VERTEX_INPUT_RATE_VERTEX}};
-}
-std::vector<VkVertexInputAttributeDescription> vertex3D::attribute_descriptions()
-{
-    return {{0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex3D, position)},
-            {1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex3D, color)}};
-}
-
-transform3D::operator glm::mat4() const
-{
-    const float c3 = cosf(rotation.z);
-    const float s3 = sinf(rotation.z);
-    const float c2 = cosf(rotation.x);
-    const float s2 = sinf(rotation.x);
-    const float c1 = cosf(rotation.y);
-    const float s1 = sinf(rotation.y);
-    return glm::mat4{{
-                         scale.x * (c1 * c3 + s1 * s2 * s3),
-                         scale.x * (c2 * s3),
-                         scale.x * (c1 * s2 * s3 - c3 * s1),
-                         0.f,
-                     },
-                     {
-                         scale.y * (c3 * s1 * s2 - c1 * s3),
-                         scale.y * (c2 * c3),
-                         scale.y * (c1 * c3 * s2 + s1 * s3),
-                         0.f,
-                     },
-                     {
-                         scale.z * (c2 * s1),
-                         scale.z * (-s2),
-                         scale.z * (c1 * c2),
-                         0.f,
-                     },
-                     {translation.x, translation.y, translation.z, 1.0f}};
-}
-
 } // namespace lynx
