@@ -47,6 +47,7 @@ class window
 
     void poll_events();
     bool display();
+    void clear();
 
     bool was_resized() const;
     void complete_resize();

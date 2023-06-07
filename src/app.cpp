@@ -22,6 +22,7 @@ void app::run()
         mdl.transform.rotation.y = 0.5f * (float)frame++ / 25.f;
 
         m_window.poll_events();
+        // m_window.clear();
         m_window.display();
     }
 }

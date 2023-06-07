@@ -56,15 +56,18 @@ bool window::display()
             sys->render(command_buffer);
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
-
-        vkDeviceWaitIdle(m_device->vulkan_device());
-        // for (const auto &sys : m_render_systems2D)
-        //     sys->clear_models();
-        // for (const auto &sys : m_render_systems3D)
-        //     sys->clear_models();
         return true;
     }
     return false;
+}
+
+void window::clear()
+{
+    vkDeviceWaitIdle(m_device->vulkan_device());
+    for (const auto &sys : m_render_systems2D)
+        sys->clear_models();
+    for (const auto &sys : m_render_systems3D)
+        sys->clear_models();
 }
 
 void window::frame_buffer_resize_callback(GLFWwindow *gwindow, const int width, const int height)
