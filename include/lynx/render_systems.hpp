@@ -3,13 +3,24 @@
 
 #include "lynx/core.hpp"
 #include "lynx/pipeline.hpp"
-#include "lynx/model.hpp"
 #include <vulkan/vulkan.hpp>
+#include <utility>
 
 namespace lynx
 {
 class device;
+class model;
+struct push_constant_data
+{
+    glm::mat4 transform{1.f};
+    alignas(16) glm::vec3 color{.2f};
+};
 
+struct render_data
+{
+    ref<const model> mdl;
+    push_constant_data push_data;
+};
 class render_system
 {
   public:
@@ -24,22 +35,17 @@ class render_system
     void create_pipeline_layout(const pipeline::config_info &config);
     void create_pipeline(VkRenderPass render_pass, pipeline::config_info &config);
 
-    template <typename T> void render(VkCommandBuffer command_buffer, const model &mdl, const T &push_data) const
-    {
-        DBG_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")
-        m_pipeline->bind(command_buffer);
-        vkCmdPushConstants(command_buffer, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-                           0, sizeof(T), &push_data);
+    void render(VkCommandBuffer command_buffer, const render_data &rdata) const;
 
-        mdl.bind(command_buffer);
-        mdl.draw(command_buffer);
-    }
+    void push_render_data(const render_data &rdata);
+    void clear_render_data();
 
     virtual void pipeline_config(pipeline::config_info &config) const;
 
   private:
     scope<pipeline> m_pipeline;
     VkPipelineLayout m_pipeline_layout;
+    std::vector<render_data> m_render_data;
 };
 
 class render_system2D : public render_system

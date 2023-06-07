@@ -2,6 +2,7 @@
 #include "lynx/render_systems.hpp"
 #include "lynx/device.hpp"
 #include "lynx/exceptions.hpp"
+#include "lynx/model.hpp"
 
 #define VERTEX_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.vert.spv"
 #define FRAGMENT_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.frag.spv"
@@ -11,12 +12,6 @@
 
 namespace lynx
 {
-struct push_constant_data
-{
-    glm::mat4 transform{1.f};
-    alignas(16) glm::vec3 color{.2f};
-};
-
 render_system::~render_system()
 {
     if (m_device)
@@ -58,6 +53,27 @@ void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::co
     config.render_pass = render_pass;
     config.pipeline_layout = m_pipeline_layout;
     m_pipeline = make_scope<pipeline>(m_device, config);
+}
+
+void render_system::render(VkCommandBuffer command_buffer, const render_data &rdata) const
+{
+    DBG_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")
+    m_pipeline->bind(command_buffer);
+    vkCmdPushConstants(command_buffer, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
+                       sizeof(push_constant_data), &rdata.push_data);
+
+    rdata.mdl->bind(command_buffer);
+    rdata.mdl->draw(command_buffer);
+}
+
+void render_system::push_render_data(const render_data &rdata)
+{
+    m_render_data.push_back(rdata);
+}
+
+void render_system::clear_render_data()
+{
+    m_render_data.clear();
 }
 
 void render_system::pipeline_config(pipeline::config_info &config) const
