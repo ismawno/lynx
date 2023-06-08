@@ -26,7 +26,7 @@ void app::run()
         line2D line{{-.5f, 0.8f}, {.5f, 0.8f}};
 
         // system->draw(line);
-        m_window.draw(model3D::cube(), TRIANGLE, transform);
+        m_window.draw(model3D::cube(), TRIANGLE_LIST, transform);
         m_window.draw(line);
         m_window.display();
     }

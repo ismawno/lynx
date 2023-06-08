@@ -12,10 +12,10 @@ namespace lynx
 {
 enum topology
 {
-    POINT = 0,
-    LINE = 1,
+    POINT_LIST = 0,
+    LINE_LIST = 1,
     LINE_STRIP = 2,
-    TRIANGLE = 3,
+    TRIANGLE_LIST = 3,
     TRIANGLE_STRIP = 4
 };
 

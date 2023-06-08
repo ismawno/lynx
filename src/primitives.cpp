@@ -20,6 +20,6 @@ void line2D::draw(render_system2D &rs) const
 }
 topology line2D::primitive_topology() const
 {
-    return LINE;
+    return LINE_LIST;
 }
 } // namespace lynx
