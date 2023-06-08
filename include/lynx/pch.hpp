@@ -12,7 +12,7 @@
 #include <array>
 #include <memory>
 #include <vulkan/vulkan.hpp>
-#include <utility>
+#include <limits>
 #ifdef HAS_DEBUG_LOG_TOOLS
 #include "dbg/log.hpp"
 #endif

@@ -4,6 +4,7 @@
 #include "lynx/render_systems.hpp"
 #include "lynx/device.hpp"
 #include "lynx/model.hpp"
+#include "lynx/camera.hpp"
 
 namespace lynx
 {
@@ -79,13 +80,16 @@ void window::poll_events()
 
 bool window::display()
 {
+    const float aspect = m_renderer->swap_chain().extent_aspect_ratio();
+    // const camera cam{{-aspect, -1.f, -1.f}, {aspect, 1.f, 1.f}};
+    const camera cam{glm::radians(50.f), aspect, 0.1f, 10.f};
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         m_renderer->begin_swap_chain_render_pass(command_buffer);
         for (const auto &sys : m_render_systems2D)
-            sys->render(command_buffer);
+            sys->render(command_buffer, cam);
         for (const auto &sys : m_render_systems3D)
-            sys->render(command_buffer);
+            sys->render(command_buffer, cam);
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
         return true;
