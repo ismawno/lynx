@@ -26,7 +26,8 @@ class model2D : public model
 {
   public:
     model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices);
-    static const std::vector<vertex2D> &triangle(const glm::vec3 &color = glm::vec3(1.f));
+    // create NGon
+    static const std::vector<vertex2D> &rect(const glm::vec3 &color = glm::vec3(1.f));
     static const std::vector<vertex2D> &line(const glm::vec3 &color = glm::vec3(1.f));
 };
 
@@ -34,7 +35,9 @@ class model3D : public model
 {
   public:
     model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices);
+    static const std::vector<vertex3D> &rect(const glm::vec3 &color = glm::vec3(1.f));
     static const std::vector<vertex3D> &cube(const glm::vec3 &color = glm::vec3(1.f));
+    static const std::vector<vertex3D> &line(const glm::vec3 &color = glm::vec3(1.f));
 };
 } // namespace lynx
 

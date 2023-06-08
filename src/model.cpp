@@ -27,9 +27,10 @@ model2D::model2D(const ref<const device> &dev, const std::vector<vertex2D> &vert
 {
 }
 
-const std::vector<vertex2D> &model2D::triangle(const glm::vec3 &color)
+const std::vector<vertex2D> &model2D::rect(const glm::vec3 &color)
 {
-    static std::vector<vertex2D> vertices = {{{0.f, -0.25f}, color}, {{0.25f, 0.25f}, color}, {{-0.25f, 0.25f}, color}};
+    static std::vector<vertex2D> vertices = {{{-.5f, -.5f}, color}, {{.5f, .5f}, color},  {{-.5f, .5f}, color},
+                                             {{-.5f, -.5f}, color}, {{.5f, -.5f}, color}, {{.5f, .5f}, color}};
     return vertices;
 }
 
@@ -41,6 +42,14 @@ const std::vector<vertex2D> &model2D::line(const glm::vec3 &color)
 
 model3D::model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices) : model(dev, vertices)
 {
+}
+
+const std::vector<vertex3D> &model3D::rect(const glm::vec3 &color)
+{
+    static std::vector<vertex3D> vertices = {{{-.5f, -.5f, .5f}, color}, {{.5f, .5f, .5f}, color},
+                                             {{-.5f, .5f, .5f}, color},  {{-.5f, -.5f, .5f}, color},
+                                             {{.5f, -.5f, .5f}, color},  {{.5f, .5f, .5f}, color}};
+    return vertices;
 }
 
 const std::vector<vertex3D> &model3D::cube(const glm::vec3 &color)
@@ -79,21 +88,28 @@ const std::vector<vertex3D> &model3D::cube(const glm::vec3 &color)
         {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
 
         // nose face (blue)
-        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-        {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+        {{-.5f, -.5f, .5f}, {.1f, .1f, .8f}},
+        {{.5f, .5f, .5f}, {.1f, .1f, .8f}},
+        {{-.5f, .5f, .5f}, {.1f, .1f, .8f}},
+        {{-.5f, -.5f, .5f}, {.1f, .1f, .8f}},
+        {{.5f, -.5f, .5f}, {.1f, .1f, .8f}},
+        {{.5f, .5f, .5f}, {.1f, .1f, .8f}},
 
         // tail face (green)
-        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-        {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+        {{-.5f, -.5f, -.5f}, {.1f, .8f, .1f}},
+        {{.5f, .5f, -.5f}, {.1f, .8f, .1f}},
+        {{-.5f, .5f, -.5f}, {.1f, .8f, .1f}},
+        {{-.5f, -.5f, -.5f}, {.1f, .8f, .1f}},
+        {{.5f, -.5f, -.5f}, {.1f, .8f, .1f}},
+        {{.5f, .5f, -.5f}, {.1f, .8f, .1f}},
     };
     return vertices;
 }
+
+const std::vector<vertex3D> &model3D::line(const glm::vec3 &color)
+{
+    static std::vector<vertex3D> vertices = {{{-1.f, 0.f, 0.f}, color}, {{1.f, 0.f, 0.f}, color}};
+    return vertices;
+}
+
 } // namespace lynx

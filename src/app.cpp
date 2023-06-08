@@ -10,24 +10,22 @@ app::app(const std::uint32_t width, const std::uint32_t height, const char *name
 
 void app::run()
 {
-    // const auto system = m_window.get_render_system<line_render_system2D>();
     int frame = 0;
 
     while (!m_window.should_close())
     {
-        transform3D transform;
-        transform.translation.z = 0.5f;
-        transform.scale = glm::vec3(0.5f);
-        transform.rotation.z = (float)frame / 25.f;
-        transform.rotation.y = 0.5f * (float)frame++ / 25.f;
+        // cube3D cube1;
+        // cube1.transform.translation.z = 0.5f;
+        // cube1.transform.translation.x = 0.4f;
+        // cube1.transform.scale = glm::vec3(0.5f);
+        // cube1.transform.rotation.z = (float)frame / 25.f;
+        // cube1.transform.rotation.y = 0.5f * (float)frame / 25.f;
 
         m_window.poll_events();
         m_window.clear();
-        line2D line{{-.5f, 0.8f}, {.5f, 0.8f}};
-
-        // system->draw(line);
-        m_window.draw(model3D::cube(), TRIANGLE_LIST, transform);
-        m_window.draw(line);
+        rect3D rect;
+        rect.transform.rotation.x = (float)frame++ / 25.f;
+        m_window.draw(rect);
         m_window.display();
     }
 }
