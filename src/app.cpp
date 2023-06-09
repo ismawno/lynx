@@ -22,8 +22,8 @@ void app::run()
 
         rect3D rect;
         rect.transform.translation.z = 2.f;
-        // rect.transform.rotation.y = (float)frame / 25.f;
-        rect.transform.rotation.x = 0.5f * (float)frame++ / 25.f;
+        //  rect.transform.rotation.y = (float)frame / 25.f;
+        rect.transform.rotation.z = 0.5f * (float)frame++ / 25.f;
 
         m_window.poll_events();
         m_window.clear();

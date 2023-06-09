@@ -81,8 +81,10 @@ void window::poll_events()
 bool window::display()
 {
     const float aspect = m_renderer->swap_chain().extent_aspect_ratio();
-    // const camera cam{{-aspect, -1.f, -1.f}, {aspect, 1.f, 1.f}};
-    const camera cam{glm::radians(50.f), aspect, 0.1f, 10.f};
+    camera3D cam{{-1.f, -1.f, -6.1f}, {1.f, 1.f, 6.1f}};
+    // camera3D cam{glm::radians(50.f), aspect, 0.1f, 10.f};
+    cam.view_as_target({0.f, 6.f, 0.f}, {0.0f, 0.f, 2.f});
+
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         m_renderer->begin_swap_chain_render_pass(command_buffer);

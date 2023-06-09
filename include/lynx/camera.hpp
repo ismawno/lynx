@@ -8,22 +8,30 @@
 
 namespace lynx
 {
-class camera
+class camera3D
 {
   public:
-    camera() = default;
-    camera(const glm::vec3 &orthographic_dimensions);
-    camera(const glm::vec3 &min, const glm::vec3 &max);
-    camera(float fovy, float aspect, float near, float far);
+    camera3D() = default;
+    camera3D(const glm::vec3 &orthographic_dimensions);
+    camera3D(const glm::vec3 &min, const glm::vec3 &max);
+    camera3D(float fovy, float aspect, float near, float far);
 
+    // void ortho
     void orthographic_projection(const glm::vec3 &dimensions);
     void orthographic_projection(const glm::vec3 &min, const glm::vec3 &max);
     void perspective_projection(float fovy, float aspect, float near, float far);
 
+    void view_as_direction(const glm::vec3 &position, const glm::vec3 &direction,
+                           const glm::vec3 &up = {0.f, -1.f, 0.f});
+    void view_as_target(const glm::vec3 &position, const glm::vec3 &target, const glm::vec3 &up = {0.f, -1.f, 0.f});
+    void view_as_transform(const glm::vec3 &position, const glm::vec3 &rotation);
+
     const glm::mat4 &projection_matrix() const;
+    const glm::mat4 &view_matrix() const;
 
   private:
     glm::mat4 m_projection{1.f};
+    glm::mat4 m_view{1.f};
 };
 } // namespace lynx
 
