@@ -13,6 +13,11 @@ window::window(const std::uint32_t width, const std::uint32_t height, const char
     : m_width(width), m_height(height), m_name(name)
 {
     init();
+    m_camera2D = make_scope<orthographic2D>(m_renderer->swap_chain().extent_aspect_ratio(), 10.f);
+    m_camera3D = make_scope<perspective3D>(m_renderer->swap_chain().extent_aspect_ratio(), glm::radians(90.f));
+
+    m_camera2D->update_transformation_matrices();
+    m_camera3D->update_transformation_matrices();
 }
 
 window::~window()
@@ -80,18 +85,13 @@ void window::poll_events()
 
 bool window::display()
 {
-    const float aspect = m_renderer->swap_chain().extent_aspect_ratio();
-    camera3D cam{{-1.f, -1.f, -6.1f}, {1.f, 1.f, 6.1f}};
-    // camera3D cam{glm::radians(50.f), aspect, 0.1f, 10.f};
-    cam.view_as_target({0.f, 6.f, 0.f}, {0.0f, 0.f, 2.f});
-
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         m_renderer->begin_swap_chain_render_pass(command_buffer);
         for (const auto &sys : m_render_systems2D)
-            sys->render(command_buffer, cam);
+            sys->render(command_buffer, *m_camera2D);
         for (const auto &sys : m_render_systems3D)
-            sys->render(command_buffer, cam);
+            sys->render(command_buffer, *m_camera3D);
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
         return true;
@@ -137,6 +137,15 @@ std::uint32_t window::width() const
 std::uint32_t window::height() const
 {
     return m_height;
+}
+
+float window::aspect() const
+{
+    return (float)m_width / (float)m_height;
+}
+float window::swap_chain_aspect() const
+{
+    return m_renderer->swap_chain().extent_aspect_ratio();
 }
 
 VkExtent2D window::extent() const

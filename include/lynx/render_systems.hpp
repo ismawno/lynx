@@ -13,6 +13,8 @@ namespace lynx
 class device;
 class drawable2D;
 class drawable3D;
+class camera;
+class camera2D;
 class camera3D;
 
 struct push_constant_data
@@ -32,7 +34,7 @@ class render_system
     virtual ~render_system();
 
     void init(const ref<const device> &dev, VkRenderPass render_pass);
-    void render(VkCommandBuffer command_buffer, const camera3D &cam) const;
+    void render(VkCommandBuffer command_buffer, const camera &cam) const;
 
     void push_render_data(const render_data &rdata);
     void clear_render_data();

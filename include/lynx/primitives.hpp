@@ -64,7 +64,7 @@ class rect2D : public drawable2D
 class rect3D : public drawable3D
 {
   public:
-    rect3D(const glm::vec3 &position = {0.f, 0.f, 0.f}, const glm::vec2 &dimensions = {1.f, 1.f});
+    rect3D(const glm::vec3 &position = glm::vec3(0.f), const glm::vec2 &dimensions = {1.f, 1.f});
 
     void draw(render_system3D &rs) const override;
     topology primitive_topology() const override;
@@ -73,7 +73,7 @@ class rect3D : public drawable3D
 class cube3D : public drawable3D
 {
   public:
-    cube3D(const glm::vec3 &position = {0.f, 0.f, 0.f}, const glm::vec3 &dimensions = {1.f, 1.f, 1.f});
+    cube3D(const glm::vec3 &position = glm::vec3(0.f), const glm::vec3 &dimensions = {1.f, 1.f, 1.f});
 
     void draw(render_system3D &rs) const override;
     topology primitive_topology() const override;

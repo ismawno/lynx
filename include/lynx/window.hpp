@@ -64,6 +64,9 @@ class window
     std::uint32_t width() const;
     std::uint32_t height() const;
 
+    float aspect() const;
+    float swap_chain_aspect() const;
+
     VkExtent2D extent() const;
 
     bool should_close() const;
@@ -85,6 +88,10 @@ class window
 
     ref<const device> m_device;
     scope<renderer> m_renderer;
+
+    scope<camera2D> m_camera2D;
+    scope<camera3D> m_camera3D;
+
     std::vector<scope<render_system2D>> m_render_systems2D;
     std::vector<scope<render_system3D>> m_render_systems3D;
 

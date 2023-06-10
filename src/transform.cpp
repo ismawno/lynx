@@ -25,7 +25,7 @@ transform2D::operator glm::mat4() const
                          0.f,
                          0.f,
                      },
-                     {translation.x, translation.y, 0.f, 1.0f}};
+                     {position.x, position.y, 0.f, 1.0f}};
 }
 
 transform3D::operator glm::mat4() const
@@ -54,6 +54,6 @@ transform3D::operator glm::mat4() const
                          scale.z * (c1 * c2),
                          0.f,
                      },
-                     {translation.x, translation.y, translation.z, 1.0f}};
+                     {position.x, position.y, position.z, 1.0f}};
 }
 } // namespace lynx

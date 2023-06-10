@@ -57,9 +57,9 @@ void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::co
     m_pipeline = make_scope<pipeline>(m_device, config);
 }
 
-void render_system::render(VkCommandBuffer command_buffer, const camera3D &cam) const
+void render_system::render(VkCommandBuffer command_buffer, const camera &cam) const
 {
-    const glm::mat4 proj = cam.projection_matrix() * cam.view_matrix();
+    const glm::mat4 proj = cam.projection() * cam.view();
     for (const auto &[mdl, push_data] : m_render_data)
     {
         DBG_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")

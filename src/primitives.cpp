@@ -8,7 +8,7 @@ line2D::line2D(const glm::vec2 &p1, const glm::vec2 &p2)
 {
     const glm::vec2 dp = p2 - p1;
 
-    transform.translation = 0.5f * (p1 + p2);
+    transform.position = 0.5f * (p1 + p2);
     transform.rotation = atan2f(dp.y, dp.x);
     transform.scale.x = 0.5f * glm::length(dp);
 }
@@ -28,7 +28,7 @@ line3D::line3D(const glm::vec3 &p1, const glm::vec3 &p2)
 {
     const glm::vec3 dp = p2 - p1;
 
-    transform.translation = 0.5f * (p1 + p2);
+    transform.position = 0.5f * (p1 + p2);
     transform.rotation = {0.f, atan2f(dp.z, dp.x), atan2f(dp.y, dp.x)};
     // DBG_INFO("{0}", atan2f(dp.x, dp.z))
     transform.scale.x = 0.5f * glm::length(dp);
@@ -47,7 +47,7 @@ topology line3D::primitive_topology() const
 
 rect2D::rect2D(const glm::vec2 &position, const glm::vec2 &dimensions)
 {
-    transform.translation = position;
+    transform.position = position;
     transform.scale = dimensions;
 }
 
@@ -64,7 +64,7 @@ topology rect2D::primitive_topology() const
 
 rect3D::rect3D(const glm::vec3 &position, const glm::vec2 &dimensions)
 {
-    transform.translation = position;
+    transform.position = position;
     transform.scale = {dimensions.x, dimensions.y, 1.f};
 }
 
@@ -81,7 +81,7 @@ topology rect3D::primitive_topology() const
 
 cube3D::cube3D(const glm::vec3 &position, const glm::vec3 &dimensions)
 {
-    transform.translation = position;
+    transform.position = position;
     transform.scale = dimensions;
 }
 
