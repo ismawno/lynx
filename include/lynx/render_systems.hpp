@@ -14,8 +14,6 @@ class device;
 class drawable2D;
 class drawable3D;
 class camera;
-class camera2D;
-class camera3D;
 
 struct push_constant_data
 {

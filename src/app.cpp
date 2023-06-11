@@ -1,34 +1,47 @@
 #include "lynx/pch.hpp"
 #include "lynx/app.hpp"
 #include "lynx/exceptions.hpp"
+#include "lynx/camera.hpp"
 
 namespace lynx
 {
-app::app(const std::uint32_t width, const std::uint32_t height, const char *name) : m_window(width, height, name)
+void app::run_impl(const window &win)
+{
+    while (!win.should_close())
+    {
+        win.poll_events();
+        win.clear();
+        on_draw();
+        win.display();
+    }
+    win.clear();
+}
+
+app2D::app2D(const std::uint32_t width, const std::uint32_t height, const char *name) : m_window(width, height, name)
 {
 }
 
-void app::run()
+void app2D::run()
 {
-    int frame = 0;
+    run_impl(m_window);
+}
 
-    while (!m_window.should_close())
-    {
-        // cube3D cube1;
-        // cube1.transform.translation.z = 2.f;
-        // cube1.transform.scale = glm::vec3(0.5f);
-        // cube1.transform.rotation.z = (float)frame / 25.f;
-        // cube1.transform.rotation.y = 0.5f * (float)frame++ / 25.f;
+window2D &app2D::window()
+{
+    return m_window;
+}
 
-        rect3D rect;
-        rect.transform.position.z = 1.f;
-        rect.transform.rotation.y = (float)frame / 25.f;
-        rect.transform.rotation.z = 0.5f * (float)frame++ / 25.f;
+app3D::app3D(const std::uint32_t width, const std::uint32_t height, const char *name) : m_window(width, height, name)
+{
+}
 
-        m_window.poll_events();
-        m_window.clear();
-        m_window.draw(rect);
-        m_window.display();
-    }
+void app3D::run()
+{
+    run_impl(m_window);
+}
+
+window3D &app3D::window()
+{
+    return m_window;
 }
 } // namespace lynx

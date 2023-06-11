@@ -16,50 +16,14 @@ namespace lynx
 {
 class device;
 class renderer;
+class camera2D;
+class camera3D;
+
 class window
 {
   public:
     window(std::uint32_t width, std::uint32_t height, const char *name);
     ~window();
-
-    template <typename T, class... Args> T *add_render_system(Args &&...args)
-    {
-        static_assert(std::is_base_of<render_system2D, T>::value || std::is_base_of<render_system3D, T>::value,
-                      "Type must inherit from render_system2D or render_system3D!");
-
-        auto system = make_scope<T>(std::forward<Args>(args)...);
-        T *ref = system.get();
-
-        system->init(m_device, m_renderer->swap_chain().render_pass());
-        if constexpr (std::is_base_of<render_system2D, T>::value)
-            m_render_systems2D.push_back(std::move(system));
-        else
-            m_render_systems3D.push_back(std::move(system));
-        return ref;
-    }
-
-    template <typename T> T *get_render_system() const noexcept
-    {
-        for (auto &rs : m_render_systems2D)
-        {
-            auto cast = dynamic_cast<T *>(rs.get());
-            if (cast)
-                return cast;
-        }
-        for (auto &rs : m_render_systems3D)
-        {
-            auto cast = dynamic_cast<T *>(rs.get());
-            if (cast)
-                return cast;
-        }
-        return nullptr;
-    }
-
-    void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {}) const;
-    void draw(const std::vector<vertex3D> &vertices, topology tplg, const transform3D &transform = {}) const;
-
-    void draw(const drawable2D &drawable) const;
-    void draw(const drawable3D &drawable) const;
 
     std::uint32_t width() const;
     std::uint32_t height() const;
@@ -72,14 +36,48 @@ class window
     bool should_close() const;
     void create_surface(VkInstance instance, VkSurfaceKHR *surface) const;
 
-    void poll_events();
-    bool display();
-    void clear();
+    void poll_events() const;
+    bool display() const;
+    void clear() const;
 
     bool was_resized() const;
     void complete_resize();
 
+    bool maintain_camera_aspect_ratio() const;
+    void maintain_camera_aspect_ratio(bool maintain);
+
     const device &gpu() const;
+
+    template <typename T, typename B, class... Args>
+    T *add_render_system_impl(std::vector<scope<B>> &systems, Args &&...args)
+    {
+        static_assert(std::is_base_of<render_system, B>::value,
+                      "Can only use add_render_system with a type that inherits from render_system");
+        static_assert(
+            std::is_base_of<B, T>::value,
+            "Type must inherit from render_system2D or render_system3D, depending on the window tou are using");
+
+        auto system = make_scope<T>(std::forward<Args>(args)...);
+        T *ref = system.get();
+
+        system->init(m_device, m_renderer->swap_chain().render_pass());
+        systems.push_back(std::move(system));
+        return ref;
+    }
+
+    template <typename T, typename B> T *render_system_impl(std::vector<scope<B>> &systems) const noexcept
+    {
+        for (auto &rs : systems)
+        {
+            auto cast = dynamic_cast<T *>(rs.get());
+            if (cast)
+                return cast;
+        }
+        return nullptr;
+    }
+
+  protected:
+    bool m_maintain_camera_aspect_ratio = true;
 
   private:
     std::uint32_t m_width, m_height;
@@ -89,20 +87,68 @@ class window
     ref<const device> m_device;
     scope<renderer> m_renderer;
 
-    scope<camera2D> m_camera2D;
-    scope<camera3D> m_camera3D;
-
-    std::vector<scope<render_system2D>> m_render_systems2D;
-    std::vector<scope<render_system3D>> m_render_systems3D;
-
     bool m_frame_buffer_resized = false;
 
     void init();
+    virtual void render(VkCommandBuffer command_buffer) const = 0;
+    virtual void clear_render_data() const = 0;
 
     static void frame_buffer_resize_callback(GLFWwindow *gwindow, int width, int height);
 
     window(const window &) = delete;
     window &operator=(const window &) = delete;
+};
+
+class window2D : public window
+{
+  public:
+    window2D(std::uint32_t width, std::uint32_t height, const char *name);
+
+    template <typename T, class... Args> T *add_render_system(Args &&...args)
+    {
+        return add_render_system_impl<T>(m_render_systems, std::forward<Args>(args)...);
+    }
+
+    template <typename T> T *get_render_system() const noexcept
+    {
+        return render_system_impl<T>(m_render_systems);
+    }
+
+    void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {}) const;
+    void draw(const drawable2D &drawable) const;
+
+  private:
+    scope<camera2D> m_camera;
+    std::vector<scope<render_system2D>> m_render_systems;
+
+    void render(VkCommandBuffer command_buffer) const override;
+    void clear_render_data() const override;
+};
+
+class window3D : public window
+{
+  public:
+    window3D(std::uint32_t width, std::uint32_t height, const char *name);
+
+    template <typename T, class... Args> T *add_render_system(Args &&...args)
+    {
+        return add_render_system_impl<T>(m_render_systems, std::forward<Args>(args)...);
+    }
+
+    template <typename T> T *get_render_system() const noexcept
+    {
+        return render_system_impl<T>(m_render_systems);
+    }
+
+    void draw(const std::vector<vertex3D> &vertices, topology tplg, const transform3D &transform = {}) const;
+    void draw(const drawable3D &drawable) const;
+
+  private:
+    scope<camera3D> m_camera;
+    std::vector<scope<render_system3D>> m_render_systems;
+
+    void render(VkCommandBuffer command_buffer) const override;
+    void clear_render_data() const override;
 };
 } // namespace lynx
 
