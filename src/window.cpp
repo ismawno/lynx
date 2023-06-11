@@ -14,7 +14,7 @@ window::window(const std::uint32_t width, const std::uint32_t height, const char
 {
     init();
     m_camera2D = make_scope<orthographic2D>(m_renderer->swap_chain().extent_aspect_ratio(), 10.f);
-    m_camera3D = make_scope<perspective3D>(m_renderer->swap_chain().extent_aspect_ratio(), glm::radians(90.f));
+    m_camera3D = make_scope<perspective3D>(m_renderer->swap_chain().extent_aspect_ratio(), glm::radians(60.f));
 
     m_camera2D->update_transformation_matrices();
     m_camera3D->update_transformation_matrices();

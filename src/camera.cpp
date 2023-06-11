@@ -46,8 +46,6 @@ void orthographic2D::update_projection()
     m_projection = glm::mat4{1.f};
     m_projection[0][0] = 2.f / transform.scale.x;
     m_projection[1][1] = 2.f / transform.scale.y;
-    m_projection[2][2] = 0.5f;
-    //[3][2] may need to be non zero (0.5f before)
 }
 
 void orthographic2D::update_view()

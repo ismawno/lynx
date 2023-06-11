@@ -25,7 +25,7 @@ transform2D::operator glm::mat4() const
                          0.f,
                          0.f,
                      },
-                     {position.x, position.y, 0.f, 1.0f}};
+                     {position.x, position.y, 0.5f, 1.0f}};
 }
 
 transform3D::operator glm::mat4() const
