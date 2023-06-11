@@ -15,15 +15,20 @@ class example_app2D : public lynx::app2D
 
 class example_app3D : public lynx::app3D
 {
+    void on_start() override
+    {
+        cam = m_window.camera_as<lynx::perspective3D>();
+    }
     void on_draw() override
     {
         static int frame = 0;
         lynx::rect3D rect;
         rect.transform.position.z = 2.f;
-        rect.transform.rotation.z = (float)frame++ / 25.f;
-        rect.transform.rotation.y = (float)frame++ / 25.f;
+        // m_window.camera().transform.rotation.y = (float)frame++ / 50.f;
+        rect.transform.rotation.z = (float)frame++ / 50.f;
         m_window.draw(rect);
     }
+    lynx::perspective3D *cam;
 };
 
 int main()

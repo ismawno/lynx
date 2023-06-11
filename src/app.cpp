@@ -7,6 +7,7 @@ namespace lynx
 {
 void app::run_impl(const window &win)
 {
+    on_start();
     while (!win.should_close())
     {
         win.poll_events();

@@ -55,7 +55,7 @@ class window
                       "Can only use add_render_system with a type that inherits from render_system");
         static_assert(
             std::is_base_of<B, T>::value,
-            "Type must inherit from render_system2D or render_system3D, depending on the window tou are using");
+            "Type must inherit from render_system2D or render_system3D, depending on the window you are using");
 
         auto system = make_scope<T>(std::forward<Args>(args)...);
         T *ref = system.get();
@@ -109,13 +109,27 @@ class window2D : public window
         return add_render_system_impl<T>(m_render_systems, std::forward<Args>(args)...);
     }
 
-    template <typename T> T *get_render_system() const noexcept
+    template <typename T> T *render_system() const noexcept
     {
         return render_system_impl<T>(m_render_systems);
     }
 
     void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {}) const;
     void draw(const drawable2D &drawable) const;
+
+    camera2D &camera() const;
+    template <typename T> T *camera_as() const
+    {
+        return dynamic_cast<T *>(m_camera.get());
+    }
+    template <typename T, class... Args> T *camera(Args &&...args)
+    {
+        static_assert(std::is_base_of<camera2D, T>::value, "Camera type must inherit from camera2D");
+        auto cam = make_scope<T>(std::forward<Args>(args)...);
+        T *ref = cam.get();
+        m_camera = std::move(cam);
+        return ref;
+    }
 
   private:
     scope<camera2D> m_camera;
@@ -135,13 +149,27 @@ class window3D : public window
         return add_render_system_impl<T>(m_render_systems, std::forward<Args>(args)...);
     }
 
-    template <typename T> T *get_render_system() const noexcept
+    template <typename T> T *render_system() const noexcept
     {
         return render_system_impl<T>(m_render_systems);
     }
 
     void draw(const std::vector<vertex3D> &vertices, topology tplg, const transform3D &transform = {}) const;
     void draw(const drawable3D &drawable) const;
+
+    camera3D &camera() const;
+    template <typename T> T *camera_as() const
+    {
+        return dynamic_cast<T *>(m_camera.get());
+    }
+    template <typename T, class... Args> T *camera(Args &&...args)
+    {
+        static_assert(std::is_base_of<camera3D, T>::value, "Camera type must inherit from camera3D");
+        auto cam = make_scope<T>(std::forward<Args>(args)...);
+        T *ref = cam.get();
+        m_camera = std::move(cam);
+        return ref;
+    }
 
   private:
     scope<camera3D> m_camera;

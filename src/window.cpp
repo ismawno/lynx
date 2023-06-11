@@ -127,7 +127,6 @@ bool window::should_close() const
 window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) : window(width, height, name)
 {
     m_camera = make_scope<orthographic2D>(swap_chain_aspect(), 10.f);
-    m_camera->update_transformation_matrices();
 
     add_render_system<point_render_system2D>();
     add_render_system<line_render_system2D>();
@@ -145,6 +144,11 @@ void window2D::draw(const drawable2D &drawable) const
 {
     const topology top = drawable.primitive_topology();
     drawable.draw(*m_render_systems[(std::size_t)top]);
+}
+
+camera2D &window2D::camera() const
+{
+    return *m_camera;
 }
 
 void window2D::render(const VkCommandBuffer command_buffer) const
@@ -166,7 +170,6 @@ void window2D::clear_render_data() const
 window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) : window(width, height, name)
 {
     m_camera = make_scope<perspective3D>(swap_chain_aspect(), glm::radians(60.f));
-    m_camera->update_transformation_matrices();
 
     add_render_system<point_render_system3D>();
     add_render_system<line_render_system3D>();
@@ -184,6 +187,11 @@ void window3D::draw(const drawable3D &drawable) const
 {
     const topology top = drawable.primitive_topology();
     drawable.draw(*m_render_systems[(std::size_t)top]);
+}
+
+camera3D &window3D::camera() const
+{
+    return *m_camera;
 }
 
 void window3D::render(const VkCommandBuffer command_buffer) const

@@ -16,6 +16,9 @@ class app
     void run_impl(const window &win);
 
   private:
+    virtual void on_start()
+    {
+    }
     virtual void on_draw()
     {
     }
