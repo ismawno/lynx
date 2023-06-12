@@ -32,6 +32,9 @@ class camera3D : public camera
 {
   public:
     transform3D transform;
+
+    void point_towards(const glm::vec3 &direction);
+    void point_to(const glm::vec3 &position);
 };
 
 class orthographic2D : public camera2D

@@ -18,17 +18,24 @@ class example_app3D : public lynx::app3D
     void on_start() override
     {
         cam = m_window.camera_as<lynx::perspective3D>();
+        cube.transform.position.z = 3.f;
     }
     void on_draw() override
     {
         static int frame = 0;
-        lynx::rect3D rect;
-        rect.transform.position.z = 2.f;
-        // m_window.camera().transform.rotation.y = (float)frame++ / 50.f;
-        rect.transform.rotation.z = (float)frame++ / 50.f;
+        static lynx::rect3D rect;
+        rect.transform.position.z = 4.f;
+        cube.transform.position.x = 1.f * cosf(0.03f * frame);
+        cube.transform.position.y = 1.f * sinf(0.03f * frame++);
+        cube.transform.position.z += 0.004f;
+
+        cam->point_to(cube.transform.position);
+
+        m_window.draw(cube);
         m_window.draw(rect);
     }
     lynx::perspective3D *cam;
+    lynx::cube3D cube;
 };
 
 int main()
