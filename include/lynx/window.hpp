@@ -51,9 +51,9 @@ class window
     void maintain_camera_aspect_ratio(bool maintain);
 
     template <typename T, typename B, class... Args>
-    T *add_render_system_impl(std::vector<scope<B>> &systems, Args &&...args)
+    T *add_render_system(std::vector<scope<B>> &systems, Args &&...args)
     {
-        static_assert(std::is_base_of<render_system, B>::value,
+        static_assert(std::is_base_of<lynx::render_system, B>::value,
                       "Can only use add_render_system with a type that inherits from render_system");
         static_assert(
             std::is_base_of<B, T>::value,
@@ -67,7 +67,7 @@ class window
         return ref;
     }
 
-    template <typename T, typename B> T *render_system_impl(std::vector<scope<B>> &systems) const noexcept
+    template <typename T, typename B> T *render_system(std::vector<scope<B>> &systems) const noexcept
     {
         for (auto &rs : systems)
         {
@@ -112,12 +112,12 @@ class window2D : public window
 
     template <typename T, class... Args> T *add_render_system(Args &&...args)
     {
-        return add_render_system_impl<T>(m_render_systems, std::forward<Args>(args)...);
+        return window::add_render_system<T>(m_render_systems, std::forward<Args>(args)...);
     }
 
     template <typename T> T *render_system() const noexcept
     {
-        return render_system_impl<T>(m_render_systems);
+        return window::render_system<T>(m_render_systems);
     }
 
     void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {}) const;
@@ -152,12 +152,12 @@ class window3D : public window
 
     template <typename T, class... Args> T *add_render_system(Args &&...args)
     {
-        return add_render_system_impl<T>(m_render_systems, std::forward<Args>(args)...);
+        return window::add_render_system<T>(m_render_systems, std::forward<Args>(args)...);
     }
 
     template <typename T> T *render_system() const noexcept
     {
-        return render_system_impl<T>(m_render_systems);
+        return window::render_system<T>(m_render_systems);
     }
 
     void draw(const std::vector<vertex3D> &vertices, topology tplg, const transform3D &transform = {}) const;

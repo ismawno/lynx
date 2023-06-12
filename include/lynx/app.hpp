@@ -13,7 +13,7 @@ class app
     virtual void run() = 0;
 
   protected:
-    void run_impl(const window &win);
+    void run(const window &win);
 
   private:
     virtual void on_start()

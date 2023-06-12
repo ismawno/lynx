@@ -5,7 +5,7 @@
 
 namespace lynx
 {
-void app::run_impl(const window &win)
+void app::run(const window &win)
 {
     on_start();
     while (!win.should_close())
@@ -24,7 +24,7 @@ app2D::app2D(const std::uint32_t width, const std::uint32_t height, const char *
 
 void app2D::run()
 {
-    run_impl(m_window);
+    app::run(m_window);
 }
 
 window2D &app2D::window()
@@ -38,7 +38,7 @@ app3D::app3D(const std::uint32_t width, const std::uint32_t height, const char *
 
 void app3D::run()
 {
-    run_impl(m_window);
+    app::run(m_window);
 }
 
 window3D &app3D::window()
