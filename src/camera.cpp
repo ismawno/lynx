@@ -68,9 +68,9 @@ void orthographic2D::update_view()
 
 void camera3D::point_towards(const glm::vec3 &direction)
 {
-    transform.rotation.y = atan2f(direction.x, direction.z);
-    transform.rotation.x =
-        -atan2f(direction.y, direction.z * cosf(transform.rotation.y) + direction.x * sinf(transform.rotation.y));
+    float &roty = transform.rotation.y;
+    roty = atan2f(direction.x, direction.z);
+    transform.rotation.x = -atan2f(direction.y, direction.z * cosf(roty) + direction.x * sinf(roty));
 }
 void camera3D::point_to(const glm::vec3 &position)
 {
