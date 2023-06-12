@@ -17,8 +17,7 @@ window::window(const std::uint32_t width, const std::uint32_t height, const char
 
 window::~window()
 {
-    glfwDestroyWindow(m_window);
-    vkDeviceWaitIdle(m_device->vulkan_device());
+    close();
 }
 
 void window::init()
@@ -65,6 +64,25 @@ void window::clear() const
     clear_render_data();
 }
 
+void window::close()
+{
+    vkDeviceWaitIdle(m_device->vulkan_device());
+    glfwDestroyWindow(m_window);
+    m_window = nullptr;
+}
+
+bool window::closed()
+{
+    if (!m_window)
+        return true;
+    if (glfwWindowShouldClose(m_window))
+    {
+        close();
+        return true;
+    }
+    return false;
+}
+
 void window::frame_buffer_resize_callback(GLFWwindow *gwindow, const int width, const int height)
 {
     window *win = (window *)glfwGetWindowUserPointer(gwindow);
@@ -89,11 +107,6 @@ bool window::maintain_camera_aspect_ratio() const
 void window::maintain_camera_aspect_ratio(const bool maintain)
 {
     m_maintain_camera_aspect_ratio = maintain;
-}
-
-const device &window::gpu() const
-{
-    return *m_device;
 }
 
 std::uint32_t window::width() const
@@ -121,7 +134,7 @@ VkExtent2D window::extent() const
 
 bool window::should_close() const
 {
-    return glfwWindowShouldClose(m_window);
+    return !m_window || glfwWindowShouldClose(m_window);
 }
 
 window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) : window(width, height, name)

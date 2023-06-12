@@ -41,7 +41,35 @@ class example_app3D : public lynx::app3D
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app3D app;
-    app.window().maintain_camera_aspect_ratio(false);
-    app.run();
+
+    // example_app3D app;
+    // app.window().maintain_camera_aspect_ratio(false);
+    // app.run();
+
+    lynx::window3D win1{800, 600, "One"};
+    lynx::window2D win2{800, 600, "Two"};
+    while (!win1.closed() || !win2.closed())
+    {
+        if (!win1.closed())
+        {
+            win1.poll_events();
+            win1.clear();
+            static int frame = 0;
+            lynx::cube3D cube;
+            cube.transform.position.z = 3.f;
+            cube.transform.rotation.y = (float)frame++ / 25.f;
+            win1.draw(cube);
+            win1.display();
+        }
+        if (!win2.closed())
+        {
+            win2.poll_events();
+            win2.clear();
+            static int frame = 0;
+            lynx::rect2D rect;
+            rect.transform.rotation = (float)frame++ / 25.f;
+            win2.draw(rect);
+            win2.display();
+        }
+    }
 }

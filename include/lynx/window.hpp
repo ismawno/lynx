@@ -33,20 +33,21 @@ class window
 
     VkExtent2D extent() const;
 
-    bool should_close() const;
     void create_surface(VkInstance instance, VkSurfaceKHR *surface) const;
 
     void poll_events() const;
     bool display() const;
     void clear() const;
 
+    bool should_close() const;
+    bool closed();
+    void close();
+
     bool was_resized() const;
     void complete_resize();
 
     bool maintain_camera_aspect_ratio() const;
     void maintain_camera_aspect_ratio(bool maintain);
-
-    const device &gpu() const;
 
     template <typename T, typename B, class... Args>
     T *add_render_system_impl(std::vector<scope<B>> &systems, Args &&...args)
