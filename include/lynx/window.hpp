@@ -50,6 +50,8 @@ class window
     bool maintain_camera_aspect_ratio() const;
     void maintain_camera_aspect_ratio(bool maintain);
 
+    GLFWwindow *glfw_window() const;
+
     template <typename T, typename B, class... Args>
     T *add_render_system(std::vector<scope<B>> &systems, Args &&...args)
     {

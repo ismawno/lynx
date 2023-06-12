@@ -111,6 +111,11 @@ void window::maintain_camera_aspect_ratio(const bool maintain)
     m_maintain_camera_aspect_ratio = maintain;
 }
 
+GLFWwindow *window::glfw_window() const
+{
+    return m_window;
+}
+
 const std::unordered_set<const window *> window::active_windows()
 {
     return s_active_windows;
