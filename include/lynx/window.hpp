@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <vulkan/vulkan.hpp>
+#include <unordered_set>
 
 namespace lynx
 {
@@ -77,6 +78,8 @@ class window
         return nullptr;
     }
 
+    static const std::unordered_set<const window *> active_windows();
+
   protected:
     bool m_maintain_camera_aspect_ratio = true;
 
@@ -87,6 +90,8 @@ class window
 
     ref<const device> m_device;
     scope<renderer> m_renderer;
+
+    static inline std::unordered_set<const window *> s_active_windows{};
 
     bool m_frame_buffer_resized = false;
 

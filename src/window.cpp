@@ -13,6 +13,7 @@ window::window(const std::uint32_t width, const std::uint32_t height, const char
     : m_width(width), m_height(height), m_name(name)
 {
     init();
+    s_active_windows.insert(this);
 }
 
 window::~window()
@@ -69,6 +70,7 @@ void window::close()
     vkDeviceWaitIdle(m_device->vulkan_device());
     glfwDestroyWindow(m_window);
     m_window = nullptr;
+    s_active_windows.erase(this);
 }
 
 bool window::closed()
@@ -107,6 +109,11 @@ bool window::maintain_camera_aspect_ratio() const
 void window::maintain_camera_aspect_ratio(const bool maintain)
 {
     m_maintain_camera_aspect_ratio = maintain;
+}
+
+const std::unordered_set<const window *> window::active_windows()
+{
+    return s_active_windows;
 }
 
 std::uint32_t window::width() const
