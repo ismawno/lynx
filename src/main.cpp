@@ -4,7 +4,7 @@
 
 class example_app2D : public lynx::app2D
 {
-    void on_draw() override
+    void on_update() override
     {
         static int frame = 0;
         lynx::rect2D rect;
@@ -20,7 +20,7 @@ class example_app3D : public lynx::app3D
         cam = m_window.camera_as<lynx::perspective3D>();
         cube.transform.position.z = 3.f;
     }
-    void on_draw() override
+    void on_update() override
     {
         static int frame = 0;
         static lynx::rect3D rect;
@@ -42,34 +42,17 @@ int main()
 {
     DBG_SET_LEVEL(info)
 
-    // example_app3D app;
-    // app.window().maintain_camera_aspect_ratio(false);
-    // app.run();
-
-    lynx::window3D win1{800, 600, "One"};
-    lynx::window2D win2{800, 600, "Two"};
-    while (!win1.closed() || !win2.closed())
+    example_app2D app2;
+    example_app3D app3;
+    app2.start();
+    app3.start();
+    while (true)
     {
-        if (!win1.closed())
-        {
-            win1.poll_events();
-            win1.clear();
-            static int frame = 0;
-            lynx::cube3D cube;
-            cube.transform.position.z = 3.f;
-            cube.transform.rotation.y = (float)frame++ / 25.f;
-            win1.draw(cube);
-            win1.display();
-        }
-        if (!win2.closed())
-        {
-            win2.poll_events();
-            win2.clear();
-            static int frame = 0;
-            lynx::rect2D rect;
-            rect.transform.rotation = (float)frame++ / 25.f;
-            win2.draw(rect);
-            win2.display();
-        }
+        const bool done2 = !app2.next_frame();
+        const bool done3 = !app3.next_frame();
+        if (done2 && done3)
+            break;
     }
+    app2.shutdown();
+    app3.shutdown();
 }

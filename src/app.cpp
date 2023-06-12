@@ -5,44 +5,64 @@
 
 namespace lynx
 {
-void app::run(const window &win)
+app::app(window &win) : m_window(win)
 {
+}
+
+app::~app()
+{
+    DBG_ASSERT_ERROR(m_terminated || !m_started,
+                     "Application being destroyed has not been terminated properly with shutdown()")
+}
+
+void app::run()
+{
+    start();
+    while (next_frame())
+        ;
+    shutdown();
+}
+
+void app::start()
+{
+    DBG_ASSERT_ERROR(!m_terminated, "Cannot call start on a terminated app")
+    DBG_ASSERT_ERROR(!m_started, "Cannot call start on a started app")
     on_start();
-    while (!win.should_close())
-    {
-        win.poll_events();
-        win.clear();
-        on_draw();
-        win.display();
-    }
-    win.clear();
+    m_started = true;
 }
 
-app2D::app2D(const std::uint32_t width, const std::uint32_t height, const char *name) : m_window(width, height, name)
+bool app::next_frame()
+{
+    DBG_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
+    DBG_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
+    if (m_window.closed())
+        return false;
+    m_window.poll_events();
+    m_window.clear();
+    on_update();
+    if (m_window.closed())
+        return false;
+    m_window.display();
+    return !m_window.closed();
+}
+
+void app::shutdown()
+{
+    DBG_ASSERT_ERROR(m_started, "Cannot terminate an app that has not been started")
+    DBG_ASSERT_ERROR(!m_terminated, "Cannot terminate an already terminated app")
+    m_window.clear();
+    on_shutdown();
+    m_terminated = true;
+}
+
+app2D::app2D(const std::uint32_t width, const std::uint32_t height, const char *name)
+    : app(m_window), m_window(width, height, name)
 {
 }
 
-void app2D::run()
-{
-    app::run(m_window);
-}
-
-window2D &app2D::window()
-{
-    return m_window;
-}
-
-app3D::app3D(const std::uint32_t width, const std::uint32_t height, const char *name) : m_window(width, height, name)
+app3D::app3D(const std::uint32_t width, const std::uint32_t height, const char *name)
+    : app(m_window), m_window(width, height, name)
 {
 }
 
-void app3D::run()
-{
-    app::run(m_window);
-}
-
-window3D &app3D::window()
-{
-    return m_window;
-}
 } // namespace lynx

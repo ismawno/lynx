@@ -8,20 +8,29 @@ namespace lynx
 class app
 {
   public:
-    app() = default;
+    app(window &win);
+    virtual ~app();
 
-    virtual void run() = 0;
+    void run();
+    void start();
+    bool next_frame();
+    void shutdown();
 
   protected:
-    void run(const window &win);
-
   private:
     virtual void on_start()
     {
     }
-    virtual void on_draw()
+    virtual void on_update()
     {
     }
+    virtual void on_shutdown()
+    {
+    }
+
+    bool m_started = false;
+    bool m_terminated = false;
+    window &m_window;
 
     app(const app &) = delete;
     app &operator=(const app &) = delete;
@@ -30,10 +39,7 @@ class app
 class app2D : public app
 {
   public:
-    app2D(std::uint32_t width = 800, std::uint32_t height = 600, const char *m_name = "Window 2D");
-
-    void run() override;
-    window2D &window();
+    app2D(std::uint32_t width = 800, std::uint32_t height = 600, const char *m_name = "App 2D");
 
   protected:
     window2D m_window;
@@ -42,10 +48,7 @@ class app2D : public app
 class app3D : public app
 {
   public:
-    app3D(std::uint32_t width = 800, std::uint32_t height = 600, const char *m_name = "Window 3D");
-
-    void run() override;
-    window3D &window();
+    app3D(std::uint32_t width = 800, std::uint32_t height = 600, const char *m_name = "App 3D");
 
   protected:
     window3D m_window;

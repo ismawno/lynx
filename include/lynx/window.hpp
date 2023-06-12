@@ -124,11 +124,11 @@ class window2D : public window
     void draw(const drawable2D &drawable) const;
 
     camera2D &camera() const;
-    template <typename T> T *camera_as() const
+    template <typename T> T *get_camera_as() const
     {
         return dynamic_cast<T *>(m_camera.get());
     }
-    template <typename T, class... Args> T *camera(Args &&...args)
+    template <typename T, class... Args> T *set_camera_as(Args &&...args)
     {
         static_assert(std::is_base_of<camera2D, T>::value, "Camera type must inherit from camera2D");
         auto cam = make_scope<T>(std::forward<Args>(args)...);
