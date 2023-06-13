@@ -464,7 +464,7 @@ void device::end_single_time_commands(VkCommandBuffer command_buffer) const
     vkFreeCommandBuffers(m_device, m_command_pool, 1, &command_buffer);
 }
 
-void device::copy_buffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size) const
+void device::copy_buffer(VkBuffer dst_buffer, VkBuffer src_buffer, VkDeviceSize size) const
 {
     VkCommandBuffer command_buffer = begin_single_time_commands();
 

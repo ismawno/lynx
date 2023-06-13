@@ -48,7 +48,7 @@ class device
 
     VkCommandBuffer begin_single_time_commands() const;
     void end_single_time_commands(VkCommandBuffer command_buffer) const;
-    void copy_buffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size) const;
+    void copy_buffer(VkBuffer dst_buffer, VkBuffer src_buffer, VkDeviceSize size) const;
 
     void copy_buffer_to_image(VkBuffer buffer, VkImage image, std::uint32_t width, std::uint32_t height,
                               std::uint32_t layer_count) const;

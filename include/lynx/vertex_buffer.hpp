@@ -33,8 +33,8 @@ class vertex_buffer
     VkDeviceMemory m_index_buffer_memory;
 
     template <typename T>
-    void create_buffer(const std::vector<T> &buffer_data, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
-                       VkBuffer &buffer, VkDeviceMemory &buffer_memory);
+    void create_buffer(const std::vector<T> &buffer_data, VkBufferUsageFlags usage, VkBuffer &buffer,
+                       VkDeviceMemory &buffer_memory);
     template <typename T> void create_vertex_buffer(const std::vector<T> &vertices);
     void create_index_buffer(const std::vector<std::uint32_t> &indices);
 

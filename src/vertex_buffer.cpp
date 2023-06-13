@@ -44,29 +44,38 @@ vertex_buffer::~vertex_buffer()
 }
 
 template <typename T>
-void vertex_buffer::create_buffer(const std::vector<T> &buffer_data, VkBufferUsageFlags usage,
-                                  VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &buffer_memory)
+void vertex_buffer::create_buffer(const std::vector<T> &buffer_data, VkBufferUsageFlags usage, VkBuffer &buffer,
+                                  VkDeviceMemory &buffer_memory)
 {
     VkDeviceSize buffer_size = sizeof(T) * buffer_data.size();
-    m_device->create_buffer(buffer_size, usage, properties, buffer, buffer_memory);
+
+    VkBuffer staging_buffer;
+    VkDeviceMemory staging_memory;
+
+    m_device->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
+                            staging_memory);
     void *data;
-    vkMapMemory(m_device->vulkan_device(), buffer_memory, 0, buffer_size, 0, &data);
+    vkMapMemory(m_device->vulkan_device(), staging_memory, 0, buffer_size, 0, &data);
     memcpy(data, buffer_data.data(), (std::size_t)buffer_size);
-    vkUnmapMemory(m_device->vulkan_device(), buffer_memory);
+    vkUnmapMemory(m_device->vulkan_device(), staging_memory);
+
+    m_device->create_buffer(buffer_size, usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                            buffer, buffer_memory);
+    m_device->copy_buffer(buffer, staging_buffer, buffer_size);
+
+    vkDestroyBuffer(m_device->vulkan_device(), staging_buffer, nullptr);
+    vkFreeMemory(m_device->vulkan_device(), staging_memory, nullptr);
 }
 
 template <typename T> void vertex_buffer::create_vertex_buffer(const std::vector<T> &vertices)
 {
-    create_buffer(vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_vertex_buffer,
-                  m_vertex_buffer_memory);
+    create_buffer(vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, m_vertex_buffer, m_vertex_buffer_memory);
 }
 
 void vertex_buffer::create_index_buffer(const std::vector<std::uint32_t> &indices)
 {
-    create_buffer(indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_index_buffer,
-                  m_index_buffer_memory);
+    create_buffer(indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, m_index_buffer, m_index_buffer_memory);
 }
 
 void vertex_buffer::bind(VkCommandBuffer command_buffer) const
