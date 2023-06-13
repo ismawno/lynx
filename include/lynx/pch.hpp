@@ -12,6 +12,7 @@
 #include <array>
 #include <memory>
 #include <chrono>
+#include <utility>
 #include <vulkan/vulkan.hpp>
 #ifdef HAS_DEBUG_LOG_TOOLS
 #include "dbg/log.hpp"

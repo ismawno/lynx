@@ -165,6 +165,12 @@ void window2D::draw(const std::vector<vertex2D> &vertices, const topology tplg, 
     m_render_systems[(std::size_t)tplg]->draw(vertices, transform);
 }
 
+void window2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
+                    const topology tplg, const transform2D &transform) const
+{
+    m_render_systems[(std::size_t)tplg]->draw(vertices, indices, transform);
+}
+
 void window2D::draw(const drawable2D &drawable) const
 {
     const topology top = drawable.primitive_topology();
@@ -206,6 +212,12 @@ window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) 
 void window3D::draw(const std::vector<vertex3D> &vertices, const topology tplg, const transform3D &transform) const
 {
     m_render_systems[(std::size_t)tplg]->draw(vertices, transform);
+}
+
+void window3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
+                    const topology tplg, const transform3D &transform) const
+{
+    m_render_systems[(std::size_t)tplg]->draw(vertices, indices, transform);
 }
 
 void window3D::draw(const drawable3D &drawable) const

@@ -46,7 +46,7 @@ class example_app3D : public lynx::app3D
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app2D app;
+    example_app3D app;
     app.run();
 
     // example_app2D app2;

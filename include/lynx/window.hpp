@@ -123,6 +123,8 @@ class window2D : public window
     }
 
     void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {}) const;
+    void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
+              const transform2D &transform = {}) const;
     void draw(const drawable2D &drawable) const;
 
     camera2D &camera() const;
@@ -163,6 +165,8 @@ class window3D : public window
     }
 
     void draw(const std::vector<vertex3D> &vertices, topology tplg, const transform3D &transform = {}) const;
+    void draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
+              const transform3D &transform = {}) const;
     void draw(const drawable3D &drawable) const;
 
     camera3D &camera() const;

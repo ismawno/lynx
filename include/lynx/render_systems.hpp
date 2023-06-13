@@ -55,8 +55,14 @@ class render_system2D : public render_system
 {
   public:
     void draw(const std::vector<vertex2D> &vertices, const transform2D &transform = {});
+    void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
+              const transform2D &transform = {});
     void draw(const drawable2D &drawable);
-    ref<model2D> model_from_vertices(const std::vector<vertex2D> &vertices) const;
+
+    template <class... Args> ref<model2D> model_from_vertices(Args &&...args) const
+    {
+        return make_ref<model2D>(m_device, std::forward<Args>(args)...);
+    }
 
   protected:
     virtual void pipeline_config(pipeline::config_info &config) const override;
@@ -66,8 +72,14 @@ class render_system3D : public render_system
 {
   public:
     void draw(const std::vector<vertex3D> &vertices, const transform3D &transform = {});
+    void draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
+              const transform3D &transform = {});
     void draw(const drawable3D &drawable);
-    ref<model3D> model_from_vertices(const std::vector<vertex3D> &vertices) const;
+
+    template <class... Args> ref<model3D> model_from_vertices(Args &&...args) const
+    {
+        return make_ref<model3D>(m_device, std::forward<Args>(args)...);
+    }
 
   protected:
     virtual void pipeline_config(pipeline::config_info &config) const override;
