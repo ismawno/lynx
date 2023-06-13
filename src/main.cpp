@@ -5,11 +5,10 @@
 
 class example_app2D : public lynx::app2D
 {
-    void on_update() override
+    void on_update(const float ts) override
     {
-        static int frame = 0;
-        lynx::rect2D rect;
-        rect.transform.rotation = (float)frame++ / 25.f;
+        static lynx::rect2D rect;
+        rect.transform.rotation += (float)M_PI * ts;
         m_window.draw(rect);
     }
 };
@@ -21,20 +20,20 @@ class example_app3D : public lynx::app3D
         cam = m_window.camera_as<lynx::perspective3D>();
         cube.transform.position.z = 3.f;
     }
-    void on_update() override
+    void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key_code::A))
-            cube.transform.position.x -= 0.05f;
+            cube.transform.position.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key_code::D))
-            cube.transform.position.x += 0.05f;
+            cube.transform.position.x += ts;
         if (lynx::input::key_pressed(lynx::input::key_code::W))
-            cube.transform.position.y -= 0.05f;
+            cube.transform.position.y -= ts;
         if (lynx::input::key_pressed(lynx::input::key_code::S))
-            cube.transform.position.y += 0.05f;
+            cube.transform.position.y += ts;
         if (lynx::input::key_pressed(lynx::input::key_code::Q))
-            cube.transform.rotation.z += 0.05f;
+            cube.transform.rotation.z += ts;
         if (lynx::input::key_pressed(lynx::input::key_code::E))
-            cube.transform.rotation.z -= 0.05f;
+            cube.transform.rotation.z -= ts;
 
         cam->point_to(cube.transform.position);
 
@@ -47,7 +46,7 @@ class example_app3D : public lynx::app3D
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app3D app;
+    example_app2D app;
     app.run();
 
     // example_app2D app2;

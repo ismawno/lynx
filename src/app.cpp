@@ -38,11 +38,18 @@ bool app::next_frame()
     if (m_window.closed())
         return false;
     m_window.poll_events();
+
+    static float delta_time = 0.f;
+    const auto start = std::chrono::high_resolution_clock::now();
+
     m_window.clear();
-    on_update();
+    on_update(delta_time);
     if (m_window.closed())
         return false;
     m_window.display();
+
+    const auto end = std::chrono::high_resolution_clock::now();
+    delta_time = std::chrono::duration<float, std::chrono::seconds::period>(end - start).count();
     return !m_window.closed();
 }
 

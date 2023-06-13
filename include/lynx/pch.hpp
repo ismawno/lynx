@@ -11,6 +11,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include <chrono>
 #include <vulkan/vulkan.hpp>
 #ifdef HAS_DEBUG_LOG_TOOLS
 #include "dbg/log.hpp"
