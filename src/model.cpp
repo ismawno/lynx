@@ -1,19 +1,20 @@
 #include "lynx/pch.hpp"
 #include "lynx/model.hpp"
 #include "lynx/vertex.hpp"
+#include "lynx/buffer.hpp"
 
 namespace lynx
 {
-template <typename T>
-model::model(const ref<const device> &dev, const std::vector<T> &vertices)
-    : m_vertex_buffer(dev, vertices), m_vertex_count(vertices.size())
+template <typename T> model::model(const ref<const device> &dev, const std::vector<T> &vertices)
 {
+    create_vertex_buffer(dev, vertices);
 }
 
 template <typename T>
 model::model(const ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices)
-    : m_vertex_buffer(dev, vertices, indices), m_vertex_count(vertices.size()), m_index_count(indices.size())
 {
+    create_vertex_buffer(dev, vertices);
+    create_index_buffer(dev, indices);
 }
 
 template <typename T>
@@ -22,16 +23,45 @@ model::model(const ref<const device> &dev, const vertex_index_pair<T> &build)
 {
 }
 
+template <typename T>
+scope<buffer> model::create_buffer(const ref<const device> &dev, const std::vector<T> &data, VkBufferUsageFlags usage)
+{
+    buffer staging_buffer(dev, sizeof(T), data.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    staging_buffer.map();
+    staging_buffer.write((void *)data.data());
+
+    scope<buffer> buff = make_scope<buffer>(dev, sizeof(T), data.size(), usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    buff->write(staging_buffer);
+    return buff;
+}
+
+template <typename T> void model::create_vertex_buffer(const ref<const device> &dev, const std::vector<T> &vertices)
+{
+    m_vertex_buffer = create_buffer(dev, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+}
+
+void model::create_index_buffer(const ref<const device> &dev, const std::vector<std::uint32_t> &indices)
+{
+    m_index_buffer = create_buffer(dev, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+}
+
 void model::bind(VkCommandBuffer command_buffer) const
 {
-    m_vertex_buffer.bind(command_buffer);
+    const std::array<VkBuffer, 1> buffers = {m_vertex_buffer->vulkan_buffer()};
+    const std::array<VkDeviceSize, 1> offsets = {0};
+    vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers.data(), offsets.data());
+
+    if (m_index_buffer)
+        vkCmdBindIndexBuffer(command_buffer, m_index_buffer->vulkan_buffer(), 0, VK_INDEX_TYPE_UINT32);
 }
 void model::draw(VkCommandBuffer command_buffer) const
 {
-    if (m_vertex_buffer.has_index_buffer())
-        vkCmdDrawIndexed(command_buffer, (std::uint32_t)m_index_count, 1, 0, 0, 0);
+    if (m_index_buffer)
+        vkCmdDrawIndexed(command_buffer, (std::uint32_t)m_index_buffer->instance_count(), 1, 0, 0, 0);
     else
-        vkCmdDraw(command_buffer, (std::uint32_t)m_vertex_count, 1, 0, 0);
+        vkCmdDraw(command_buffer, (std::uint32_t)m_vertex_buffer->instance_count(), 1, 0, 0);
 }
 
 model2D::model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices) : model(dev, vertices)

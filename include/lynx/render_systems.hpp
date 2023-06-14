@@ -11,9 +11,10 @@
 namespace lynx
 {
 class device;
+class camera;
+
 class drawable2D;
 class drawable3D;
-class camera;
 
 struct push_constant_data
 {

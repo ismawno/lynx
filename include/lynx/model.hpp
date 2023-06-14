@@ -2,12 +2,20 @@
 #define LYNX_MODEL_HPP
 
 #include "lynx/core.hpp"
-#include "lynx/vertex_buffer.hpp"
+#include <vulkan/vulkan.hpp>
+
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/vec3.hpp>
 
 namespace lynx
 {
+struct vertex2D;
 struct vertex3D;
-struct vertex3D;
+
+class buffer;
+class device;
+
 class model
 {
   public:
@@ -22,13 +30,20 @@ class model
     model(const ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices);
     template <typename T> model(const ref<const device> &dev, const vertex_index_pair<T> &build);
 
+    virtual ~model() = default;
+
     void bind(VkCommandBuffer command_buffer) const;
     void draw(VkCommandBuffer command_buffer) const;
 
   private:
-    vertex_buffer m_vertex_buffer;
-    std::size_t m_vertex_count;
-    std::size_t m_index_count;
+    scope<buffer> m_vertex_buffer;
+    scope<buffer> m_index_buffer;
+
+    template <typename T>
+    static scope<buffer> create_buffer(const ref<const device> &dev, const std::vector<T> &data,
+                                       VkBufferUsageFlags usage);
+    template <typename T> void create_vertex_buffer(const ref<const device> &dev, const std::vector<T> &vertices);
+    void create_index_buffer(const ref<const device> &dev, const std::vector<std::uint32_t> &indices);
 };
 
 class model2D : public model

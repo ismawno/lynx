@@ -4,11 +4,11 @@
 
 namespace lynx
 {
-buffer::buffer(const ref<const device> &dev, VkDeviceSize instance_size, std::uint32_t instance_count,
+buffer::buffer(const ref<const device> &dev, VkDeviceSize instance_size, std::size_t instance_count,
                VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize min_offset_alignment)
-    : m_device(dev), m_instance_size(instance_size), m_alignment_size(alignment(m_instance_size, min_offset_alignment)),
-      m_buffer_size(m_instance_count * m_alignment_size), m_instance_count(instance_count), m_usage(usage),
-      m_properties(properties)
+    : m_device(dev), m_instance_count(instance_count), m_instance_size(instance_size),
+      m_alignment_size(alignment(m_instance_size, min_offset_alignment)),
+      m_buffer_size(m_instance_count * m_alignment_size), m_usage(usage), m_properties(properties)
 {
     m_device->create_buffer(m_buffer_size, usage, properties, m_buffer, m_memory);
 }
@@ -18,6 +18,12 @@ buffer::~buffer()
     unmap();
     vkDestroyBuffer(m_device->vulkan_device(), m_buffer, nullptr);
     vkFreeMemory(m_device->vulkan_device(), m_memory, nullptr);
+}
+
+VkDeviceSize buffer::alignment(VkDeviceSize instance_size, VkDeviceSize min_offset_alignment)
+{
+    return min_offset_alignment > 0 ? ((instance_size + min_offset_alignment - 1) & ~(min_offset_alignment - 1))
+                                    : instance_size;
 }
 
 VkResult buffer::map(const VkDeviceSize size, const VkDeviceSize offset)
@@ -32,7 +38,7 @@ bool buffer::unmap()
     if (!m_mapped_data)
         return false;
     vkUnmapMemory(m_device->vulkan_device(), m_memory);
-    m_memory = nullptr;
+    m_mapped_data = nullptr;
     return true;
 }
 
@@ -65,6 +71,7 @@ VkMappedMemoryRange buffer::mapped_memory_range(const VkDeviceSize size, const V
     mapped_range.memory = m_memory;
     mapped_range.offset = offset;
     mapped_range.size = size;
+    return mapped_range;
 }
 
 VkResult buffer::flush(const VkDeviceSize size, const VkDeviceSize offset) const
@@ -88,22 +95,22 @@ VkResult buffer::invalidate(const VkDeviceSize size, const VkDeviceSize offset) 
     return vkInvalidateMappedMemoryRanges(m_device->vulkan_device(), 1, &mapped_range);
 }
 
-void buffer::write_at_index(const void *data, std::uint32_t index) const
+void buffer::write_at_index(const void *data, std::size_t index) const
 {
     write(data, m_instance_size, index * m_alignment_size);
 }
 
-VkResult buffer::flush_at_index(std::uint32_t index) const
+VkResult buffer::flush_at_index(std::size_t index) const
 {
     return flush(m_alignment_size, index * m_alignment_size);
 }
 
-VkDescriptorBufferInfo buffer::descriptor_info_at_index(std::uint32_t index) const
+VkDescriptorBufferInfo buffer::descriptor_info_at_index(std::size_t index) const
 {
     return descriptor_info(m_alignment_size, index * m_alignment_size);
 }
 
-VkResult buffer::invalidate_at_index(std::uint32_t index) const
+VkResult buffer::invalidate_at_index(std::size_t index) const
 {
     return invalidate(m_alignment_size, index * m_alignment_size);
 }
@@ -116,7 +123,7 @@ VkDeviceSize buffer::instance_size() const
 {
     return m_instance_size;
 }
-std::uint32_t buffer::instance_count() const
+std::size_t buffer::instance_count() const
 {
     return m_instance_count;
 }

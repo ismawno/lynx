@@ -6,16 +6,15 @@
 
 namespace lynx
 {
-
+#ifdef DEBUG
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT,
                                                      VkDebugUtilsMessageTypeFlagsEXT,
                                                      const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *)
 {
-    std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
+    DBG_ERROR("{0}", pCallbackData->pMessage)
     return VK_FALSE;
 }
 
-#ifdef DEBUG
 VkResult create_debug_utils_messenger_EXT(const VkInstance m_instance,
                                           const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
                                           const VkAllocationCallbacks *pAllocator,
@@ -212,6 +211,7 @@ bool device::is_device_suitable(const VkPhysicalDevice device) const
     return indices.is_complete() && extensions_supported && swap_chain_adequate && supported_features.samplerAnisotropy;
 }
 
+#ifdef DEBUG
 void device::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT &create_info) const
 {
     create_info = {};
@@ -224,6 +224,7 @@ void device::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInf
     create_info.pfnUserCallback = debug_callback;
     create_info.pUserData = nullptr; // Optional
 }
+#endif
 
 #ifdef DEBUG
 void device::setup_debug_messenger()

@@ -83,9 +83,10 @@ class device
     std::vector<const char *> required_extensions() const;
 #ifdef DEBUG
     bool check_validation_layer_support() const;
-#endif
-    queue_family_indices find_queue_families(VkPhysicalDevice device) const;
     void populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT &createInfo) const;
+#endif
+
+    queue_family_indices find_queue_families(VkPhysicalDevice device) const;
     void has_gflw_required_instance_extensions() const;
     bool check_device_extension_support(VkPhysicalDevice device) const;
     swap_chain_support_details query_swap_chain_support(VkPhysicalDevice device) const;

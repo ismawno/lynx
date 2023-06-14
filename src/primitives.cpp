@@ -1,6 +1,7 @@
 #include "lynx/pch.hpp"
 #include "lynx/primitives.hpp"
 #include "lynx/render_systems.hpp"
+#include "lynx/buffer.hpp"
 
 namespace lynx
 {
