@@ -16,7 +16,8 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverity
 }
 
 #ifdef DEBUG
-VkResult create_debug_utils_messenger_EXT(VkInstance m_instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
+VkResult create_debug_utils_messenger_EXT(const VkInstance m_instance,
+                                          const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
                                           const VkAllocationCallbacks *pAllocator,
                                           VkDebugUtilsMessengerEXT *pDebugMessenger)
 {
@@ -192,7 +193,7 @@ void device::create_command_pool()
         throw device_error("Failed to create command pool");
 }
 
-bool device::is_device_suitable(VkPhysicalDevice device) const
+bool device::is_device_suitable(const VkPhysicalDevice device) const
 {
     const queue_family_indices indices = find_queue_families(device);
 

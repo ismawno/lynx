@@ -40,7 +40,7 @@ class model2D : public model
     model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices,
             const std::vector<std::uint32_t> &indices);
     model2D(const ref<const device> &dev, const vertex_index_pair &build);
-    // create NGon
+    // create NGon. HACER STATIC UNORDERED MAP
     static const vertex_index_pair &rect(const glm::vec3 &color = glm::vec3(1.f));
     static const std::vector<vertex2D> &line(const glm::vec3 &color = glm::vec3(1.f));
 };
