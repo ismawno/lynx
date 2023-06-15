@@ -6,7 +6,7 @@ layout(location = 0) out vec4 out_color;
 layout(push_constant) uniform Push
 {
     mat4 transform;
-    vec3 color;
+    mat4 projection;
 }
 push;
 

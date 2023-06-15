@@ -17,7 +17,7 @@ line2D::line2D(const glm::vec2 &p1, const glm::vec2 &p2)
 void line2D::draw(render_system2D &rs) const
 {
     static ref<model2D> mdl = rs.model_from_vertices(model2D::line());
-    rs.push_render_data({mdl, {transform}});
+    rs.push_render_data({mdl, transform});
 }
 
 topology line2D::primitive_topology() const
@@ -38,7 +38,7 @@ line3D::line3D(const glm::vec3 &p1, const glm::vec3 &p2)
 void line3D::draw(render_system3D &rs) const
 {
     static ref<model3D> mdl = rs.model_from_vertices(model3D::line());
-    rs.push_render_data({mdl, {transform}});
+    rs.push_render_data({mdl, transform});
 }
 
 topology line3D::primitive_topology() const
@@ -55,7 +55,7 @@ rect2D::rect2D(const glm::vec2 &position, const glm::vec2 &dimensions)
 void rect2D::draw(render_system2D &rs) const
 {
     static ref<model2D> mdl = rs.model_from_vertices(model2D::rect());
-    rs.push_render_data({mdl, {transform}});
+    rs.push_render_data({mdl, transform});
 }
 
 topology rect2D::primitive_topology() const
@@ -72,7 +72,7 @@ rect3D::rect3D(const glm::vec3 &position, const glm::vec2 &dimensions)
 void rect3D::draw(render_system3D &rs) const
 {
     static ref<model3D> mdl = rs.model_from_vertices(model3D::rect());
-    rs.push_render_data({mdl, {transform}});
+    rs.push_render_data({mdl, transform});
 }
 
 topology rect3D::primitive_topology() const
@@ -89,7 +89,7 @@ cube3D::cube3D(const glm::vec3 &position, const glm::vec3 &dimensions)
 void cube3D::draw(render_system3D &rs) const
 {
     static ref<model3D> mdl = rs.model_from_vertices(model3D::cube());
-    rs.push_render_data({mdl, {transform}});
+    rs.push_render_data({mdl, transform});
 }
 
 topology cube3D::primitive_topology() const

@@ -8,13 +8,13 @@ layout(location = 0) out vec3 frag_color;
 layout(push_constant) uniform Push
 {
     mat4 transform;
-    vec3 color;
+    mat4 projection;
 }
 push;
 
 void main()
 {
-    gl_Position = push.transform * vec4(position, 1.0);
+    gl_Position = push.projection * push.transform * vec4(position, 1.0);
     frag_color = color;
     gl_PointSize = 1.0;
 }

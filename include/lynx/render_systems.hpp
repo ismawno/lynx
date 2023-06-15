@@ -19,13 +19,13 @@ class drawable3D;
 struct push_constant_data
 {
     glm::mat4 transform{1.f};
-    alignas(16) glm::vec3 color{.2f};
+    glm::mat4 projection{1.f};
 };
 
 struct render_data
 {
     ref<const model> mdl;
-    push_constant_data push_data;
+    glm::mat4 mdl_transform;
 };
 class render_system
 {
