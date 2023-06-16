@@ -529,6 +529,14 @@ VkDevice device::vulkan_device() const
 {
     return m_device;
 }
+VkPhysicalDevice device::vulkan_physical_device() const
+{
+    return m_physical_device;
+}
+VkInstance device::vulkan_instance() const
+{
+    return m_instance;
+}
 VkSurfaceKHR device::surface() const
 {
     return m_surface;

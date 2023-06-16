@@ -10,7 +10,6 @@ namespace lynx
 class window;
 class device
 {
-
   public:
     struct swap_chain_support_details
     {
@@ -33,6 +32,8 @@ class device
 
     VkCommandPool command_pool() const;
     VkDevice vulkan_device() const;
+    VkPhysicalDevice vulkan_physical_device() const;
+    VkInstance vulkan_instance() const;
     VkSurfaceKHR surface() const;
     VkQueue graphics_queue() const;
     VkQueue present_queue() const;

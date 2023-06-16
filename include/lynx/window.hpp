@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <vulkan/vulkan.hpp>
 #include <unordered_set>
+#include <functional>
 
 namespace lynx
 {
@@ -39,7 +40,7 @@ class window
     void create_surface(VkInstance instance, VkSurfaceKHR *surface) const;
 
     void poll_events() const;
-    bool display() const;
+    bool display(const std::vector<std::function<void(VkCommandBuffer)>> &submissions = {}) const;
     void clear() const;
 
     bool should_close() const;
@@ -94,7 +95,6 @@ class window
 
     ref<const device> m_device;
     scope<renderer> m_renderer;
-    std::array<scope<buffer>, swap_chain::MAX_FRAMES_IN_FLIGHT> m_uniform_buffers;
 
     static inline std::unordered_set<const window *> s_active_windows{};
 
@@ -109,6 +109,8 @@ class window
 
     window(const window &) = delete;
     window &operator=(const window &) = delete;
+
+    friend class app;
 };
 
 class window2D : public window

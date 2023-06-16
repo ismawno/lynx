@@ -13,7 +13,11 @@
 #include <memory>
 #include <chrono>
 #include <utility>
+#include <functional>
 #include <vulkan/vulkan.hpp>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
 #ifdef HAS_DEBUG_LOG_TOOLS
 #include "dbg/log.hpp"
 #endif

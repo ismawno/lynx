@@ -18,6 +18,13 @@ class app
 
   protected:
   private:
+    bool m_started = false;
+    bool m_terminated = false;
+    VkDescriptorPool m_imgui_pool;
+    window &m_window;
+
+    void init_imgui();
+
     virtual void on_start()
     {
     }
@@ -27,10 +34,6 @@ class app
     virtual void on_shutdown()
     {
     }
-
-    bool m_started = false;
-    bool m_terminated = false;
-    window &m_window;
 
     app(const app &) = delete;
     app &operator=(const app &) = delete;

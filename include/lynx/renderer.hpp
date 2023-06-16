@@ -2,13 +2,14 @@
 #define LYNX_RENDERER_HPP
 
 #include "lynx/core.hpp"
+#include "lynx/swap_chain.hpp"
 #include <vulkan/vulkan.hpp>
+#include <functional>
 
 namespace lynx
 {
 class window;
 class device;
-class swap_chain;
 class renderer
 {
   public:
@@ -21,6 +22,8 @@ class renderer
     void begin_swap_chain_render_pass(VkCommandBuffer command_buffer) const;
     void end_swap_chain_render_pass(VkCommandBuffer command_buffer) const;
 
+    void immediate_submission(const std::function<void(VkCommandBuffer)> &submission) const;
+
     bool frame_in_progress() const;
     VkCommandBuffer current_command_buffer() const;
     std::uint32_t frame_index() const;
@@ -30,7 +33,8 @@ class renderer
     window &m_window;
     ref<const device> m_device;
     scope<lynx::swap_chain> m_swap_chain;
-    std::vector<VkCommandBuffer> m_command_buffers;
+    std::array<VkCommandBuffer, swap_chain::MAX_FRAMES_IN_FLIGHT + 1>
+        m_command_buffers; // Last one for immediate submissions
 
     std::uint32_t m_image_index;
     std::uint32_t m_frame_index = 0;

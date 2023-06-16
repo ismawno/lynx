@@ -26,7 +26,8 @@ filter "system:macosx"
       "Cocoa.framework",
       "IOKit.framework",
       "CoreFoundation.framework",
-      "vulkan"
+      "vulkan",
+      "imgui"
    }
    rpath = "-Wl,-rpath,".. rootpath .."vendor/vulkan-sdk/macOS/lib"
    linkoptions {rpath}
@@ -53,5 +54,7 @@ includedirs {
    "%{wks.location}/vendor/spdlog/include",
    "%{wks.location}/vendor/glfw/include",
    "%{wks.location}/vendor/glm",
-   "%{wks.location}/vendor/vulkan-sdk/macOS/include"
+   "%{wks.location}/vendor/vulkan-sdk/macOS/include",
+   "%{wks.location}/vendor/imgui/include",
+   "%{wks.location}/vendor/imgui/backends"
 }

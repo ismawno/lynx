@@ -8,12 +8,6 @@
 
 namespace lynx
 {
-
-struct uniform_data
-{
-    glm::mat4 view{1.f};
-};
-
 window::window(const std::uint32_t width, const std::uint32_t height, const char *name)
     : m_width(width), m_height(height), m_name(name)
 {
@@ -37,14 +31,6 @@ void window::init()
     glfwSetFramebufferSizeCallback(m_window, frame_buffer_resize_callback);
     m_device = make_ref<device>(*this);
     m_renderer = make_scope<renderer>(m_device, *this);
-
-    for (std::size_t i = 0; i < swap_chain::MAX_FRAMES_IN_FLIGHT; i++)
-    {
-        m_uniform_buffers[i] = make_scope<buffer>(
-            m_device, sizeof(uniform_data), 1ul, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
-        m_uniform_buffers[i]->map();
-    }
 }
 
 void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
@@ -58,7 +44,7 @@ void window::poll_events() const
     glfwPollEvents();
 }
 
-bool window::display() const
+bool window::display(const std::vector<std::function<void(VkCommandBuffer)>> &submissions) const
 {
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
@@ -67,12 +53,10 @@ bool window::display() const
             cam.keep_aspect_ratio(m_renderer->swap_chain().extent_aspect_ratio());
         cam.update_transformation_matrices();
 
-        const std::uint32_t frame_index = m_renderer->frame_index();
-        const uniform_data ufo{cam.view()};
-        m_uniform_buffers[frame_index]->write(&ufo);
-
         m_renderer->begin_swap_chain_render_pass(command_buffer);
         render(command_buffer);
+        for (const auto &submission : submissions)
+            submission(command_buffer);
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
         return true;
