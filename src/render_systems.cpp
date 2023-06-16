@@ -1,7 +1,6 @@
 #include "lynx/pch.hpp"
 #include "lynx/render_systems.hpp"
 #include "lynx/device.hpp"
-#include "lynx/exceptions.hpp"
 #include "lynx/vertex.hpp"
 #include "lynx/primitives.hpp"
 #include "lynx/camera.hpp"
@@ -45,8 +44,8 @@ void render_system::create_pipeline_layout(const pipeline::config_info &config)
     layout_info.pSetLayouts = nullptr;
     layout_info.pushConstantRangeCount = 1;
     layout_info.pPushConstantRanges = &push_constant_range;
-    if (vkCreatePipelineLayout(m_device->vulkan_device(), &layout_info, nullptr, &m_pipeline_layout) != VK_SUCCESS)
-        throw bad_init("Failed to create pipeline layout");
+    DBG_CHECK_RETURN_VALUE(vkCreatePipelineLayout(m_device->vulkan_device(), &layout_info, nullptr, &m_pipeline_layout),
+                           VK_SUCCESS, CRITICAL, "Failed to create pipeline layout")
 }
 
 void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::config_info &config)

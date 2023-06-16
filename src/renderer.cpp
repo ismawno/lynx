@@ -1,6 +1,5 @@
 #include "lynx/pch.hpp"
 #include "lynx/renderer.hpp"
-#include "lynx/exceptions.hpp"
 #include "lynx/window.hpp"
 #include "lynx/device.hpp"
 #include "lynx/swap_chain.hpp"
@@ -63,8 +62,8 @@ void renderer::create_command_buffers()
     alloc_info.commandPool = m_device->command_pool();
     alloc_info.commandBufferCount = (std::uint32_t)m_command_buffers.size();
 
-    if (vkAllocateCommandBuffers(m_device->vulkan_device(), &alloc_info, m_command_buffers.data()) != VK_SUCCESS)
-        throw bad_init("Failed to create command buffers");
+    DBG_CHECK_RETURN_VALUE(vkAllocateCommandBuffers(m_device->vulkan_device(), &alloc_info, m_command_buffers.data()),
+                           VK_SUCCESS, CRITICAL, "Failed to create command buffers")
 }
 
 void renderer::free_command_buffers()
@@ -83,30 +82,32 @@ VkCommandBuffer renderer::begin_frame()
         return nullptr;
     }
 
-    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-        throw draw_error("Failed to acquire swap chain image");
-
+    DBG_ASSERT_CRITICAL(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR, "Failed to acquire swap chain image")
     m_frame_started = true;
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    if (vkBeginCommandBuffer(m_command_buffers[m_frame_index], &begin_info) != VK_SUCCESS)
-        throw bad_init("Failed to begin command buffer");
+
+    DBG_CHECK_RETURN_VALUE(vkBeginCommandBuffer(m_command_buffers[m_frame_index], &begin_info), VK_SUCCESS, CRITICAL,
+                           "Failed to begin command buffer")
     return m_command_buffers[m_frame_index];
 }
 void renderer::end_frame()
 {
     DBG_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
-    if (vkEndCommandBuffer(m_command_buffers[m_frame_index]) != VK_SUCCESS)
-        throw bad_deinit("Failed to end command buffer");
+    DBG_CHECK_RETURN_VALUE(vkEndCommandBuffer(m_command_buffers[m_frame_index]), VK_SUCCESS, CRITICAL,
+                           "Failed to end command buffer")
 
     const VkResult result = m_swap_chain->submit_command_buffers(&m_command_buffers[m_frame_index], &m_image_index);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.was_resized())
+
+    const bool recreate_fixes_issue =
+        result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.was_resized();
+    if (recreate_fixes_issue)
     {
         create_swap_chain();
         m_window.complete_resize();
     }
-    else if (result != VK_SUCCESS)
-        throw draw_error("Failed to submit command buffers");
+
+    DBG_ASSERT_CRITICAL(recreate_fixes_issue || result == VK_SUCCESS, "Failed to submit command buffers")
     m_frame_started = false;
     m_frame_index = (m_frame_index + 1) % swap_chain::MAX_FRAMES_IN_FLIGHT;
 }

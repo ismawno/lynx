@@ -1,6 +1,5 @@
 #include "lynx/pch.hpp"
 #include "lynx/app.hpp"
-#include "lynx/exceptions.hpp"
 #include "lynx/camera.hpp"
 
 namespace lynx

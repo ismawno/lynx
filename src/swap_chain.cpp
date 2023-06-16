@@ -1,6 +1,5 @@
 #include "lynx/pch.hpp"
 #include "lynx/swap_chain.hpp"
-#include "lynx/exceptions.hpp"
 
 namespace lynx
 {
@@ -8,8 +7,9 @@ namespace lynx
 swap_chain::swap_chain(const ref<const device> &dev, VkExtent2D extent, scope<swap_chain> old_swap_chain)
     : m_device(dev), m_old_swap_chain(std::move(old_swap_chain)), m_window_extent(extent)
 {
-    if (old_swap_chain && !compare_swap_formats(*old_swap_chain))
-        throw bad_init("Swap chain image (or depth) has changed!");
+    DBG_ASSERT_ERROR(!old_swap_chain || compare_swap_formats(*old_swap_chain),
+                     "Swap chain image (or depth) has changed")
+
     init();
     create_image_views();
     create_render_pass();
@@ -88,8 +88,9 @@ VkResult swap_chain::submit_command_buffers(const VkCommandBuffer *buffers, std:
     submit_info.pSignalSemaphores = signal_semaphores.data();
 
     vkResetFences(m_device->vulkan_device(), 1, &m_in_flight_fences[m_current_frame]);
-    if (vkQueueSubmit(m_device->graphics_queue(), 1, &submit_info, m_in_flight_fences[m_current_frame]) != VK_SUCCESS)
-        throw bad_init("Failed to submit draw command buffer!");
+    DBG_CHECK_RETURN_VALUE(
+        vkQueueSubmit(m_device->graphics_queue(), 1, &submit_info, m_in_flight_fences[m_current_frame]), VK_SUCCESS,
+        CRITICAL, "Failed to submit draw command buffer")
 
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -162,8 +163,8 @@ void swap_chain::init()
 
     createInfo.oldSwapchain = m_old_swap_chain ? m_old_swap_chain->m_swap_chain : VK_NULL_HANDLE;
 
-    if (vkCreateSwapchainKHR(m_device->vulkan_device(), &createInfo, nullptr, &m_swap_chain) != VK_SUCCESS)
-        throw bad_init("Failed to create swap chain!");
+    DBG_CHECK_RETURN_VALUE(vkCreateSwapchainKHR(m_device->vulkan_device(), &createInfo, nullptr, &m_swap_chain),
+                           VK_SUCCESS, CRITICAL, "Failed to create swap chain")
 
     // We only specified a minimum number of images in the swap chain, so the implementation is
     // allowed to create a swap chain with more. That's why we'll first query the final number of
@@ -193,9 +194,9 @@ void swap_chain::create_image_views()
         view_info.subresourceRange.baseArrayLayer = 0;
         view_info.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(m_device->vulkan_device(), &view_info, nullptr, &m_swap_chain_image_views[i]) !=
-            VK_SUCCESS)
-            throw bad_init("Failed to create texture image view!");
+        DBG_CHECK_RETURN_VALUE(
+            vkCreateImageView(m_device->vulkan_device(), &view_info, nullptr, &m_swap_chain_image_views[i]), VK_SUCCESS,
+            CRITICAL, "Failed to create texture image view")
     }
 }
 
@@ -255,8 +256,8 @@ void swap_chain::create_render_pass()
     render_pass_info.dependencyCount = 1;
     render_pass_info.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(m_device->vulkan_device(), &render_pass_info, nullptr, &m_render_pass) != VK_SUCCESS)
-        throw bad_init("Failed to create render pass!");
+    DBG_CHECK_RETURN_VALUE(vkCreateRenderPass(m_device->vulkan_device(), &render_pass_info, nullptr, &m_render_pass),
+                           VK_SUCCESS, CRITICAL, "Failed to create render pass")
 }
 
 void swap_chain::create_frame_buffers()
@@ -275,9 +276,9 @@ void swap_chain::create_frame_buffers()
         frame_buffer_info.height = m_extent.height;
         frame_buffer_info.layers = 1;
 
-        if (vkCreateFramebuffer(m_device->vulkan_device(), &frame_buffer_info, nullptr,
-                                &m_swap_chain_frame_buffers[i]) != VK_SUCCESS)
-            throw bad_init("Failed to create frame_buffer!");
+        DBG_CHECK_RETURN_VALUE(
+            vkCreateFramebuffer(m_device->vulkan_device(), &frame_buffer_info, nullptr, &m_swap_chain_frame_buffers[i]),
+            VK_SUCCESS, CRITICAL, "Failed to create frame_buffer")
     }
 }
 
@@ -321,8 +322,9 @@ void swap_chain::create_depth_resources()
         view_info.subresourceRange.baseArrayLayer = 0;
         view_info.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(m_device->vulkan_device(), &view_info, nullptr, &m_depth_image_views[i]) != VK_SUCCESS)
-            throw bad_init("Failed to create texture image view!");
+        DBG_CHECK_RETURN_VALUE(
+            vkCreateImageView(m_device->vulkan_device(), &view_info, nullptr, &m_depth_image_views[i]), VK_SUCCESS,
+            CRITICAL, "Failed to create texture image view")
     }
 }
 
@@ -341,12 +343,16 @@ void swap_chain::create_sync_objects()
     fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     for (std::size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-        if (vkCreateSemaphore(m_device->vulkan_device(), &semaphore_info, nullptr, &m_image_available_semaphores[i]) !=
-                VK_SUCCESS ||
-            vkCreateSemaphore(m_device->vulkan_device(), &semaphore_info, nullptr, &m_render_finished_semaphores[i]) !=
-                VK_SUCCESS ||
-            vkCreateFence(m_device->vulkan_device(), &fence_info, nullptr, &m_in_flight_fences[i]) != VK_SUCCESS)
-            throw bad_init("failed to create synchronization objects for a frame!");
+    {
+        DBG_CHECK_RETURN_VALUE(
+            vkCreateSemaphore(m_device->vulkan_device(), &semaphore_info, nullptr, &m_image_available_semaphores[i]),
+            VK_SUCCESS, CRITICAL, "Failed to create synchronization objects for a frame")
+        DBG_CHECK_RETURN_VALUE(
+            vkCreateSemaphore(m_device->vulkan_device(), &semaphore_info, nullptr, &m_render_finished_semaphores[i]),
+            VK_SUCCESS, CRITICAL, "Failed to create synchronization objects for a frame")
+        DBG_CHECK_RETURN_VALUE(vkCreateFence(m_device->vulkan_device(), &fence_info, nullptr, &m_in_flight_fences[i]),
+                               VK_SUCCESS, CRITICAL, "Failed to create synchronization objects for a frame")
+    }
 }
 
 VkSurfaceFormatKHR swap_chain::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR> &available_formats)

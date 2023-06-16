@@ -89,7 +89,9 @@ class device
 #endif
 
     queue_family_indices find_queue_families(VkPhysicalDevice device) const;
+#ifdef DEBUG
     void has_gflw_required_instance_extensions() const;
+#endif
     bool check_device_extension_support(VkPhysicalDevice device) const;
     swap_chain_support_details query_swap_chain_support(VkPhysicalDevice device) const;
 

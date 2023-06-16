@@ -1,6 +1,5 @@
 #include "lynx/pch.hpp"
 #include "lynx/pipeline.hpp"
-#include "lynx/exceptions.hpp"
 #include "lynx/model.hpp"
 
 #include <fstream>
@@ -77,9 +76,9 @@ void pipeline::init(const config_info &config)
 
     pipeline_info.basePipelineIndex = -1;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
-    if (vkCreateGraphicsPipelines(m_device->vulkan_device(), VK_NULL_HANDLE, 1, &pipeline_info, nullptr,
-                                  &m_graphics_pipeline) != VK_SUCCESS)
-        throw bad_init("Failed to create graphics pipeline");
+    DBG_CHECK_RETURN_VALUE(vkCreateGraphicsPipelines(m_device->vulkan_device(), VK_NULL_HANDLE, 1, &pipeline_info,
+                                                     nullptr, &m_graphics_pipeline),
+                           VK_SUCCESS, CRITICAL, "Failed to create graphics pipeline")
 }
 
 void pipeline::create_shader_module(const std::vector<char> &code, VkShaderModule *shader_module) const
@@ -88,8 +87,8 @@ void pipeline::create_shader_module(const std::vector<char> &code, VkShaderModul
     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     create_info.codeSize = code.size();
     create_info.pCode = (const std::uint32_t *)code.data();
-    if (vkCreateShaderModule(m_device->vulkan_device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
-        throw bad_init("Failed to create shader module");
+    DBG_CHECK_RETURN_VALUE(vkCreateShaderModule(m_device->vulkan_device(), &create_info, nullptr, shader_module),
+                           VK_SUCCESS, CRITICAL, "Failed to create shader module")
 }
 
 void pipeline::config_info::default_config(config_info &config)
@@ -164,8 +163,7 @@ void pipeline::config_info::default_config(config_info &config)
 std::vector<char> pipeline::read_file(const char *path)
 {
     std::ifstream file{path, std::ios::ate | std::ios::binary};
-    if (!file.is_open())
-        throw file_not_found_error(path);
+    DBG_ASSERT_ERROR(file.is_open(), "File at path {0} not found", path)
 
     const long file_size = file.tellg();
     std::vector<char> buffer((std::size_t)file_size);
