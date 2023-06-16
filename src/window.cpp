@@ -5,9 +5,15 @@
 #include "lynx/device.hpp"
 #include "lynx/model.hpp"
 #include "lynx/camera.hpp"
+#include "lynx/buffer.hpp"
 
 namespace lynx
 {
+
+struct uniform_data
+{
+    glm::mat4 view{1.f};
+};
 
 window::window(const std::uint32_t width, const std::uint32_t height, const char *name)
     : m_width(width), m_height(height), m_name(name)
@@ -33,6 +39,14 @@ void window::init()
     glfwSetFramebufferSizeCallback(m_window, frame_buffer_resize_callback);
     m_device = make_ref<device>(*this);
     m_renderer = make_scope<renderer>(m_device, *this);
+
+    for (std::size_t i = 0; i < swap_chain::MAX_FRAMES_IN_FLIGHT; i++)
+    {
+        m_uniform_buffers[i] = make_scope<buffer>(
+            m_device, sizeof(uniform_data), 1ul, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+        m_uniform_buffers[i]->map();
+    }
 }
 
 void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
@@ -50,6 +64,15 @@ bool window::display() const
 {
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
+        camera &cam = get_camera();
+        if (m_maintain_camera_aspect_ratio)
+            cam.keep_aspect_ratio(m_renderer->swap_chain().extent_aspect_ratio());
+        cam.update_transformation_matrices();
+
+        const std::uint32_t frame_index = m_renderer->frame_index();
+        const uniform_data ufo{cam.view()};
+        m_uniform_buffers[frame_index]->write(&ufo);
+
         m_renderer->begin_swap_chain_render_pass(command_buffer);
         render(command_buffer);
         m_renderer->end_swap_chain_render_pass(command_buffer);
@@ -177,17 +200,8 @@ void window2D::draw(const drawable2D &drawable) const
     drawable.draw(*m_render_systems[(std::size_t)top]);
 }
 
-camera2D &window2D::camera() const
-{
-    return *m_camera;
-}
-
 void window2D::render(const VkCommandBuffer command_buffer) const
 {
-    if (m_maintain_camera_aspect_ratio)
-        m_camera->transform.scale.x = swap_chain_aspect() * m_camera->transform.scale.y;
-
-    m_camera->update_transformation_matrices(); // THIS MAY BE TOO MUCH
     for (const auto &sys : m_render_systems)
         sys->render(command_buffer, *m_camera);
 }
@@ -196,6 +210,11 @@ void window2D::clear_render_data() const
 {
     for (const auto &sys : m_render_systems)
         sys->clear_render_data();
+}
+
+camera &window2D::get_camera() const
+{
+    return *m_camera;
 }
 
 window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) : window(width, height, name)
@@ -226,17 +245,8 @@ void window3D::draw(const drawable3D &drawable) const
     drawable.draw(*m_render_systems[(std::size_t)top]);
 }
 
-camera3D &window3D::camera() const
-{
-    return *m_camera;
-}
-
 void window3D::render(const VkCommandBuffer command_buffer) const
 {
-    if (m_maintain_camera_aspect_ratio)
-        m_camera->transform.scale.x = swap_chain_aspect() * m_camera->transform.scale.y;
-
-    m_camera->update_transformation_matrices(); // THIS MAY BE TOO MUCH
     for (const auto &sys : m_render_systems)
         sys->render(command_buffer, *m_camera);
 }
@@ -245,6 +255,11 @@ void window3D::clear_render_data() const
 {
     for (const auto &sys : m_render_systems)
         sys->clear_render_data();
+}
+
+camera &window3D::get_camera() const
+{
+    return *m_camera;
 }
 
 } // namespace lynx

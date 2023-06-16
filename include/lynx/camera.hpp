@@ -10,6 +10,7 @@ class camera
   public:
     virtual ~camera() = default;
     virtual void update_transformation_matrices() = 0;
+    virtual void keep_aspect_ratio(float aspect) = 0;
 
     const glm::mat4 &projection() const;
     const glm::mat4 &view() const;
@@ -26,12 +27,16 @@ class camera2D : public camera
 {
   public:
     transform2D transform;
+
+    void keep_aspect_ratio(float aspect) override;
 };
 
 class camera3D : public camera
 {
   public:
     transform3D transform;
+
+    void keep_aspect_ratio(float aspect) override;
 
     void point_towards(const glm::vec3 &direction);
     void point_to(const glm::vec3 &position);

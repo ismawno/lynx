@@ -12,6 +12,11 @@ const glm::mat4 &camera::view() const
     return m_view;
 }
 
+void camera2D::keep_aspect_ratio(const float aspect)
+{
+    transform.scale.x = aspect * transform.scale.y;
+}
+
 orthographic2D::orthographic2D(const float aspect, const float size, const float rotation)
     : orthographic2D({0.f, 0.f}, aspect, size, rotation)
 {
@@ -64,6 +69,11 @@ void orthographic2D::update_view()
     m_view[3][0] = -glm::dot(u, transform.position);
     m_view[3][1] = -glm::dot(v, transform.position);
     //[3][2] may need to be non zero
+}
+
+void camera3D::keep_aspect_ratio(const float aspect)
+{
+    transform.scale.x = aspect * transform.scale.y;
 }
 
 void camera3D::point_towards(const glm::vec3 &direction)

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LYNX_DEVICE_HPP
+#define LYNX_DEVICE_HPP
 
 #include <string>
 #include <vector>
@@ -35,6 +36,7 @@ class device
     VkSurfaceKHR surface() const;
     VkQueue graphics_queue() const;
     VkQueue present_queue() const;
+    VkPhysicalDeviceProperties properties() const;
 
     swap_chain_support_details swap_chain_support() const;
     std::uint32_t find_memory_type(std::uint32_t type_filter, VkMemoryPropertyFlags properties) const;
@@ -56,8 +58,6 @@ class device
     void create_image_with_info(const VkImageCreateInfo &image_info, VkMemoryPropertyFlags properties, VkImage &image,
                                 VkDeviceMemory &image_memory) const;
 
-    VkPhysicalDeviceProperties m_properties;
-
   private:
     VkInstance m_instance;
 #ifdef DEBUG
@@ -65,6 +65,8 @@ class device
 #endif
     VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
     VkCommandPool m_command_pool;
+
+    VkPhysicalDeviceProperties m_properties;
 
     VkDevice m_device;
     VkSurfaceKHR m_surface;
@@ -109,3 +111,5 @@ class device
 };
 
 } // namespace lynx
+
+#endif

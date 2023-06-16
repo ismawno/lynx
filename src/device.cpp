@@ -543,6 +543,11 @@ VkQueue device::present_queue() const
     return m_present_queue;
 }
 
+VkPhysicalDeviceProperties device::properties() const
+{
+    return m_properties;
+}
+
 device::swap_chain_support_details device::swap_chain_support() const
 {
     return query_swap_chain_support(m_physical_device);

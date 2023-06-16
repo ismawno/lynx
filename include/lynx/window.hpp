@@ -17,6 +17,8 @@ namespace lynx
 {
 class device;
 class renderer;
+class buffer;
+
 class camera2D;
 class camera3D;
 
@@ -92,6 +94,7 @@ class window
 
     ref<const device> m_device;
     scope<renderer> m_renderer;
+    std::array<scope<buffer>, swap_chain::MAX_FRAMES_IN_FLIGHT> m_uniform_buffers;
 
     static inline std::unordered_set<const window *> s_active_windows{};
 
@@ -100,6 +103,7 @@ class window
     void init();
     virtual void render(VkCommandBuffer command_buffer) const = 0;
     virtual void clear_render_data() const = 0;
+    virtual camera &get_camera() const = 0;
 
     static void frame_buffer_resize_callback(GLFWwindow *gwindow, int width, int height);
 
@@ -127,8 +131,7 @@ class window2D : public window
               const transform2D &transform = {}) const;
     void draw(const drawable2D &drawable) const;
 
-    camera2D &camera() const;
-    template <typename T> T *get_camera_as() const
+    template <typename T = camera2D> T *get_camera_as() const
     {
         return dynamic_cast<T *>(m_camera.get());
     }
@@ -147,6 +150,7 @@ class window2D : public window
 
     void render(VkCommandBuffer command_buffer) const override;
     void clear_render_data() const override;
+    camera &get_camera() const override;
 };
 
 class window3D : public window
@@ -169,12 +173,11 @@ class window3D : public window
               const transform3D &transform = {}) const;
     void draw(const drawable3D &drawable) const;
 
-    camera3D &camera() const;
-    template <typename T> T *camera_as() const
+    template <typename T = camera3D> T *get_camera_as() const
     {
         return dynamic_cast<T *>(m_camera.get());
     }
-    template <typename T, class... Args> T *camera(Args &&...args)
+    template <typename T, class... Args> T *set_camera_as(Args &&...args)
     {
         static_assert(std::is_base_of<camera3D, T>::value, "Camera type must inherit from camera3D");
         auto cam = make_scope<T>(std::forward<Args>(args)...);
@@ -189,6 +192,7 @@ class window3D : public window
 
     void render(VkCommandBuffer command_buffer) const override;
     void clear_render_data() const override;
+    camera &get_camera() const override;
 };
 } // namespace lynx
 

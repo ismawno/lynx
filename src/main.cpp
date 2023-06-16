@@ -17,7 +17,7 @@ class example_app3D : public lynx::app3D
 {
     void on_start() override
     {
-        cam = m_window.camera_as<lynx::perspective3D>();
+        cam = m_window.get_camera_as<lynx::perspective3D>();
         cube.transform.position.z = 3.f;
     }
     void on_update(const float ts) override
