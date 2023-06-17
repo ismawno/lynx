@@ -2,6 +2,7 @@
 #define LYNX_APP_HPP
 
 #include "lynx/window.hpp"
+#include "lynx/layer.hpp"
 
 #include <chrono>
 #include <imgui.h>
@@ -15,14 +16,28 @@ class app
     virtual ~app();
 
     void run();
+
     void start();
     bool next_frame();
     void shutdown();
+
+    template <typename T, class... Args> ref<T> push_layer(Args &&...args)
+    {
+        static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
+        auto ly = make_ref<T>(std::forward<Args>(args)...);
+        m_layers.push_back(ly);
+        ly->on_attach();
+        return ly;
+    }
+
+    bool pop_layer(const layer *ly);
 
   protected:
   private:
     bool m_started = false;
     bool m_terminated = false;
+
+    std::vector<ref<layer>> m_layers;
 
     VkDescriptorPool m_imgui_pool;
     ImGuiContext *m_imgui_context;
@@ -32,6 +47,7 @@ class app
     window &m_window;
 
     void init_imgui();
+    // CREAR LAYERS. QUE IMGUI SEA UNA LAYER
 
     virtual void on_start()
     {

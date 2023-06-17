@@ -10,8 +10,8 @@ app::app(window &win) : m_window(win)
 
 app::~app()
 {
-    DBG_ASSERT_ERROR(m_terminated || !m_started,
-                     "Application being destroyed has not been terminated properly with shutdown()")
+    if (!m_terminated)
+        shutdown();
 }
 
 void app::run()
@@ -19,7 +19,7 @@ void app::run()
     start();
     while (next_frame())
         ;
-    shutdown();
+    // shutdown();
 }
 
 void app::start()
@@ -27,9 +27,9 @@ void app::start()
     DBG_ASSERT_ERROR(!m_terminated, "Cannot call start on a terminated app")
     DBG_ASSERT_ERROR(!m_started, "Cannot call start on a started app")
     init_imgui();
-    on_start();
     m_current_timestamp = std::chrono::high_resolution_clock::now();
     m_started = true;
+    on_start();
 }
 
 bool app::next_frame()
@@ -55,7 +55,11 @@ bool app::next_frame()
 
     const float delta_time =
         std::chrono::duration<float, std::chrono::seconds::period>(m_current_timestamp - m_last_timestamp).count();
+
     on_update(delta_time);
+    for (const auto &ly : m_layers)
+        ly->on_update(delta_time);
+
     // ImGui::ShowDemoWindow();
     ImGui::Begin("Hi!");
     ImGui::End();
@@ -74,8 +78,12 @@ void app::shutdown()
     DBG_ASSERT_ERROR(m_started, "Cannot terminate an app that has not been started")
     DBG_ASSERT_ERROR(!m_terminated, "Cannot terminate an already terminated app")
     ImGui::SetCurrentContext(m_imgui_context);
-    m_window.clear();
+    vkDeviceWaitIdle(m_window.m_device->vulkan_device());
+
     on_shutdown();
+    for (const auto &ly : m_layers)
+        ly->on_detach();
+
     vkDestroyDescriptorPool(m_window.m_device->vulkan_device(), m_imgui_pool, nullptr);
     ImGui_ImplVulkan_Shutdown();
     ImGui::DestroyContext(m_imgui_context);

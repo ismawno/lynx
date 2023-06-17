@@ -44,7 +44,7 @@ void window::poll_events() const
     glfwPollEvents();
 }
 
-bool window::display(const std::vector<std::function<void(VkCommandBuffer)>> &submissions) const
+bool window::display(const std::function<void(VkCommandBuffer)> &submission) const
 {
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
@@ -55,8 +55,9 @@ bool window::display(const std::vector<std::function<void(VkCommandBuffer)>> &su
 
         m_renderer->begin_swap_chain_render_pass(command_buffer);
         render(command_buffer);
-        for (const auto &submission : submissions)
+        if (submission)
             submission(command_buffer);
+
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
         return true;

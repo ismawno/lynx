@@ -22,3 +22,5 @@
 
 # Compiled shaders
 *.spv
+
+imgui.ini

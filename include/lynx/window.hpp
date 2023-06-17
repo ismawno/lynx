@@ -40,7 +40,7 @@ class window
     void create_surface(VkInstance instance, VkSurfaceKHR *surface) const;
 
     void poll_events() const;
-    bool display(const std::vector<std::function<void(VkCommandBuffer)>> &submissions = {}) const;
+    bool display(const std::function<void(VkCommandBuffer)> &submission = nullptr) const;
     void clear() const;
 
     bool should_close() const;
@@ -66,11 +66,11 @@ class window
             "Type must inherit from render_system2D or render_system3D, depending on the window you are using");
 
         auto system = make_scope<T>(std::forward<Args>(args)...);
-        T *ref = system.get();
+        T *ptr = system.get();
 
         system->init(m_device, m_renderer->swap_chain().render_pass());
         systems.push_back(std::move(system));
-        return ref;
+        return ptr;
     }
 
     template <typename T, typename B> T *render_system(std::vector<scope<B>> &systems) const noexcept
@@ -142,9 +142,9 @@ class window2D : public window
     {
         static_assert(std::is_base_of<camera2D, T>::value, "Camera type must inherit from camera2D");
         auto cam = make_scope<T>(std::forward<Args>(args)...);
-        T *ref = cam.get();
+        T *ptr = cam.get();
         m_camera = std::move(cam);
-        return ref;
+        return ptr;
     }
 
   private:
@@ -184,9 +184,9 @@ class window3D : public window
     {
         static_assert(std::is_base_of<camera3D, T>::value, "Camera type must inherit from camera3D");
         auto cam = make_scope<T>(std::forward<Args>(args)...);
-        T *ref = cam.get();
+        T *ptr = cam.get();
         m_camera = std::move(cam);
-        return ref;
+        return ptr;
     }
 
   private:

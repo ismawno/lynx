@@ -46,20 +46,18 @@ class example_app3D : public lynx::app3D
 int main()
 {
     DBG_SET_LEVEL(info)
-    // example_app3D app;
-    // app.run();
+    example_app3D app;
+    app.run();
 
-    example_app2D app2;
-    example_app3D app3;
-    app2.start();
-    app3.start();
-    while (true)
-    {
-        const bool done2 = !app2.next_frame();
-        const bool done3 = !app3.next_frame();
-        if (done2 && done3)
-            break;
-    }
-    app2.shutdown();
-    app3.shutdown();
+    // example_app2D app2;
+    // example_app3D app3;
+    // app2.start();
+    // app3.start();
+    // while (true)
+    // {
+    //     const bool done2 = !app2.next_frame();
+    //     const bool done3 = !app3.next_frame();
+    //     if (done2 && done3)
+    //         break;
+    // }
 }
