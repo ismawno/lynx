@@ -39,7 +39,6 @@ class window
 
     void create_surface(VkInstance instance, VkSurfaceKHR *surface) const;
 
-    void poll_events() const;
     bool display(const std::function<void(VkCommandBuffer)> &submission = nullptr) const;
     void clear() const;
 
@@ -53,6 +52,9 @@ class window
 
     bool maintain_camera_aspect_ratio() const;
     void maintain_camera_aspect_ratio(bool maintain);
+
+    const lynx::renderer &renderer() const;
+    const lynx::device &device() const;
 
     GLFWwindow *glfw_window() const;
 
@@ -94,8 +96,8 @@ class window
     const char *m_name;
     GLFWwindow *m_window;
 
-    ref<const device> m_device;
-    scope<renderer> m_renderer;
+    ref<const lynx::device> m_device;
+    scope<lynx::renderer> m_renderer;
 
     static inline std::unordered_set<const window *> s_active_windows{};
 
@@ -110,8 +112,6 @@ class window
 
     window(const window &) = delete;
     window &operator=(const window &) = delete;
-
-    friend class app;
 };
 
 class window2D : public window

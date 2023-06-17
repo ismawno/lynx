@@ -29,19 +29,14 @@ void window::init()
     m_window = glfwCreateWindow((int)m_width, (int)m_height, m_name, nullptr, nullptr);
     glfwSetWindowUserPointer(m_window, this);
     glfwSetFramebufferSizeCallback(m_window, frame_buffer_resize_callback);
-    m_device = make_ref<device>(*this);
-    m_renderer = make_scope<renderer>(m_device, *this);
+    m_device = make_ref<lynx::device>(*this);
+    m_renderer = make_scope<lynx::renderer>(m_device, *this);
 }
 
 void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
 {
     DBG_CHECK_RETURN_VALUE(glfwCreateWindowSurface(instance, m_window, nullptr, surface), VK_SUCCESS, CRITICAL,
                            "Failed to create GLFW window surface")
-}
-
-void window::poll_events() const
-{
-    glfwPollEvents();
 }
 
 bool window::display(const std::function<void(VkCommandBuffer)> &submission) const
@@ -120,6 +115,16 @@ bool window::maintain_camera_aspect_ratio() const
 void window::maintain_camera_aspect_ratio(const bool maintain)
 {
     m_maintain_camera_aspect_ratio = maintain;
+}
+
+const renderer &window::renderer() const
+{
+    return *m_renderer;
+}
+
+const device &window::device() const
+{
+    return *m_device;
 }
 
 GLFWwindow *window::glfw_window() const

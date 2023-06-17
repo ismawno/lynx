@@ -1,6 +1,7 @@
 #include "lynx/app.hpp"
 #include "lynx/camera.hpp"
 #include "lynx/input.hpp"
+#include "lynx/layer.hpp"
 #include <iostream>
 
 class example_app2D : public lynx::app2D
@@ -47,6 +48,7 @@ int main()
 {
     DBG_SET_LEVEL(info)
     example_app3D app;
+    app.push_layer<lynx::imgui_layer>("ImGui layer");
     app.run();
 
     // example_app2D app2;

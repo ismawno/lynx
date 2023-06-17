@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <vulkan/vulkan.hpp>
+#include <imgui.h>
 
 namespace lynx
 {
@@ -12,9 +13,11 @@ class layer
   public:
     layer(const char *name);
 
+    const char *name() const;
+
   private:
     const char *m_name;
-    virtual void on_attach()
+    virtual void on_attach(app *parent)
     {
     }
 
@@ -33,17 +36,23 @@ class layer
     friend class app;
 };
 
-// class imgui_layer : public layer
-// {
-//   public:
-//     using layer::layer;
+class imgui_layer : public layer
+{
+  public:
+    using layer::layer;
+    virtual ~imgui_layer() = default;
 
-//   protected:
-//     virtual void on_attach() override;
-//     virtual void on_detach() override;
-//     virtual void on_update(float ts) override;
-//     virtual void on_command_submission(VkCommandBuffer command_buffer) override;
-// };
+  protected:
+    virtual void on_attach(app *parent) override;
+    virtual void on_detach() override;
+    void on_update(float ts) override;
+    virtual void on_command_submission(VkCommandBuffer command_buffer) override;
+
+  private:
+    VkDescriptorPool m_imgui_pool;
+    ImGuiContext *m_imgui_context;
+    app *m_parent;
+};
 } // namespace lynx
 
 #endif

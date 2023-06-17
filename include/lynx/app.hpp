@@ -5,7 +5,6 @@
 #include "lynx/layer.hpp"
 
 #include <chrono>
-#include <imgui.h>
 
 namespace lynx
 {
@@ -25,12 +24,13 @@ class app
     {
         static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
         auto ly = make_ref<T>(std::forward<Args>(args)...);
-        m_layers.push_back(ly);
-        ly->on_attach();
+        m_layers.emplace_back(ly)->on_attach(this);
         return ly;
     }
 
     bool pop_layer(const layer *ly);
+
+    lynx::window &window() const;
 
   protected:
   private:
@@ -39,15 +39,9 @@ class app
 
     std::vector<ref<layer>> m_layers;
 
-    VkDescriptorPool m_imgui_pool;
-    ImGuiContext *m_imgui_context;
-
     std::chrono::steady_clock::time_point m_last_timestamp;
     std::chrono::steady_clock::time_point m_current_timestamp;
-    window &m_window;
-
-    void init_imgui();
-    // CREAR LAYERS. QUE IMGUI SEA UNA LAYER
+    lynx::window &m_window;
 
     virtual void on_start()
     {
