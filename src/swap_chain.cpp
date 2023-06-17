@@ -249,7 +249,7 @@ void swap_chain::create_render_pass()
     std::array<VkAttachmentDescription, 2> attachments = {color_attachment, depth_attachment};
     VkRenderPassCreateInfo render_pass_info{};
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    render_pass_info.attachmentCount = static_cast<std::uint32_t>(attachments.size());
+    render_pass_info.attachmentCount = (std::uint32_t)attachments.size();
     render_pass_info.pAttachments = attachments.data();
     render_pass_info.subpassCount = 1;
     render_pass_info.pSubpasses = &subpass;
@@ -358,9 +358,13 @@ void swap_chain::create_sync_objects()
 VkSurfaceFormatKHR swap_chain::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR> &available_formats)
 {
     for (const auto &available_format : available_formats)
-        if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB &&
-            available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+    {
+        if (available_format.format == VK_FORMAT_B8G8R8A8_UNORM)
             return available_format;
+        // if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB &&
+        //     available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+        //     return available_format;
+    }
 
     return available_formats[0];
 }

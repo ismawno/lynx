@@ -11,7 +11,7 @@ namespace lynx
 class app
 {
   public:
-    app(window &win);
+    template <typename T> app(scope<T> &&win);
     virtual ~app();
 
     void run();
@@ -33,6 +33,8 @@ class app
     lynx::window &window() const;
 
   protected:
+    template <typename T> T *window_as() const;
+
   private:
     bool m_started = false;
     bool m_terminated = false;
@@ -41,7 +43,7 @@ class app
 
     std::chrono::steady_clock::time_point m_last_timestamp;
     std::chrono::steady_clock::time_point m_current_timestamp;
-    lynx::window &m_window;
+    scope<lynx::window> m_window;
 
     virtual void on_start()
     {
@@ -60,19 +62,23 @@ class app
 class app2D : public app
 {
   public:
-    app2D(std::uint32_t width = 800, std::uint32_t height = 600, const char *m_name = "App 2D");
+    app2D(std::uint32_t width = 800, std::uint32_t height = 600, const char *name = "App 2D");
+
+    window2D &window() const;
 
   protected:
-    window2D m_window;
+    window2D *m_window;
 };
 
 class app3D : public app
 {
   public:
-    app3D(std::uint32_t width = 800, std::uint32_t height = 600, const char *m_name = "App 3D");
+    app3D(std::uint32_t width = 800, std::uint32_t height = 600, const char *name = "App 3D");
+
+    window3D &window() const;
 
   protected:
-    window3D m_window;
+    window3D *m_window;
 };
 
 } // namespace lynx

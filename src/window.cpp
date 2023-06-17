@@ -43,7 +43,7 @@ bool window::display(const std::function<void(VkCommandBuffer)> &submission) con
 {
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
-        camera &cam = get_camera();
+        lynx::camera &cam = camera();
         if (m_maintain_camera_aspect_ratio)
             cam.keep_aspect_ratio(m_renderer->swap_chain().extent_aspect_ratio());
         cam.update_transformation_matrices();
@@ -205,7 +205,7 @@ void window2D::clear_render_data() const
         sys->clear_render_data();
 }
 
-camera &window2D::get_camera() const
+lynx::camera &window2D::camera() const
 {
     return *m_camera;
 }
@@ -250,7 +250,7 @@ void window3D::clear_render_data() const
         sys->clear_render_data();
 }
 
-camera &window3D::get_camera() const
+lynx::camera &window3D::camera() const
 {
     return *m_camera;
 }

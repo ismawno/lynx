@@ -27,7 +27,7 @@ class window
 {
   public:
     window(std::uint32_t width, std::uint32_t height, const char *name);
-    ~window();
+    virtual ~window();
 
     std::uint32_t width() const;
     std::uint32_t height() const;
@@ -106,7 +106,7 @@ class window
     void init();
     virtual void render(VkCommandBuffer command_buffer) const = 0;
     virtual void clear_render_data() const = 0;
-    virtual camera &get_camera() const = 0;
+    virtual lynx::camera &camera() const = 0;
 
     static void frame_buffer_resize_callback(GLFWwindow *gwindow, int width, int height);
 
@@ -134,7 +134,7 @@ class window2D : public window
               const transform2D &transform = {}) const;
     void draw(const drawable2D &drawable) const;
 
-    template <typename T = camera2D> T *get_camera_as() const
+    template <typename T = camera2D> T *camera_as() const
     {
         return dynamic_cast<T *>(m_camera.get());
     }
@@ -153,7 +153,7 @@ class window2D : public window
 
     void render(VkCommandBuffer command_buffer) const override;
     void clear_render_data() const override;
-    camera &get_camera() const override;
+    lynx::camera &camera() const override;
 };
 
 class window3D : public window
@@ -176,7 +176,7 @@ class window3D : public window
               const transform3D &transform = {}) const;
     void draw(const drawable3D &drawable) const;
 
-    template <typename T = camera3D> T *get_camera_as() const
+    template <typename T = camera3D> T *camera_as() const
     {
         return dynamic_cast<T *>(m_camera.get());
     }
@@ -195,7 +195,7 @@ class window3D : public window
 
     void render(VkCommandBuffer command_buffer) const override;
     void clear_render_data() const override;
-    camera &get_camera() const override;
+    lynx::camera &camera() const override;
 };
 } // namespace lynx
 

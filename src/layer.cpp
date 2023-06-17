@@ -45,6 +45,12 @@ void imgui_layer::on_attach(app *parent)
     m_imgui_context = ImGui::CreateContext();
     ImGui::SetCurrentContext(m_imgui_context);
 
+    IMGUI_CHECKVERSION();
+    ImGuiIO &io = ImGui::GetIO();
+    io.ConfigFlags |=
+        ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+
+    ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForVulkan(parent->window().glfw_window(), true);
 
     ImGui_ImplVulkan_InitInfo init_info{};
@@ -73,23 +79,29 @@ void imgui_layer::on_update(const float ts)
     ImGui_ImplGlfw_NewFrame();
 
     ImGui::NewFrame();
-    // ImGui::ShowDemoWindow();
-    ImGui::Begin("Hi!");
-    ImGui::End();
-
+    on_imgui_render();
     ImGui::Render();
 }
 
 void imgui_layer::on_detach()
 {
     ImGui::SetCurrentContext(m_imgui_context);
+    vkDeviceWaitIdle(m_parent->window().device().vulkan_device());
     vkDestroyDescriptorPool(m_parent->window().device().vulkan_device(), m_imgui_pool, nullptr);
     ImGui_ImplVulkan_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext(m_imgui_context);
 }
 
 void imgui_layer::on_command_submission(const VkCommandBuffer command_buffer)
 {
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        GLFWwindow *current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(current_context);
+    }
 }
 } // namespace lynx

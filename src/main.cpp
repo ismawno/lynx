@@ -9,7 +9,7 @@ class example_app2D : public lynx::app2D
     void on_update(const float ts) override
     {
         rect.transform.rotation += (float)M_PI * ts;
-        m_window.draw(rect);
+        m_window->draw(rect);
     }
     lynx::rect2D rect;
 };
@@ -18,7 +18,7 @@ class example_app3D : public lynx::app3D
 {
     void on_start() override
     {
-        cam = m_window.get_camera_as<lynx::perspective3D>();
+        cam = m_window->camera_as<lynx::perspective3D>();
         cube.transform.position.z = 3.f;
     }
     void on_update(const float ts) override
@@ -38,21 +38,40 @@ class example_app3D : public lynx::app3D
 
         cam->point_to(cube.transform.position);
 
-        m_window.draw(cube);
+        m_window->draw(cube);
     }
     lynx::perspective3D *cam;
     lynx::cube3D cube;
+};
+
+class imgui_demo : public lynx::imgui_layer
+{
+  public:
+    imgui_demo() : lynx::imgui_layer("ImGui demo")
+    {
+    }
+
+  private:
+    void on_imgui_render() override
+    {
+        ImGui::ShowDemoWindow();
+    }
 };
 
 int main()
 {
     DBG_SET_LEVEL(info)
     example_app3D app;
-    app.push_layer<lynx::imgui_layer>("ImGui layer");
+
+    app.push_layer<imgui_demo>();
     app.run();
 
     // example_app2D app2;
     // example_app3D app3;
+
+    // app2.push_layer<imgui_demo>();
+    // app3.push_layer<imgui_demo>();
+
     // app2.start();
     // app3.start();
     // while (true)

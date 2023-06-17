@@ -4,7 +4,7 @@
 
 namespace lynx
 {
-app::app(lynx::window &win) : m_window(win)
+template <typename T> app::app(scope<T> &&win) : m_window(std::move(win))
 {
 }
 
@@ -34,15 +34,15 @@ bool app::next_frame()
 {
     DBG_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     DBG_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
-    if (m_window.closed())
+    if (m_window->closed())
         return false;
 
     glfwPollEvents();
-    m_window.make_context_current();
+    m_window->make_context_current();
 
     m_last_timestamp = m_current_timestamp;
     m_current_timestamp = std::chrono::high_resolution_clock::now();
-    m_window.clear();
+    m_window->clear();
 
     const float delta_time =
         std::chrono::duration<float, std::chrono::seconds::period>(m_current_timestamp - m_last_timestamp).count();
@@ -51,43 +51,59 @@ bool app::next_frame()
     for (const auto &ly : m_layers)
         ly->on_update(delta_time);
 
-    if (m_window.closed())
+    if (m_window->closed())
         return false;
 
     const auto submission = [this](const VkCommandBuffer cmd) {
         for (const auto &ly : m_layers)
             ly->on_command_submission(cmd);
     };
-    m_window.display(submission);
+    m_window->display(submission);
 
-    return !m_window.closed();
+    return !m_window->closed();
 }
 
 void app::shutdown()
 {
-    DBG_ASSERT_ERROR(m_started, "Cannot terminate an app that has not been started")
+    // DBG_ASSERT_ERROR(m_started, "Cannot terminate an app that has not been started")
     DBG_ASSERT_ERROR(!m_terminated, "Cannot terminate an already terminated app")
 
     on_shutdown();
     for (const auto &ly : m_layers)
         ly->on_detach();
-    m_window.close();
     m_terminated = true;
 }
 
 window &app::window() const
 {
-    return m_window;
+    return *m_window;
+}
+
+template <typename T> T *app::window_as() const
+{
+    return dynamic_cast<T *>(m_window.get());
 }
 
 app2D::app2D(const std::uint32_t width, const std::uint32_t height, const char *name)
-    : app(m_window), m_window(width, height, name)
+    : app(make_scope<window2D>(width, height, name))
 {
+    m_window = window_as<window2D>();
+}
+
+window2D &app2D::window() const
+{
+    return *m_window;
 }
 
 app3D::app3D(const std::uint32_t width, const std::uint32_t height, const char *name)
-    : app(m_window), m_window(width, height, name)
+    : app(make_scope<window3D>(width, height, name))
 {
+    m_window = window_as<window3D>();
+}
+
+window3D &app3D::window() const
+{
+    return *m_window;
 }
 
 } // namespace lynx

@@ -48,6 +48,8 @@ class imgui_layer : public layer
     void on_update(float ts) override;
     virtual void on_command_submission(VkCommandBuffer command_buffer) override;
 
+    virtual void on_imgui_render() = 0;
+
   private:
     VkDescriptorPool m_imgui_pool;
     ImGuiContext *m_imgui_context;
