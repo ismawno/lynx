@@ -3,6 +3,9 @@
 
 #include "lynx/window.hpp"
 
+#include <chrono>
+#include <imgui.h>
+
 namespace lynx
 {
 class app
@@ -20,7 +23,12 @@ class app
   private:
     bool m_started = false;
     bool m_terminated = false;
+
     VkDescriptorPool m_imgui_pool;
+    ImGuiContext *m_imgui_context;
+
+    std::chrono::steady_clock::time_point m_last_timestamp;
+    std::chrono::steady_clock::time_point m_current_timestamp;
     window &m_window;
 
     void init_imgui();

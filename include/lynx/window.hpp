@@ -49,6 +49,7 @@ class window
 
     bool was_resized() const;
     void complete_resize();
+    void make_context_current() const;
 
     bool maintain_camera_aspect_ratio() const;
     void maintain_camera_aspect_ratio(bool maintain);

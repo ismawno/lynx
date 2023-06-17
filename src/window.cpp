@@ -107,6 +107,11 @@ void window::complete_resize()
     m_frame_buffer_resized = false;
 }
 
+void window::make_context_current() const
+{
+    glfwMakeContextCurrent(m_window);
+}
+
 bool window::maintain_camera_aspect_ratio() const
 {
     return m_maintain_camera_aspect_ratio;

@@ -28,6 +28,7 @@ void app::start()
     DBG_ASSERT_ERROR(!m_started, "Cannot call start on a started app")
     init_imgui();
     on_start();
+    m_current_timestamp = std::chrono::high_resolution_clock::now();
     m_started = true;
 }
 
@@ -37,11 +38,14 @@ bool app::next_frame()
     DBG_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
     if (m_window.closed())
         return false;
+
     m_window.poll_events();
 
-    static float delta_time = 0.f;
-    const auto start = std::chrono::high_resolution_clock::now();
+    m_window.make_context_current();
+    ImGui::SetCurrentContext(m_imgui_context);
 
+    m_last_timestamp = m_current_timestamp;
+    m_current_timestamp = std::chrono::high_resolution_clock::now();
     m_window.clear();
 
     ImGui_ImplVulkan_NewFrame();
@@ -49,8 +53,12 @@ bool app::next_frame()
 
     ImGui::NewFrame();
 
+    const float delta_time =
+        std::chrono::duration<float, std::chrono::seconds::period>(m_current_timestamp - m_last_timestamp).count();
     on_update(delta_time);
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
+    ImGui::Begin("Hi!");
+    ImGui::End();
 
     if (m_window.closed())
         return false;
@@ -58,8 +66,6 @@ bool app::next_frame()
     ImGui::Render();
     m_window.display({[](const VkCommandBuffer cmd) { ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd); }});
 
-    const auto end = std::chrono::high_resolution_clock::now();
-    delta_time = std::chrono::duration<float, std::chrono::seconds::period>(end - start).count();
     return !m_window.closed();
 }
 
@@ -67,10 +73,12 @@ void app::shutdown()
 {
     DBG_ASSERT_ERROR(m_started, "Cannot terminate an app that has not been started")
     DBG_ASSERT_ERROR(!m_terminated, "Cannot terminate an already terminated app")
+    ImGui::SetCurrentContext(m_imgui_context);
     m_window.clear();
     on_shutdown();
     vkDestroyDescriptorPool(m_window.m_device->vulkan_device(), m_imgui_pool, nullptr);
     ImGui_ImplVulkan_Shutdown();
+    ImGui::DestroyContext(m_imgui_context);
     m_terminated = true;
 }
 
@@ -100,7 +108,8 @@ void app::init_imgui()
         vkCreateDescriptorPool(m_window.m_device->vulkan_device(), &pool_info, nullptr, &m_imgui_pool), VK_SUCCESS,
         CRITICAL, "Failed to create descriptor pool")
 
-    ImGui::CreateContext();
+    m_imgui_context = ImGui::CreateContext();
+    ImGui::SetCurrentContext(m_imgui_context);
 
     ImGui_ImplGlfw_InitForVulkan(m_window.glfw_window(), true);
 
