@@ -35,6 +35,8 @@ class example_app3D : public lynx::app3D
             cube.transform.rotation.z += ts;
         if (lynx::input::key_pressed(lynx::input::key_code::E))
             cube.transform.rotation.z -= ts;
+        if (lynx::input::key_pressed(lynx::input::key_code::ESCAPE))
+            shutdown();
 
         cam->point_to(cube.transform.position);
 

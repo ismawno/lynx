@@ -38,6 +38,8 @@ class app
   private:
     bool m_started = false;
     bool m_terminated = false;
+    bool m_to_finish_next_frame = false;
+    bool m_ongoing_frame = false;
 
     std::vector<ref<layer>> m_layers;
 

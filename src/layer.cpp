@@ -6,7 +6,11 @@
 
 namespace lynx
 {
-layer::layer(const char *name) : m_name()
+layer::layer(const char *name) : m_name(name)
+{
+}
+
+imgui_layer::imgui_layer(const char *name) : layer(name)
 {
 }
 
@@ -79,7 +83,9 @@ void imgui_layer::on_update(const float ts)
     ImGui_ImplGlfw_NewFrame();
 
     ImGui::NewFrame();
+    ImGui::PushID(this);
     on_imgui_render();
+    ImGui::PopID();
     ImGui::Render();
 }
 

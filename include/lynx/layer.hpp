@@ -39,7 +39,7 @@ class layer
 class imgui_layer : public layer
 {
   public:
-    using layer::layer;
+    imgui_layer(const char *name = "ImGui Layer");
     virtual ~imgui_layer() = default;
 
   protected:
@@ -54,6 +54,9 @@ class imgui_layer : public layer
     VkDescriptorPool m_imgui_pool;
     ImGuiContext *m_imgui_context;
     app *m_parent;
+
+    imgui_layer(const imgui_layer &) = delete;
+    imgui_layer &operator=(const imgui_layer &) = delete;
 };
 } // namespace lynx
 

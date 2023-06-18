@@ -34,12 +34,10 @@ bool app::next_frame()
 {
     DBG_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     DBG_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
-    if (m_window->closed())
-        return false;
+    DBG_ASSERT_ERROR(!m_window->closed(), "Cannot fetch next frame if the window is closed")
+    m_ongoing_frame = true;
 
     glfwPollEvents();
-    m_window->make_context_current();
-
     m_last_timestamp = m_current_timestamp;
     m_current_timestamp = std::chrono::high_resolution_clock::now();
     m_window->clear();
@@ -51,27 +49,40 @@ bool app::next_frame()
     for (const auto &ly : m_layers)
         ly->on_update(delta_time);
 
-    if (m_window->closed())
-        return false;
-
     const auto submission = [this](const VkCommandBuffer cmd) {
         for (const auto &ly : m_layers)
             ly->on_command_submission(cmd);
     };
     m_window->display(submission);
 
-    return !m_window->closed();
+    m_ongoing_frame = false;
+    return !m_window->closed() && !m_to_finish_next_frame;
 }
 
 void app::shutdown()
 {
-    // DBG_ASSERT_ERROR(m_started, "Cannot terminate an app that has not been started")
+    if (m_ongoing_frame)
+    {
+        m_to_finish_next_frame = true;
+        return;
+    }
     DBG_ASSERT_ERROR(!m_terminated, "Cannot terminate an already terminated app")
 
     on_shutdown();
     for (const auto &ly : m_layers)
         ly->on_detach();
     m_terminated = true;
+}
+
+bool app::pop_layer(const layer *ly)
+{
+    for (auto it = m_layers.begin(); it != m_layers.end(); ++it)
+        if (it->get() == ly)
+        {
+            m_layers.erase(it);
+            return true;
+        }
+    return false;
 }
 
 window &app::window() const
