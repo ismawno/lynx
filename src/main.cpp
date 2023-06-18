@@ -24,19 +24,19 @@ class example_app3D : public lynx::app3D
     void on_update(const float ts) override
     {
         lynx::input::push_window(m_window);
-        if (lynx::input::key_pressed(lynx::input::key_code::A))
+        if (lynx::input::key_pressed(lynx::input::key::A))
             cube.transform.position.x -= ts;
-        if (lynx::input::key_pressed(lynx::input::key_code::D))
+        if (lynx::input::key_pressed(lynx::input::key::D))
             cube.transform.position.x += ts;
-        if (lynx::input::key_pressed(lynx::input::key_code::W))
+        if (lynx::input::key_pressed(lynx::input::key::W))
             cube.transform.position.y -= ts;
-        if (lynx::input::key_pressed(lynx::input::key_code::S))
+        if (lynx::input::key_pressed(lynx::input::key::S))
             cube.transform.position.y += ts;
-        if (lynx::input::key_pressed(lynx::input::key_code::Q))
+        if (lynx::input::key_pressed(lynx::input::key::Q))
             cube.transform.rotation.z += ts;
-        if (lynx::input::key_pressed(lynx::input::key_code::E))
+        if (lynx::input::key_pressed(lynx::input::key::E))
             cube.transform.rotation.z -= ts;
-        if (lynx::input::key_pressed(lynx::input::key_code::ESCAPE))
+        if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 
         cam->point_to(cube.transform.position);

@@ -10,9 +10,9 @@ class window;
 
 namespace lynx::input
 {
-namespace key_code
+namespace key
 {
-enum key
+enum key_code
 {
     SPACE = GLFW_KEY_SPACE,
     APOSTROPHE = GLFW_KEY_APOSTROPHE,
@@ -136,14 +136,16 @@ enum key
     MENU = GLFW_KEY_MENU,
     LAST = GLFW_KEY_MENU
 };
-} // namespace key_code
+} // namespace key
 
-bool key_pressed(key_code::key kc);
-bool key_pressed(const window &win, key_code::key kc);
-const char *key_name(key_code::key kc);
+bool key_pressed(key::key_code kc);
+bool key_pressed(const window &win, key::key_code kc);
+const char *key_name(key::key_code kc);
 
 void push_window(const window *win);
 void pop_window();
+
+void install_key_callbacks(const window *win);
 } // namespace lynx::input
 
 #endif

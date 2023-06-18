@@ -13,7 +13,7 @@ static const window *active_window()
     return nullptr;
 }
 
-bool key_pressed(const key_code::key kc)
+bool key_pressed(const key::key_code kc)
 {
     const window *win = s_pushed_window ? s_pushed_window : active_window();
     if (!win)
@@ -21,12 +21,12 @@ bool key_pressed(const key_code::key kc)
     return key_pressed(*win, kc);
 }
 
-bool key_pressed(const window &win, const key_code::key kc)
+bool key_pressed(const window &win, const key::key_code kc)
 {
     return glfwGetKey(win.glfw_window(), (int)kc) == GLFW_PRESS;
 }
 
-const char *key_name(const key_code::key kc)
+const char *key_name(const key::key_code kc)
 {
     return glfwGetKeyName((int)kc, 0);
 }
@@ -41,5 +41,10 @@ void pop_window()
 {
     DBG_ASSERT_ERROR(s_pushed_window, "No window has been pushed.")
     s_pushed_window = nullptr;
+    install_key_callbacks(nullptr);
+}
+
+void install_key_callbacks(const window *win)
+{
 }
 } // namespace lynx::input
