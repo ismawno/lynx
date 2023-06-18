@@ -34,7 +34,8 @@ bool app::next_frame()
 {
     DBG_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     DBG_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
-    DBG_ASSERT_ERROR(!m_window->closed(), "Cannot fetch next frame if the window is closed")
+    if (m_window->closed())
+        return false;
     m_ongoing_frame = true;
 
     glfwPollEvents();

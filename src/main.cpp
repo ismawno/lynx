@@ -23,6 +23,7 @@ class example_app3D : public lynx::app3D
     }
     void on_update(const float ts) override
     {
+        lynx::input::push_window(m_window);
         if (lynx::input::key_pressed(lynx::input::key_code::A))
             cube.transform.position.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key_code::D))
@@ -41,6 +42,7 @@ class example_app3D : public lynx::app3D
         cam->point_to(cube.transform.position);
 
         m_window->draw(cube);
+        lynx::input::pop_window();
     }
     lynx::perspective3D *cam;
     lynx::cube3D cube;
@@ -63,24 +65,24 @@ class imgui_demo : public lynx::imgui_layer
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app3D app;
+    // example_app3D app;
 
-    app.push_layer<imgui_demo>();
-    app.run();
+    // app.push_layer<imgui_demo>();
+    // app.run();
 
-    // example_app2D app2;
-    // example_app3D app3;
+    example_app2D app2;
+    example_app3D app3;
 
-    // app2.push_layer<imgui_demo>();
+    app2.push_layer<imgui_demo>();
     // app3.push_layer<imgui_demo>();
 
-    // app2.start();
-    // app3.start();
-    // while (true)
-    // {
-    //     const bool done2 = !app2.next_frame();
-    //     const bool done3 = !app3.next_frame();
-    //     if (done2 && done3)
-    //         break;
-    // }
+    app2.start();
+    app3.start();
+    while (true)
+    {
+        const bool done2 = !app2.next_frame();
+        const bool done3 = !app3.next_frame();
+        if (done2 && done3)
+            break;
+    }
 }

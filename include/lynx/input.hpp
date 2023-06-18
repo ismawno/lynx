@@ -141,6 +141,9 @@ enum key
 bool key_pressed(key_code::key kc);
 bool key_pressed(const window &win, key_code::key kc);
 const char *key_name(key_code::key kc);
+
+void push_window(const window *win);
+void pop_window();
 } // namespace lynx::input
 
 #endif
