@@ -12,6 +12,23 @@ const glm::mat4 &camera::view() const
     return m_view;
 }
 
+const glm::mat4 &camera::inverse_projection() const
+{
+    return m_inv_projection;
+}
+const glm::mat4 &camera::inverse_view() const
+{
+    return m_inv_view;
+}
+
+glm::vec3 camera::screen_to_world(const glm::vec2 &position, const float z_screen) const
+{
+    DBG_ASSERT_ERROR(z_screen >= 0.f && z_screen <= 1.f,
+                     "The z offset must be normalized (set in vulkan bounding volume units, i.e [0, 1])")
+    const glm::vec4 pos4 = m_inv_view * m_inv_projection * glm::vec4(position, z_screen, 1.f);
+    return glm::vec3(pos4) * pos4.w;
+}
+
 void camera2D::keep_aspect_ratio(const float aspect)
 {
     transform.scale.x = aspect * transform.scale.y;
@@ -51,6 +68,10 @@ void orthographic2D::update_projection()
     m_projection = glm::mat4{1.f};
     m_projection[0][0] = 2.f / transform.scale.x;
     m_projection[1][1] = 2.f / transform.scale.y;
+
+    m_inv_projection = glm::mat4{1.f};
+    m_inv_projection[0][0] = 0.5f * transform.scale.x;
+    m_inv_projection[1][1] = 0.5f * transform.scale.y;
 }
 
 void orthographic2D::update_view()
@@ -68,7 +89,14 @@ void orthographic2D::update_view()
     const glm::vec2 v{-s, c};
     m_view[3][0] = -glm::dot(u, transform.position);
     m_view[3][1] = -glm::dot(v, transform.position);
-    //[3][2] may need to be non zero
+
+    m_inv_view = glm::mat4{1.f};
+    m_inv_view[0][0] = c;
+    m_inv_view[1][0] = -s;
+    m_inv_view[0][1] = s;
+    m_inv_view[1][1] = c;
+    m_inv_view[3][0] = transform.position.x;
+    m_inv_view[3][1] = transform.position.y;
 }
 
 void camera3D::keep_aspect_ratio(const float aspect)
@@ -122,6 +150,11 @@ void orthographic3D::update_projection()
     m_projection[0][0] = 2.f / transform.scale.x;
     m_projection[1][1] = 2.f / transform.scale.y;
     m_projection[2][2] = 1.f / transform.scale.z;
+
+    m_inv_projection = glm::mat4{1.0f};
+    m_inv_projection[0][0] = 0.5f * transform.scale.x;
+    m_inv_projection[1][1] = 0.5f * transform.scale.y;
+    m_inv_projection[2][2] = transform.scale.z;
 }
 
 void orthographic3D::update_view()
@@ -132,6 +165,7 @@ void orthographic3D::update_view()
     const float s2 = sinf(transform.rotation.x);
     const float c1 = cosf(transform.rotation.y);
     const float s1 = sinf(transform.rotation.y);
+
     const glm::vec3 u{(c1 * c3 + s1 * s2 * s3), (c2 * s3), (c1 * s2 * s3 - c3 * s1)};
     const glm::vec3 v{(c3 * s1 * s2 - c1 * s3), (c2 * c3), (c1 * c3 * s2 + s1 * s3)};
     const glm::vec3 w{(c2 * s1), (-s2), (c1 * c2)};
@@ -149,6 +183,20 @@ void orthographic3D::update_view()
     m_view[3][0] = -glm::dot(u, transform.position);
     m_view[3][1] = -glm::dot(v, transform.position);
     m_view[3][2] = -glm::dot(w, transform.position);
+
+    m_inv_view = glm::mat4{1.f};
+    m_inv_view[0][0] = u.x;
+    m_inv_view[1][0] = v.x;
+    m_inv_view[2][0] = w.x;
+    m_inv_view[0][1] = u.y;
+    m_inv_view[1][1] = v.y;
+    m_inv_view[2][1] = w.y;
+    m_inv_view[0][2] = u.z;
+    m_inv_view[1][2] = v.z;
+    m_inv_view[2][2] = w.z;
+    m_inv_view[3][0] = transform.position.x;
+    m_inv_view[3][1] = transform.position.y;
+    m_inv_view[3][2] = transform.position.z;
 }
 
 perspective3D::perspective3D(const float aspect, const float fovy, const glm::vec3 &rotation, const float near,
@@ -208,7 +256,14 @@ void perspective3D::update_projection()
     m_projection[1][1] = m_near / transform.scale.y;
     m_projection[2][2] = m_far / (m_far - m_near);
     m_projection[2][3] = 1.f;
-    m_projection[3][2] = -(m_far * m_near) / (m_far - m_near);
+    m_projection[3][2] = m_far * m_near / (m_near - m_far);
+
+    m_inv_projection = glm::mat4{0.0f};
+    m_inv_projection[0][0] = transform.scale.x / m_near;
+    m_inv_projection[1][1] = transform.scale.y / m_near;
+    m_inv_projection[3][3] = 1.f / m_near;
+    m_inv_projection[3][2] = 1.f;
+    m_inv_projection[2][3] = (m_near - m_far) / (m_far * m_near);
 }
 
 void perspective3D::update_view()
@@ -236,107 +291,19 @@ void perspective3D::update_view()
     m_view[3][0] = -glm::dot(u, transform.position);
     m_view[3][1] = -glm::dot(v, transform.position);
     m_view[3][2] = -glm::dot(w, transform.position);
+
+    m_inv_view = glm::mat4{1.f};
+    m_inv_view[0][0] = u.x;
+    m_inv_view[1][0] = v.x;
+    m_inv_view[2][0] = w.x;
+    m_inv_view[0][1] = u.y;
+    m_inv_view[1][1] = v.y;
+    m_inv_view[2][1] = w.y;
+    m_inv_view[0][2] = u.z;
+    m_inv_view[1][2] = v.z;
+    m_inv_view[2][2] = w.z;
+    m_inv_view[3][0] = transform.position.x;
+    m_inv_view[3][1] = transform.position.y;
+    m_inv_view[3][2] = transform.position.z;
 }
-
-// camera3D::camera3D(const glm::vec3 &orthographic_dimensions)
-// {
-//     orthographic_projection(orthographic_dimensions);
-// }
-// camera3D::camera3D(const glm::vec3 &min, const glm::vec3 &max)
-// {
-//     orthographic_projection(min, max);
-// }
-// camera3D::camera3D(const float fovy, const float aspect, const float near, const float far)
-// {
-//     perspective_projection(fovy, aspect, near, far);
-// }
-
-// void camera3D::orthographic_projection(const glm::vec3 &dimensions)
-// {
-//     orthographic_projection(-0.5f * dimensions, 0.5f * dimensions);
-// }
-// void camera3D::orthographic_projection(const glm::vec3 &min, const glm::vec3 &max)
-// {
-//     m_projection = glm::mat4{1.0f};
-//     m_projection[0][0] = 2.f / (max.x - min.x);
-//     m_projection[1][1] = 2.f / (max.y - min.y);
-//     m_projection[2][2] = 1.f / (max.z - min.z);
-//     m_projection[3][0] = -(max.x + min.x) / (max.x - min.x);
-//     m_projection[3][1] = -(max.y + min.y) / (max.y - min.y);
-//     m_projection[3][2] = -min.z / (max.z - min.z);
-// }
-// void camera3D::perspective_projection(const float fovy, const float aspect, const float near, const float far)
-// {
-//     DBG_ASSERT_ERROR(aspect > 0.0f, "Aspect ratio must be greater than 0");
-//     const float tan_half = tanf(fovy / 2.f);
-//     DBG_ASSERT_ERROR(tan_half > 0.0f, "The tangent of the field of view must be greater than 0");
-
-//     m_projection = glm::mat4{0.0f};
-//     m_projection[0][0] = 1.f / (aspect * tan_half);
-//     m_projection[1][1] = 1.f / (tan_half);
-//     m_projection[2][2] = far / (far - near);
-//     m_projection[2][3] = 1.f;
-//     m_projection[3][2] = -(far * near) / (far - near);
-// }
-
-// void camera3D::view_as_direction(const glm::vec3 &position, const glm::vec3 &direction, const glm::vec3 &up)
-// {
-//     const glm::vec3 w{glm::normalize(direction)};
-//     const glm::vec3 u{glm::normalize(glm::cross(w, up))};
-//     const glm::vec3 v{glm::cross(w, u)};
-
-//     m_view = glm::mat4{1.f};
-//     m_view[0][0] = u.x;
-//     m_view[1][0] = u.y;
-//     m_view[2][0] = u.z;
-//     m_view[0][1] = v.x;
-//     m_view[1][1] = v.y;
-//     m_view[2][1] = v.z;
-//     m_view[0][2] = w.x;
-//     m_view[1][2] = w.y;
-//     m_view[2][2] = w.z;
-//     m_view[3][0] = -glm::dot(u, position);
-//     m_view[3][1] = -glm::dot(v, position);
-//     m_view[3][2] = -glm::dot(w, position);
-// }
-// void camera3D::view_as_target(const glm::vec3 &position, const glm::vec3 &target, const glm::vec3 &up)
-// {
-//     view_as_direction(position, target - position, up);
-// }
-// void camera3D::view_as_transform(const glm::vec3 &position, const glm::vec3 &rotation)
-// {
-//     const float c3 = cosf(rotation.z);
-//     const float s3 = sinf(rotation.z);
-//     const float c2 = cosf(rotation.x);
-//     const float s2 = sinf(rotation.x);
-//     const float c1 = cosf(rotation.y);
-//     const float s1 = sinf(rotation.y);
-//     const glm::vec3 u{(c1 * c3 + s1 * s2 * s3), (c2 * s3), (c1 * s2 * s3 - c3 * s1)};
-//     const glm::vec3 v{(c3 * s1 * s2 - c1 * s3), (c2 * c3), (c1 * c3 * s2 + s1 * s3)};
-//     const glm::vec3 w{(c2 * s1), (-s2), (c1 * c2)};
-//     m_view = glm::mat4{1.f};
-//     m_view[0][0] = u.x;
-//     m_view[1][0] = u.y;
-//     m_view[2][0] = u.z;
-//     m_view[0][1] = v.x;
-//     m_view[1][1] = v.y;
-//     m_view[2][1] = v.z;
-//     m_view[0][2] = w.x;
-//     m_view[1][2] = w.y;
-//     m_view[2][2] = w.z;
-//     m_view[3][0] = -glm::dot(u, position);
-//     m_view[3][1] = -glm::dot(v, position);
-//     m_view[3][2] = -glm::dot(w, position);
-// }
-
-// const glm::mat4 &camera3D::projection_matrix() const
-// {
-//     return m_projection;
-// }
-
-// const glm::mat4 &camera3D::view_matrix() const
-// {
-//     return m_view;
-// }
-// } // namespace lynx
 } // namespace lynx

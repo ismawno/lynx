@@ -13,6 +13,7 @@ window::window(const std::uint32_t width, const std::uint32_t height, const char
 {
     init();
     s_active_windows.insert(this);
+    input::install_callbacks(this);
 }
 
 window::~window()
@@ -28,7 +29,6 @@ void window::init()
 
     m_window = glfwCreateWindow((int)m_width, (int)m_height, m_name, nullptr, nullptr);
     glfwSetWindowUserPointer(m_window, this);
-    glfwSetFramebufferSizeCallback(m_window, frame_buffer_resize_callback);
     m_device = make_ref<lynx::device>(*this);
     m_renderer = make_scope<lynx::renderer>(m_device, *this);
 }
@@ -86,14 +86,6 @@ bool window::closed()
     return false;
 }
 
-void window::frame_buffer_resize_callback(GLFWwindow *gwindow, const int width, const int height)
-{
-    window *win = (window *)glfwGetWindowUserPointer(gwindow);
-    win->m_width = (std::uint32_t)width;
-    win->m_height = (std::uint32_t)height;
-    win->m_frame_buffer_resized = true;
-}
-
 bool window::was_resized() const
 {
     return m_frame_buffer_resized;
@@ -115,6 +107,27 @@ bool window::maintain_camera_aspect_ratio() const
 void window::maintain_camera_aspect_ratio(const bool maintain)
 {
     m_maintain_camera_aspect_ratio = maintain;
+}
+
+void window::frame_buffer_resize(const std::uint32_t width, const std::uint32_t height)
+{
+    m_width = width;
+    m_height = height;
+    m_frame_buffer_resized = true;
+}
+
+void window::push_event(const event &ev)
+{
+    m_event_queue.push(ev);
+}
+
+event window::poll_event()
+{
+    if (m_event_queue.empty())
+        return {};
+    const event ev = m_event_queue.front();
+    m_event_queue.pop();
+    return ev;
 }
 
 const renderer &window::renderer() const

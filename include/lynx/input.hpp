@@ -3,6 +3,11 @@
 
 #include <GLFW/glfw3.h>
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+
 namespace lynx
 {
 class window;
@@ -138,14 +143,62 @@ enum key_code
 };
 } // namespace key
 
+void poll_events();
+
 bool key_pressed(key::key_code kc);
 bool key_pressed(const window &win, key::key_code kc);
+
+glm::vec2 screen_mouse_position();
+glm::vec3 world_mouse_position(float z_screen = 0.5f);
+
 const char *key_name(key::key_code kc);
 
 void push_window(const window *win);
 void pop_window();
 
-void install_key_callbacks(const window *win);
+void install_callbacks(window *win);
+
 } // namespace lynx::input
+
+namespace lynx
+{
+struct event
+{
+    enum action_type
+    {
+        KEY_PRESSED = GLFW_PRESS,
+        KEY_RELEASED = GLFW_RELEASE,
+        KEY_REPEAT = GLFW_REPEAT,
+        WINDOW_RESIZE,
+        MOUSE_DRAGGED
+    };
+
+    struct window_resize
+    {
+        std::uint32_t old_width = 0;
+        std::uint32_t old_height = 0;
+        std::uint32_t new_width = 0;
+        std::uint32_t new_height = 0;
+    };
+
+    struct mouse_state
+    {
+        glm::vec2 position{0.f};
+        float scroll = 0.f;
+    };
+
+    bool empty = true;
+    action_type type;
+    input::key::key_code key;
+
+    window_resize window;
+    mouse_state mouse;
+
+    operator bool() const
+    {
+        return !empty;
+    }
+};
+} // namespace lynx
 
 #endif

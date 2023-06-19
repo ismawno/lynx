@@ -38,7 +38,10 @@ bool app::next_frame()
         return false;
     m_ongoing_frame = true;
 
-    glfwPollEvents();
+    input::poll_events();
+    while (const event ev = m_window->poll_event())
+        ;
+
     m_last_timestamp = m_current_timestamp;
     m_current_timestamp = std::chrono::high_resolution_clock::now();
     m_window->clear();

@@ -15,9 +15,17 @@ class camera
     const glm::mat4 &projection() const;
     const glm::mat4 &view() const;
 
+    const glm::mat4 &inverse_projection() const;
+    const glm::mat4 &inverse_view() const;
+
+    glm::vec3 screen_to_world(const glm::vec2 &screen_pos, float z_screen = 0.5f) const;
+
   protected:
     glm::mat4 m_projection{1.f};
     glm::mat4 m_view{1.f};
+
+    glm::mat4 m_inv_projection{1.f};
+    glm::mat4 m_inv_view{1.f};
 
   private:
     camera &operator=(const camera &) = delete;

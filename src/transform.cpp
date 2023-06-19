@@ -28,7 +28,7 @@ transform2D::operator glm::mat4() const
                      {position.x, position.y, 0.5f, 1.0f}};
 }
 
-transform3D::operator glm::mat4() const
+transform3D::operator glm::mat4() const // YXZ
 {
     const float c3 = cosf(rotation.z);
     const float s3 = sinf(rotation.z);

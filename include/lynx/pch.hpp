@@ -14,6 +14,7 @@
 #include <chrono>
 #include <utility>
 #include <functional>
+#include <queue>
 #include <vulkan/vulkan.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>

@@ -6,6 +6,7 @@
 #include "lynx/renderer.hpp"
 #include "lynx/swap_chain.hpp"
 #include "lynx/primitives.hpp"
+#include "lynx/input.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -13,6 +14,7 @@
 #include <vulkan/vulkan.hpp>
 #include <unordered_set>
 #include <functional>
+#include <queue>
 
 namespace lynx
 {
@@ -52,9 +54,15 @@ class window
 
     bool maintain_camera_aspect_ratio() const;
     void maintain_camera_aspect_ratio(bool maintain);
+    void frame_buffer_resize(std::uint32_t width, std::uint32_t height);
+
+    void push_event(const event &ev);
+    event poll_event();
 
     const lynx::renderer &renderer() const;
     const lynx::device &device() const;
+
+    virtual lynx::camera &camera() const = 0;
 
     GLFWwindow *glfw_window() const;
 
@@ -98,6 +106,7 @@ class window
 
     ref<const lynx::device> m_device;
     scope<lynx::renderer> m_renderer;
+    std::queue<event> m_event_queue;
 
     static inline std::unordered_set<const window *> s_active_windows{};
 
@@ -106,9 +115,6 @@ class window
     void init();
     virtual void render(VkCommandBuffer command_buffer) const = 0;
     virtual void clear_render_data() const = 0;
-    virtual lynx::camera &camera() const = 0;
-
-    static void frame_buffer_resize_callback(GLFWwindow *gwindow, int width, int height);
 
     window(const window &) = delete;
     window &operator=(const window &) = delete;
