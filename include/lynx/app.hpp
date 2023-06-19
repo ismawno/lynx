@@ -11,7 +11,7 @@ namespace lynx
 class app
 {
   public:
-    template <typename T> app(scope<T> &&win);
+    app() = default;
     virtual ~app();
 
     void run();
@@ -30,10 +30,22 @@ class app
 
     bool pop_layer(const layer *ly);
 
-    lynx::window &window() const;
+    template <typename T = window> T *window() const
+    {
+        if constexpr (std::is_same<T, lynx::window>::value)
+            return m_window.get();
+        else
+            return dynamic_cast<T *>(m_window.get());
+    }
 
-  protected:
-    template <typename T> T *window_as() const;
+    template <typename T, class... Args> T *set_window(Args &&...args)
+    {
+        static_assert(std::is_base_of<lynx::window, T>::value, "Window type must inherit from window");
+        auto win = make_scope<T>(std::forward<Args>(args)...);
+        T *ptr = win.get();
+        m_window = std::move(win);
+        return ptr;
+    }
 
   private:
     bool m_started = false;
@@ -66,10 +78,17 @@ class app2D : public app
   public:
     app2D(std::uint32_t width = 800, std::uint32_t height = 600, const char *name = "App 2D");
 
-    window2D &window() const;
+    template <typename T = window2D> T *window() const
+    {
+        static_assert(std::is_base_of<lynx::window2D, T>::value, "Window type must inherit from window2D");
+        return app::window<T>();
+    }
 
-  protected:
-    window2D *m_window;
+    template <typename T = window2D, class... Args> T *set_window(Args &&...args)
+    {
+        static_assert(std::is_base_of<lynx::window2D, T>::value, "Window type must inherit from window2D");
+        return app::set_window<T>(std::forward<Args>(args)...);
+    }
 };
 
 class app3D : public app
@@ -77,10 +96,17 @@ class app3D : public app
   public:
     app3D(std::uint32_t width = 800, std::uint32_t height = 600, const char *name = "App 3D");
 
-    window3D &window() const;
+    template <typename T = window3D> T *window() const
+    {
+        static_assert(std::is_base_of<lynx::window3D, T>::value, "Window type must inherit from window3D");
+        return app::window<T>();
+    }
 
-  protected:
-    window3D *m_window;
+    template <typename T = window3D, class... Args> T *set_window(Args &&...args)
+    {
+        static_assert(std::is_base_of<lynx::window3D, T>::value, "Window type must inherit from window3D");
+        return app::set_window<T>(std::forward<Args>(args)...);
+    }
 };
 
 } // namespace lynx

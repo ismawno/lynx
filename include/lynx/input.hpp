@@ -148,8 +148,7 @@ void poll_events();
 bool key_pressed(key::key_code kc);
 bool key_pressed(const window &win, key::key_code kc);
 
-glm::vec2 screen_mouse_position();
-glm::vec3 world_mouse_position(float z_screen = 0.5f);
+glm::vec2 mouse_position();
 
 const char *key_name(key::key_code kc);
 

@@ -4,10 +4,6 @@
 
 namespace lynx
 {
-template <typename T> app::app(scope<T> &&win) : m_window(std::move(win))
-{
-}
-
 app::~app()
 {
     if (!m_terminated)
@@ -89,36 +85,16 @@ bool app::pop_layer(const layer *ly)
     return false;
 }
 
-window &app::window() const
-{
-    return *m_window;
-}
-
-template <typename T> T *app::window_as() const
-{
-    return dynamic_cast<T *>(m_window.get());
-}
-
 app2D::app2D(const std::uint32_t width, const std::uint32_t height, const char *name)
-    : app(make_scope<window2D>(width, height, name))
-{
-    m_window = window_as<window2D>();
-}
 
-window2D &app2D::window() const
 {
-    return *m_window;
+    set_window(width, height, name);
 }
 
 app3D::app3D(const std::uint32_t width, const std::uint32_t height, const char *name)
-    : app(make_scope<window3D>(width, height, name))
-{
-    m_window = window_as<window3D>();
-}
 
-window3D &app3D::window() const
 {
-    return *m_window;
+    set_window(width, height, name);
 }
 
 } // namespace lynx

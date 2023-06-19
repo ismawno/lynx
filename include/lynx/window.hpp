@@ -25,6 +25,9 @@ class buffer;
 class camera2D;
 class camera3D;
 
+class orthographic2D;
+class perspective3D;
+
 class window
 {
   public:
@@ -62,7 +65,22 @@ class window
     const lynx::renderer &renderer() const;
     const lynx::device &device() const;
 
-    virtual lynx::camera &camera() const = 0;
+    template <typename T = camera> T *camera() const
+    {
+        if constexpr (std::is_same<T, lynx::camera>::value)
+            return m_camera.get();
+        else
+            return dynamic_cast<T *>(m_camera.get());
+    }
+
+    template <typename T, class... Args> T *set_camera(Args &&...args)
+    {
+        static_assert(std::is_base_of<lynx::camera, T>::value, "Camera type must inherit from camera");
+        auto cam = make_scope<T>(std::forward<Args>(args)...);
+        T *ptr = cam.get();
+        m_camera = std::move(cam);
+        return ptr;
+    }
 
     GLFWwindow *glfw_window() const;
 
@@ -106,6 +124,7 @@ class window
 
     ref<const lynx::device> m_device;
     scope<lynx::renderer> m_renderer;
+    scope<lynx::camera> m_camera;
     std::queue<event> m_event_queue;
 
     static inline std::unordered_set<const window *> s_active_windows{};
@@ -140,26 +159,23 @@ class window2D : public window
               const transform2D &transform = {}) const;
     void draw(const drawable2D &drawable) const;
 
-    template <typename T = camera2D> T *camera_as() const
-    {
-        return dynamic_cast<T *>(m_camera.get());
-    }
-    template <typename T, class... Args> T *set_camera_as(Args &&...args)
+    template <typename T = camera2D> T *camera() const
     {
         static_assert(std::is_base_of<camera2D, T>::value, "Camera type must inherit from camera2D");
-        auto cam = make_scope<T>(std::forward<Args>(args)...);
-        T *ptr = cam.get();
-        m_camera = std::move(cam);
-        return ptr;
+        return window::camera<T>();
+    }
+
+    template <typename T = orthographic2D, class... Args> T *set_camera(Args &&...args)
+    {
+        static_assert(std::is_base_of<camera2D, T>::value, "Camera type must inherit from camera2D");
+        return window::set_camera<T>(std::forward<Args>(args)...);
     }
 
   private:
-    scope<camera2D> m_camera;
     std::vector<scope<render_system2D>> m_render_systems;
 
     void render(VkCommandBuffer command_buffer) const override;
     void clear_render_data() const override;
-    lynx::camera &camera() const override;
 };
 
 class window3D : public window
@@ -182,26 +198,23 @@ class window3D : public window
               const transform3D &transform = {}) const;
     void draw(const drawable3D &drawable) const;
 
-    template <typename T = camera3D> T *camera_as() const
-    {
-        return dynamic_cast<T *>(m_camera.get());
-    }
-    template <typename T, class... Args> T *set_camera_as(Args &&...args)
+    template <typename T = camera3D> T *camera() const
     {
         static_assert(std::is_base_of<camera3D, T>::value, "Camera type must inherit from camera3D");
-        auto cam = make_scope<T>(std::forward<Args>(args)...);
-        T *ptr = cam.get();
-        m_camera = std::move(cam);
-        return ptr;
+        return window::camera<T>();
+    }
+
+    template <typename T = perspective3D, class... Args> T *set_camera(Args &&...args)
+    {
+        static_assert(std::is_base_of<camera3D, T>::value, "Camera type must inherit from camera3D");
+        return window::set_camera<T>(std::forward<Args>(args)...);
     }
 
   private:
-    scope<camera3D> m_camera;
     std::vector<scope<render_system3D>> m_render_systems;
 
     void render(VkCommandBuffer command_buffer) const override;
     void clear_render_data() const override;
-    lynx::camera &camera() const override;
 };
 } // namespace lynx
 

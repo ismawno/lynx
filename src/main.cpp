@@ -8,35 +8,38 @@ class example_app2D : public lynx::app2D
 {
     void on_start() override
     {
-        cam = m_window->camera_as<lynx::orthographic2D>();
+        m_window = window();
+        m_cam = m_window->camera<lynx::orthographic2D>();
     }
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            cam->transform.position.x -= ts;
+            m_cam->transform.position.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::D))
-            cam->transform.position.x += ts;
+            m_cam->transform.position.x += ts;
         if (lynx::input::key_pressed(lynx::input::key::W))
-            cam->transform.position.y -= ts;
+            m_cam->transform.position.y -= ts;
         if (lynx::input::key_pressed(lynx::input::key::S))
-            cam->transform.position.y += ts;
+            m_cam->transform.position.y += ts;
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            cam->transform.rotation += ts;
+            m_cam->transform.rotation += ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
-            cam->transform.rotation -= ts;
+            m_cam->transform.rotation -= ts;
 
         // rect.transform.rotation += (float)M_PI * ts;
-        m_window->draw(rect);
+        m_window->draw(m_rect);
     }
-    lynx::rect2D rect;
-    lynx::orthographic2D *cam;
+    lynx::window2D *m_window;
+    lynx::rect2D m_rect;
+    lynx::orthographic2D *m_cam;
 };
 
 class example_app3D : public lynx::app3D
 {
     void on_start() override
     {
-        cam = m_window->camera_as<lynx::perspective3D>();
+        m_window = window();
+        cam = m_window->camera<lynx::perspective3D>();
         cube.transform.position.z = 3.f;
     }
     void on_update(const float ts) override
@@ -66,6 +69,7 @@ class example_app3D : public lynx::app3D
         m_window->draw(cube);
         lynx::input::pop_window();
     }
+    lynx::window3D *m_window;
     lynx::perspective3D *cam;
     lynx::cube3D cube;
 };
@@ -78,22 +82,29 @@ class imgui_demo : public lynx::imgui_layer
     }
 
   private:
+    void on_attach(lynx::app *parent) override
+    {
+        lynx::imgui_layer::on_attach(parent);
+        m_cam = parent->window<lynx::window3D>()->camera<lynx::perspective3D>();
+    }
     void on_imgui_render() override
     {
-        const glm::vec2 spos = lynx::input::screen_mouse_position();
-        const glm::vec3 wpos = lynx::input::world_mouse_position(1.f);
+        const glm::vec2 spos = lynx::input::mouse_position();
+        const glm::vec3 wpos = m_cam->screen_to_world(spos, 0.1f);
 
         ImGui::Begin("Mouse");
         ImGui::Text("Screen mouse pos: %f, %f", spos.x, spos.y);
         ImGui::Text("World mouse pos: %f, %f, %f", wpos.x, wpos.y, wpos.z);
         ImGui::End();
     }
+
+    lynx::perspective3D *m_cam;
 };
 
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app2D app;
+    example_app3D app;
 
     app.push_layer<imgui_demo>();
     app.run();

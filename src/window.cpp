@@ -43,10 +43,9 @@ bool window::display(const std::function<void(VkCommandBuffer)> &submission) con
 {
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
-        lynx::camera &cam = camera();
         if (m_maintain_camera_aspect_ratio)
-            cam.keep_aspect_ratio(m_renderer->swap_chain().extent_aspect_ratio());
-        cam.update_transformation_matrices();
+            m_camera->keep_aspect_ratio(m_renderer->swap_chain().extent_aspect_ratio());
+        m_camera->update_transformation_matrices();
 
         m_renderer->begin_swap_chain_render_pass(command_buffer);
         render(command_buffer);
@@ -180,7 +179,7 @@ bool window::should_close() const
 
 window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) : window(width, height, name)
 {
-    m_camera = make_scope<orthographic2D>(swap_chain_aspect(), 10.f);
+    set_camera<orthographic2D>(swap_chain_aspect(), 10.f);
 
     add_render_system<point_render_system2D>();
     add_render_system<line_render_system2D>();
@@ -209,7 +208,7 @@ void window2D::draw(const drawable2D &drawable) const
 void window2D::render(const VkCommandBuffer command_buffer) const
 {
     for (const auto &sys : m_render_systems)
-        sys->render(command_buffer, *m_camera);
+        sys->render(command_buffer, *camera());
 }
 
 void window2D::clear_render_data() const
@@ -218,14 +217,9 @@ void window2D::clear_render_data() const
         sys->clear_render_data();
 }
 
-lynx::camera &window2D::camera() const
-{
-    return *m_camera;
-}
-
 window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) : window(width, height, name)
 {
-    m_camera = make_scope<perspective3D>(swap_chain_aspect(), glm::radians(60.f));
+    set_camera<perspective3D>(swap_chain_aspect(), glm::radians(60.f));
 
     add_render_system<point_render_system3D>();
     add_render_system<line_render_system3D>();
@@ -254,18 +248,13 @@ void window3D::draw(const drawable3D &drawable) const
 void window3D::render(const VkCommandBuffer command_buffer) const
 {
     for (const auto &sys : m_render_systems)
-        sys->render(command_buffer, *m_camera);
+        sys->render(command_buffer, *camera());
 }
 
 void window3D::clear_render_data() const
 {
     for (const auto &sys : m_render_systems)
         sys->clear_render_data();
-}
-
-lynx::camera &window3D::camera() const
-{
-    return *m_camera;
 }
 
 } // namespace lynx

@@ -21,17 +21,21 @@ const glm::mat4 &camera::inverse_view() const
     return m_inv_view;
 }
 
-glm::vec3 camera::screen_to_world(const glm::vec2 &position, const float z_screen) const
-{
-    DBG_ASSERT_ERROR(z_screen >= 0.f && z_screen <= 1.f,
-                     "The z offset must be normalized (set in vulkan bounding volume units, i.e [0, 1])")
-    const glm::vec4 pos4 = m_inv_view * m_inv_projection * glm::vec4(position, z_screen, 1.f);
-    return glm::vec3(pos4) * pos4.w;
-}
-
 void camera2D::keep_aspect_ratio(const float aspect)
 {
     transform.scale.x = aspect * transform.scale.y;
+}
+
+glm::vec2 camera2D::screen_to_world(const glm::vec2 &screen_pos) const
+{
+    const glm::vec4 pos4 = m_inv_view * m_inv_projection * glm::vec4(screen_pos, 0.5f, 1.f);
+    return glm::vec2(pos4) * pos4.w;
+}
+
+glm::vec2 camera2D::world_to_screen(const glm::vec2 &world_pos) const
+{
+    const glm::vec4 pos4 = m_projection * m_view * glm::vec4(world_pos, 0.5f, 1.f);
+    return glm::vec2(pos4) / pos4.w;
 }
 
 orthographic2D::orthographic2D(const float aspect, const float size, const float rotation)
@@ -102,6 +106,21 @@ void orthographic2D::update_view()
 void camera3D::keep_aspect_ratio(const float aspect)
 {
     transform.scale.x = aspect * transform.scale.y;
+}
+
+glm::vec3 camera3D::screen_to_world(const glm::vec2 &screen_pos, const float z_screen) const
+{
+    DBG_ASSERT_ERROR(z_screen >= 0.f && z_screen <= 1.f,
+                     "Value of z-screen must be normalized ([0, 1]) to fit into vulkan's canonical volume. z: {0}",
+                     z_screen)
+    const glm::vec4 pos4 = m_inv_view * m_inv_projection * glm::vec4(screen_pos, z_screen, 1.f);
+    return glm::vec3(pos4) * pos4.w;
+}
+
+glm::vec2 camera3D::world_to_screen(const glm::vec3 &world_pos) const
+{
+    const glm::vec4 pos4 = m_projection * m_view * glm::vec4(world_pos, 1.f);
+    return glm::vec2(pos4) / pos4.w;
 }
 
 void camera3D::point_towards(const glm::vec3 &direction)

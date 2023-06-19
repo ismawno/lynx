@@ -18,8 +18,6 @@ class camera
     const glm::mat4 &inverse_projection() const;
     const glm::mat4 &inverse_view() const;
 
-    glm::vec3 screen_to_world(const glm::vec2 &screen_pos, float z_screen = 0.5f) const;
-
   protected:
     glm::mat4 m_projection{1.f};
     glm::mat4 m_view{1.f};
@@ -37,6 +35,8 @@ class camera2D : public camera
     transform2D transform;
 
     void keep_aspect_ratio(float aspect) override;
+    glm::vec2 screen_to_world(const glm::vec2 &screen_pos) const;
+    glm::vec2 world_to_screen(const glm::vec2 &world_pos) const;
 };
 
 class camera3D : public camera
@@ -45,6 +45,9 @@ class camera3D : public camera
     transform3D transform;
 
     void keep_aspect_ratio(float aspect) override;
+
+    glm::vec3 screen_to_world(const glm::vec2 &screen_pos, float z_screen = 0.5f) const;
+    glm::vec2 world_to_screen(const glm::vec3 &world_pos) const;
 
     void point_towards(const glm::vec3 &direction);
     void point_to(const glm::vec3 &position);

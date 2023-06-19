@@ -33,7 +33,7 @@ bool key_pressed(const window &win, const key::key_code kc)
     return glfwGetKey(win.glfw_window(), (int)kc) == GLFW_PRESS;
 }
 
-glm::vec2 screen_mouse_position()
+glm::vec2 mouse_position()
 {
     static glm::vec2 pixel_mouse{0.f};
     const window *win = active_window();
@@ -44,16 +44,6 @@ glm::vec2 screen_mouse_position()
     glfwGetCursorPos(win->glfw_window(), &x, &y);
     pixel_mouse = {2.f * (float)x / (float)win->width() - 1.f, 2.f * (float)y / (float)win->height() - 1.f};
     return pixel_mouse;
-}
-glm::vec3 world_mouse_position(const float z_screen)
-{
-    static glm::vec3 world_mouse{0.f};
-    const window *win = active_window();
-    if (!win)
-        return world_mouse;
-
-    world_mouse = win->camera().screen_to_world(screen_mouse_position(), z_screen);
-    return world_mouse;
 }
 
 const char *key_name(const key::key_code kc)
