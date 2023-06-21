@@ -1,6 +1,7 @@
 #ifndef LYNX_LAYER_HPP
 #define LYNX_LAYER_HPP
 
+#include "lynx/input.hpp"
 #include <functional>
 #include <vulkan/vulkan.hpp>
 #include <imgui.h>
@@ -28,15 +29,16 @@ class layer
     virtual void on_attach()
     {
     }
-
     virtual void on_detach()
     {
     }
-
     virtual void on_update(float ts)
     {
     }
-
+    virtual bool on_event(event ev)
+    {
+        return false;
+    }
     virtual void on_command_submission(VkCommandBuffer command_buffer)
     {
     }

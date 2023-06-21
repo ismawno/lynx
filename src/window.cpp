@@ -123,7 +123,11 @@ void window::push_event(const event &ev)
 event window::poll_event()
 {
     if (m_event_queue.empty())
-        return {};
+    {
+        event ev;
+        ev.empty = true;
+        return ev;
+    }
     const event ev = m_event_queue.front();
     m_event_queue.pop();
     return ev;

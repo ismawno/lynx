@@ -71,6 +71,10 @@ class app
     virtual void on_shutdown()
     {
     }
+    virtual bool on_event(event ev)
+    {
+        return false;
+    }
 
     app(const app &) = delete;
     app &operator=(const app &) = delete;

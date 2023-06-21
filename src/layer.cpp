@@ -78,7 +78,6 @@ void imgui_layer::on_attach()
 
 void imgui_layer::on_update(const float ts)
 {
-    const app *parent_app = parent();
     ImGui::SetCurrentContext(m_imgui_context);
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();

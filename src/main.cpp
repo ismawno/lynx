@@ -95,10 +95,19 @@ class imgui_demo : public lynx::imgui_layer
         ImGui::Begin("Mouse");
         ImGui::Text("Screen mouse pos: %f, %f", spos.x, spos.y);
         ImGui::Text("World mouse pos: %f, %f", wpos.x, wpos.y);
+        if (m_pressed)
+            ImGui::Text("PRESSED!");
+        m_pressed = false;
         ImGui::End();
+    }
+    bool on_event(lynx::event ev) override
+    {
+        m_pressed = ev.type == lynx::event::KEY_REPEAT;
+        return true;
     }
 
     lynx::orthographic2D *m_cam;
+    bool m_pressed = false;
 };
 
 int main()

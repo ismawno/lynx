@@ -143,10 +143,32 @@ enum key_code
 };
 } // namespace key
 
+namespace mouse
+{
+enum button
+{
+    BUTTON_1 = GLFW_MOUSE_BUTTON_1,
+    BUTTON_2 = GLFW_MOUSE_BUTTON_2,
+    BUTTON_3 = GLFW_MOUSE_BUTTON_3,
+    BUTTON_4 = GLFW_MOUSE_BUTTON_4,
+    BUTTON_5 = GLFW_MOUSE_BUTTON_5,
+    BUTTON_6 = GLFW_MOUSE_BUTTON_6,
+    BUTTON_7 = GLFW_MOUSE_BUTTON_7,
+    BUTTON_8 = GLFW_MOUSE_BUTTON_8,
+    BUTTON_LAST = GLFW_MOUSE_BUTTON_LAST,
+    BUTTON_LEFT = GLFW_MOUSE_BUTTON_LEFT,
+    BUTTON_RIGHT = GLFW_MOUSE_BUTTON_RIGHT,
+    BUTTON_MIDDLE = GLFW_MOUSE_BUTTON_MIDDLE
+};
+} // namespace mouse
+
 void poll_events();
 
 bool key_pressed(key::key_code kc);
 bool key_pressed(const window &win, key::key_code kc);
+
+bool mouse_button_pressed(mouse::button btn);
+bool mouse_button_pressed(const window &win, mouse::button btn);
 
 glm::vec2 mouse_position();
 
@@ -165,11 +187,14 @@ struct event
 {
     enum action_type
     {
-        KEY_PRESSED = GLFW_PRESS,
-        KEY_RELEASED = GLFW_RELEASE,
-        KEY_REPEAT = GLFW_REPEAT,
-        WINDOW_RESIZE,
-        MOUSE_DRAGGED
+        KEY_PRESSED,
+        KEY_RELEASED,
+        KEY_REPEAT,
+        MOUSE_MOVED,
+        MOUSE_PRESSED,
+        MOUSE_RELEASED,
+        SCROLLED,
+        WINDOW_RESIZED
     };
 
     struct window_resize
@@ -183,15 +208,16 @@ struct event
     struct mouse_state
     {
         glm::vec2 position{0.f};
-        float scroll = 0.f;
+        input::mouse::button button;
     };
 
-    bool empty = true;
+    bool empty = false;
     action_type type;
     input::key::key_code key;
 
     window_resize window;
     mouse_state mouse;
+    glm::vec2 scroll_offset{0.f};
 
     operator bool() const
     {

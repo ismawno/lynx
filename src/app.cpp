@@ -36,7 +36,10 @@ bool app::next_frame()
 
     input::poll_events();
     while (const event ev = m_window->poll_event())
-        ;
+        if (!on_event(ev))
+            for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
+                if ((*it)->on_event(ev))
+                    break;
 
     m_last_timestamp = m_current_timestamp;
     m_current_timestamp = std::chrono::high_resolution_clock::now();

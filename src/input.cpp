@@ -33,6 +33,18 @@ bool key_pressed(const window &win, const key::key_code kc)
     return glfwGetKey(win.glfw_window(), (int)kc) == GLFW_PRESS;
 }
 
+bool mouse_button_pressed(const mouse::button btn)
+{
+    const window *win = active_window();
+    if (!win)
+        return false;
+    return mouse_button_pressed(*win, btn);
+}
+bool mouse_button_pressed(const window &win, const mouse::button btn)
+{
+    return glfwGetMouseButton(win.glfw_window(), (int)btn);
+}
+
 glm::vec2 mouse_position()
 {
     static glm::vec2 pixel_mouse{0.f};
@@ -71,8 +83,7 @@ static window *from_glfw(GLFWwindow *win)
 static void frame_buffer_resize_callback(GLFWwindow *gwindow, const int width, const int height)
 {
     event ev;
-    ev.empty = false;
-    ev.type = event::WINDOW_RESIZE;
+    ev.type = event::WINDOW_RESIZED;
 
     window *win = from_glfw(gwindow);
 
@@ -89,8 +100,20 @@ static void frame_buffer_resize_callback(GLFWwindow *gwindow, const int width, c
 static void key_callback(GLFWwindow *window, const int key, const int scancode, const int action, const int mods)
 {
     event ev;
-    ev.empty = false;
-    ev.type = (event::action_type)action;
+    switch (action)
+    {
+    case GLFW_PRESS:
+        ev.type = event::KEY_PRESSED;
+        break;
+    case GLFW_RELEASE:
+        ev.type = event::KEY_RELEASED;
+        break;
+    case GLFW_REPEAT:
+        ev.type = event::KEY_REPEAT;
+        break;
+    default:
+        break;
+    }
     ev.key = (key::key_code)key;
     from_glfw(window)->push_event(ev);
 }
@@ -98,9 +121,25 @@ static void key_callback(GLFWwindow *window, const int key, const int scancode, 
 static void cursor_position_callback(GLFWwindow *window, const double xpos, const double ypos)
 {
     event ev;
-    ev.empty = false;
-    ev.type = event::MOUSE_DRAGGED;
+    ev.type = event::MOUSE_MOVED;
     ev.mouse.position = {(float)xpos, (float)ypos};
+    from_glfw(window)->push_event(ev);
+}
+
+static void mouse_button_callback(GLFWwindow *window, const int button, const int action, const int mods)
+{
+    event ev;
+    ev.type = action == GLFW_PRESS ? event::MOUSE_PRESSED : event::MOUSE_RELEASED;
+    ev.mouse.button = (mouse::button)button;
+    from_glfw(window)->push_event(ev);
+}
+
+static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+{
+    event ev;
+    ev.type = event::SCROLLED;
+    ev.scroll_offset = {(float)xoffset, (float)yoffset};
+    from_glfw(window)->push_event(ev);
 }
 
 void install_callbacks(window *win)
@@ -108,5 +147,7 @@ void install_callbacks(window *win)
     glfwSetFramebufferSizeCallback(win->glfw_window(), frame_buffer_resize_callback);
     glfwSetKeyCallback(win->glfw_window(), key_callback);
     glfwSetCursorPosCallback(win->glfw_window(), cursor_position_callback);
+    glfwSetMouseButtonCallback(win->glfw_window(), mouse_button_callback);
+    glfwSetScrollCallback(win->glfw_window(), scroll_callback);
 }
 } // namespace lynx::input
