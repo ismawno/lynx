@@ -24,7 +24,9 @@ class app
     {
         static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
         auto ly = make_ref<T>(std::forward<Args>(args)...);
-        m_layers.emplace_back(ly)->on_attach(this);
+
+        ly->m_parent = this;
+        m_layers.emplace_back(ly)->on_attach();
         return ly;
     }
 
@@ -32,6 +34,7 @@ class app
 
     template <typename T = window> T *window() const
     {
+        static_assert(std::is_base_of<lynx::window, T>::value, "Type must inherit from window class");
         if constexpr (std::is_same<T, lynx::window>::value)
             return m_window.get();
         else

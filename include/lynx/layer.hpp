@@ -14,10 +14,18 @@ class layer
     layer(const char *name);
 
     const char *name() const;
+    template <typename T = app> T *parent() const
+    {
+        if constexpr (std::is_same<T, app>::value)
+            return m_parent;
+        else
+            return dynamic_cast<T *>(m_parent);
+    }
 
   private:
     const char *m_name;
-    virtual void on_attach(app *parent)
+    app *m_parent = nullptr;
+    virtual void on_attach()
     {
     }
 
@@ -43,7 +51,7 @@ class imgui_layer : public layer
     virtual ~imgui_layer() = default;
 
   protected:
-    virtual void on_attach(app *parent) override;
+    virtual void on_attach() override;
     virtual void on_detach() override;
     void on_update(float ts) override;
     virtual void on_command_submission(VkCommandBuffer command_buffer) override;
@@ -53,7 +61,6 @@ class imgui_layer : public layer
   private:
     VkDescriptorPool m_imgui_pool;
     ImGuiContext *m_imgui_context;
-    app *m_parent;
 
     imgui_layer(const imgui_layer &) = delete;
     imgui_layer &operator=(const imgui_layer &) = delete;

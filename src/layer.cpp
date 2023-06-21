@@ -19,9 +19,9 @@ const char *layer::name() const
     return m_name;
 }
 
-void imgui_layer::on_attach(app *parent)
+void imgui_layer::on_attach()
 {
-    m_parent = parent;
+    const app *parent_app = parent();
     constexpr std::uint32_t pool_size = 1000;
     VkDescriptorPoolSize pool_sizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, pool_size},
                                          {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, pool_size},
@@ -43,7 +43,7 @@ void imgui_layer::on_attach(app *parent)
     pool_info.pPoolSizes = pool_sizes;
 
     DBG_CHECK_RETURN_VALUE(
-        vkCreateDescriptorPool(parent->window()->device().vulkan_device(), &pool_info, nullptr, &m_imgui_pool),
+        vkCreateDescriptorPool(parent_app->window()->device().vulkan_device(), &pool_info, nullptr, &m_imgui_pool),
         VK_SUCCESS, CRITICAL, "Failed to create descriptor pool")
 
     m_imgui_context = ImGui::CreateContext();
@@ -55,29 +55,30 @@ void imgui_layer::on_attach(app *parent)
         ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
 
     ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForVulkan(parent->window()->glfw_window(), true);
+    ImGui_ImplGlfw_InitForVulkan(parent_app->window()->glfw_window(), true);
 
     ImGui_ImplVulkan_InitInfo init_info{};
-    init_info.Instance = parent->window()->device().vulkan_instance();
-    init_info.PhysicalDevice = parent->window()->device().vulkan_physical_device();
-    init_info.Device = parent->window()->device().vulkan_device();
-    init_info.Queue = parent->window()->device().graphics_queue();
+    init_info.Instance = parent_app->window()->device().vulkan_instance();
+    init_info.PhysicalDevice = parent_app->window()->device().vulkan_physical_device();
+    init_info.Device = parent_app->window()->device().vulkan_device();
+    init_info.Queue = parent_app->window()->device().graphics_queue();
     init_info.DescriptorPool = m_imgui_pool;
     init_info.MinImageCount = 3;
     init_info.ImageCount = 3;
     init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-    ImGui_ImplVulkan_Init(&init_info, parent->window()->renderer().swap_chain().render_pass());
+    ImGui_ImplVulkan_Init(&init_info, parent_app->window()->renderer().swap_chain().render_pass());
 
-    parent->window()->renderer().immediate_submission(
+    parent_app->window()->renderer().immediate_submission(
         [](const VkCommandBuffer cmd) { ImGui_ImplVulkan_CreateFontsTexture(cmd); });
 
-    vkDeviceWaitIdle(parent->window()->device().vulkan_device());
+    vkDeviceWaitIdle(parent_app->window()->device().vulkan_device());
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
 void imgui_layer::on_update(const float ts)
 {
+    const app *parent_app = parent();
     ImGui::SetCurrentContext(m_imgui_context);
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -91,9 +92,10 @@ void imgui_layer::on_update(const float ts)
 
 void imgui_layer::on_detach()
 {
+    const app *parent_app = parent();
     ImGui::SetCurrentContext(m_imgui_context);
-    vkDeviceWaitIdle(m_parent->window()->device().vulkan_device());
-    vkDestroyDescriptorPool(m_parent->window()->device().vulkan_device(), m_imgui_pool, nullptr);
+    vkDeviceWaitIdle(parent_app->window()->device().vulkan_device());
+    vkDestroyDescriptorPool(parent_app->window()->device().vulkan_device(), m_imgui_pool, nullptr);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext(m_imgui_context);

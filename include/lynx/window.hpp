@@ -67,6 +67,7 @@ class window
 
     template <typename T = camera> T *camera() const
     {
+        static_assert(std::is_base_of<lynx::camera, T>::value, "Type must inherit from camera");
         if constexpr (std::is_same<T, lynx::camera>::value)
             return m_camera.get();
         else
@@ -75,7 +76,7 @@ class window
 
     template <typename T, class... Args> T *set_camera(Args &&...args)
     {
-        static_assert(std::is_base_of<lynx::camera, T>::value, "Camera type must inherit from camera");
+        static_assert(std::is_base_of<lynx::camera, T>::value, "Type must inherit from camera");
         auto cam = make_scope<T>(std::forward<Args>(args)...);
         T *ptr = cam.get();
         m_camera = std::move(cam);
@@ -161,13 +162,13 @@ class window2D : public window
 
     template <typename T = camera2D> T *camera() const
     {
-        static_assert(std::is_base_of<camera2D, T>::value, "Camera type must inherit from camera2D");
+        static_assert(std::is_base_of<camera2D, T>::value, "Type must inherit from camera2D");
         return window::camera<T>();
     }
 
     template <typename T = orthographic2D, class... Args> T *set_camera(Args &&...args)
     {
-        static_assert(std::is_base_of<camera2D, T>::value, "Camera type must inherit from camera2D");
+        static_assert(std::is_base_of<camera2D, T>::value, "Type must inherit from camera2D");
         return window::set_camera<T>(std::forward<Args>(args)...);
     }
 
@@ -200,13 +201,13 @@ class window3D : public window
 
     template <typename T = camera3D> T *camera() const
     {
-        static_assert(std::is_base_of<camera3D, T>::value, "Camera type must inherit from camera3D");
+        static_assert(std::is_base_of<camera3D, T>::value, "Type must inherit from camera3D");
         return window::camera<T>();
     }
 
     template <typename T = perspective3D, class... Args> T *set_camera(Args &&...args)
     {
-        static_assert(std::is_base_of<camera3D, T>::value, "Camera type must inherit from camera3D");
+        static_assert(std::is_base_of<camera3D, T>::value, "Type must inherit from camera3D");
         return window::set_camera<T>(std::forward<Args>(args)...);
     }
 
