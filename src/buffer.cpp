@@ -1,6 +1,5 @@
 #include "lynx/pch.hpp"
 #include "lynx/buffer.hpp"
-#include "lynx/device.hpp"
 
 namespace lynx
 {
@@ -24,13 +23,6 @@ buffer::~buffer()
     unmap();
     vkDestroyBuffer(m_device->vulkan_device(), m_buffer, nullptr);
     vkFreeMemory(m_device->vulkan_device(), m_memory, nullptr);
-}
-
-VkResult buffer::map(const VkDeviceSize size, const VkDeviceSize offset)
-{
-    if (m_mapped_data)
-        unmap();
-    return vkMapMemory(m_device->vulkan_device(), m_memory, offset, size, 0, &m_mapped_data);
 }
 
 bool buffer::unmap()
@@ -97,21 +89,29 @@ VkResult buffer::invalidate(const VkDeviceSize size, const VkDeviceSize offset)
 
 void buffer::write_at_index(const void *data, std::size_t index)
 {
+    DBG_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
+                     m_instance_count)
     write(data, m_instance_size, index * m_alignment_size);
 }
 
 VkResult buffer::flush_at_index(std::size_t index)
 {
+    DBG_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
+                     m_instance_count)
     return flush(m_alignment_size, index * m_alignment_size);
 }
 
 VkDescriptorBufferInfo buffer::descriptor_info_at_index(std::size_t index) const
 {
+    DBG_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
+                     m_instance_count)
     return descriptor_info(m_alignment_size, index * m_alignment_size);
 }
 
 VkResult buffer::invalidate_at_index(std::size_t index)
 {
+    DBG_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
+                     m_instance_count)
     return invalidate(m_alignment_size, index * m_alignment_size);
 }
 

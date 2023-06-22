@@ -2,11 +2,11 @@
 #define LYNX_BUFFER_HPP
 
 #include "lynx/core.hpp"
+#include "lynx/device.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace lynx
 {
-class device;
 class buffer
 {
   public:
@@ -14,7 +14,26 @@ class buffer
            VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize min_offset_alignment = 1);
     ~buffer();
 
-    VkResult map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+    template <typename T = void>
+    T *map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0, VkMemoryMapFlags flags = 0)
+    {
+        if (m_mapped_data)
+            unmap();
+        DBG_CHECK_RETURN_VALUE(vkMapMemory(m_device->vulkan_device(), m_memory, offset, size, flags, &m_mapped_data),
+                               VK_SUCCESS, CRITICAL, "Failed to map memory");
+        if constexpr (std::is_same<T, void>::value)
+            return m_mapped_data;
+        else
+            return (T *)m_mapped_data;
+    }
+    template <typename T = void> T *mapped_data() const
+    {
+        DBG_ASSERT_ERROR(m_mapped_data, "Buffer does not have mapped data")
+        if constexpr (std::is_same<T, void>::value)
+            return m_mapped_data;
+        else
+            return (T *)m_mapped_data;
+    }
     bool unmap();
 
     void write(const buffer &src_buffer);

@@ -8,6 +8,8 @@ namespace lynx
 template <typename T> model::model(const ref<const device> &dev, const std::vector<T> &vertices)
 {
     create_vertex_buffer(dev, vertices);
+    m_device_index_buffer = nullptr;
+    m_host_index_buffer = nullptr;
 }
 
 template <typename T>
@@ -27,11 +29,11 @@ template <typename T>
 static void create_buffer(const ref<const device> &dev, const std::vector<T> &data, VkBufferUsageFlags usage,
                           scope<buffer> &device_buffer, scope<buffer> &host_buffer)
 {
-    host_buffer = make_scope<buffer>(
-        dev, sizeof(T), data.size(), (VkBufferUsageFlags)VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+    host_buffer = make_scope<buffer>(dev, sizeof(T), data.size(), (VkBufferUsageFlags)VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                     (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
     host_buffer->map();
     host_buffer->write((void *)data.data());
+    host_buffer->flush();
 
     device_buffer = make_scope<buffer>(dev, sizeof(T), data.size(), usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -59,10 +61,63 @@ void model::bind(VkCommandBuffer command_buffer) const
 }
 void model::draw(VkCommandBuffer command_buffer) const
 {
-    if (m_device_index_buffer && m_host_index_buffer)
+    if (has_index_buffers())
         vkCmdDrawIndexed(command_buffer, (std::uint32_t)m_device_index_buffer->instance_count(), 1, 0, 0, 0);
     else
         vkCmdDraw(command_buffer, (std::uint32_t)m_device_vertex_buffer->instance_count(), 1, 0, 0);
+}
+
+bool model::has_index_buffers() const
+{
+    return m_device_index_buffer && m_host_index_buffer;
+}
+
+template <typename T> void model::update_vertex_buffer(std::function<void(T *, std::size_t)> update_fn)
+{
+    if (update_fn)
+    {
+        T *data = m_host_vertex_buffer->mapped_data<T>();
+        update_fn(data, m_host_vertex_buffer->instance_count());
+        m_host_vertex_buffer->flush();
+    }
+    m_device_vertex_buffer->write(*m_host_vertex_buffer);
+}
+void model::update_index_buffer(std::function<void(std::uint32_t *, std::size_t)> update_fn)
+{
+    DBG_ASSERT_ERROR(has_index_buffers(), "Cannot update index buffer in a model that does not have index buffers")
+    if (update_fn)
+    {
+        std::uint32_t *data = m_host_index_buffer->mapped_data<std::uint32_t>();
+        update_fn(data, m_host_index_buffer->instance_count());
+        m_host_index_buffer->flush();
+    }
+    m_device_index_buffer->write(*m_host_index_buffer);
+}
+
+template <typename T> T *model::vertex_buffer_mapped_data() const
+{
+    return m_host_vertex_buffer->mapped_data<T>();
+}
+std::uint32_t *model::index_buffer_mapped_data() const
+{
+    DBG_ASSERT_ERROR(has_index_buffers(),
+                     "Cannot retrieve mapped index buffer data in a model that does not have index buffers")
+    return m_host_index_buffer->mapped_data<std::uint32_t>();
+}
+
+template <typename T> void model::write_vertex(const std::size_t buffer_index, const T &vertex)
+{
+    m_host_vertex_buffer->write_at_index(&vertex, buffer_index);
+    m_host_vertex_buffer->flush_at_index(buffer_index);
+    update_vertex_buffer<void>();
+}
+
+void model::write_index(const std::size_t buffer_index, const std::uint32_t index)
+{
+    DBG_ASSERT_ERROR(has_index_buffers(), "Cannot write to index buffer in a model that does not have index buffers")
+    m_host_index_buffer->write_at_index(&index, buffer_index);
+    m_host_index_buffer->flush_at_index(buffer_index);
+    update_index_buffer();
 }
 
 model2D::model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices) : model(dev, vertices)
@@ -89,6 +144,22 @@ const model2D::vertex_index_pair &model2D::rect(const glm::vec4 &color)
     return build;
 }
 
+void model2D::write_vertex(std::size_t buffer_index, const vertex2D &vertex)
+{
+    model::write_vertex(buffer_index, vertex);
+}
+
+void model2D::update_vertex_buffer(std::function<void(vertex2D *, std::size_t)> update_fn)
+{
+    model::update_vertex_buffer(update_fn);
+}
+
+const vertex2D &model2D::operator[](const std::size_t index) const
+{
+    vertex2D *data = vertex_buffer_mapped_data<vertex2D>();
+    return *(data + index);
+}
+
 const std::vector<vertex2D> &model2D::line(const glm::vec4 &color)
 {
     static std::vector<vertex2D> vertices = {{{-1.f, 0.f}, color}, {{1.f, 0.f}, color}};
@@ -107,6 +178,22 @@ model3D::model3D(const ref<const device> &dev, const std::vector<vertex3D> &vert
 
 model3D::model3D(const ref<const device> &dev, const vertex_index_pair &build) : model(dev, build)
 {
+}
+
+void model3D::write_vertex(std::size_t buffer_index, const vertex3D &vertex)
+{
+    model::write_vertex(buffer_index, vertex);
+}
+
+void model3D::update_vertex_buffer(std::function<void(vertex3D *, std::size_t)> update_fn)
+{
+    model::update_vertex_buffer(update_fn);
+}
+
+const vertex3D &model3D::operator[](const std::size_t index) const
+{
+    vertex3D *data = vertex_buffer_mapped_data<vertex3D>();
+    return *(data + index);
 }
 
 const model3D::vertex_index_pair &model3D::rect(const glm::vec4 &color)
