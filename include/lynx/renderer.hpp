@@ -19,8 +19,8 @@ class renderer
     VkCommandBuffer begin_frame();
     void end_frame();
 
-    void begin_swap_chain_render_pass(VkCommandBuffer command_buffer) const;
-    void end_swap_chain_render_pass(VkCommandBuffer command_buffer) const;
+    void begin_swap_chain_render_pass(VkCommandBuffer command_buffer);
+    void end_swap_chain_render_pass(VkCommandBuffer command_buffer);
 
     void immediate_submission(const std::function<void(VkCommandBuffer)> &submission) const;
 

@@ -109,7 +109,7 @@ void renderer::end_frame()
     m_frame_index = (m_frame_index + 1) % swap_chain::MAX_FRAMES_IN_FLIGHT;
 }
 
-void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer) const
+void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer)
 {
     DBG_ASSERT_ERROR(m_frame_started, "Cannot begin render pass if a frame is not in progress")
     DBG_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
@@ -146,7 +146,7 @@ void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer) cons
     vkCmdSetViewport(m_command_buffers[m_frame_index], 0, 1, &viewport);
     vkCmdSetScissor(m_command_buffers[m_frame_index], 0, 1, &scissor);
 }
-void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer) const
+void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
 {
     DBG_ASSERT_ERROR(m_frame_started, "Cannot end render pass if a frame is not in progress")
     DBG_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,

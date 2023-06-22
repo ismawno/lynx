@@ -59,7 +59,7 @@ bool window::display(const std::function<void(VkCommandBuffer)> &submission) con
     return false;
 }
 
-void window::clear() const
+void window::clear()
 {
     vkDeviceWaitIdle(m_device->vulkan_device());
     clear_render_data();
@@ -192,18 +192,18 @@ window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) 
     add_render_system<triangle_strip_render_system2D>();
 }
 
-void window2D::draw(const std::vector<vertex2D> &vertices, const topology tplg, const transform2D &transform) const
+void window2D::draw(const std::vector<vertex2D> &vertices, const topology tplg, const transform2D &transform)
 {
     m_render_systems[(std::size_t)tplg]->draw(vertices, transform);
 }
 
 void window2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
-                    const topology tplg, const transform2D &transform) const
+                    const topology tplg, const transform2D &transform)
 {
     m_render_systems[(std::size_t)tplg]->draw(vertices, indices, transform);
 }
 
-void window2D::draw(const drawable2D &drawable) const
+void window2D::draw(const drawable2D &drawable)
 {
     const topology top = drawable.primitive_topology();
     drawable.draw(*m_render_systems[(std::size_t)top]);
@@ -215,7 +215,7 @@ void window2D::render(const VkCommandBuffer command_buffer) const
         sys->render(command_buffer, *camera());
 }
 
-void window2D::clear_render_data() const
+void window2D::clear_render_data()
 {
     for (const auto &sys : m_render_systems)
         sys->clear_render_data();
@@ -255,7 +255,7 @@ void window3D::render(const VkCommandBuffer command_buffer) const
         sys->render(command_buffer, *camera());
 }
 
-void window3D::clear_render_data() const
+void window3D::clear_render_data()
 {
     for (const auto &sys : m_render_systems)
         sys->clear_render_data();

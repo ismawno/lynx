@@ -56,8 +56,6 @@ class pipeline
     void init(const config_info &config);
     void create_shader_module(const std::vector<char> &code, VkShaderModule *shader_module) const;
 
-    static std::vector<char> read_file(const char *path);
-
     pipeline(const pipeline &) = delete;
     pipeline &operator=(const pipeline &) = delete;
 };

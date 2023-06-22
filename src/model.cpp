@@ -59,7 +59,7 @@ void model::bind(VkCommandBuffer command_buffer) const
 }
 void model::draw(VkCommandBuffer command_buffer) const
 {
-    if (m_device_index_buffer)
+    if (m_device_index_buffer && m_host_index_buffer)
         vkCmdDrawIndexed(command_buffer, (std::uint32_t)m_device_index_buffer->instance_count(), 1, 0, 0, 0);
     else
         vkCmdDraw(command_buffer, (std::uint32_t)m_device_vertex_buffer->instance_count(), 1, 0, 0);

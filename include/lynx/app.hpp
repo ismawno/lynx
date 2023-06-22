@@ -32,7 +32,16 @@ class app
 
     bool pop_layer(const layer *ly);
 
-    template <typename T = window> T *window() const
+    template <typename T = lynx::window> const T *window() const
+    {
+        static_assert(std::is_base_of<lynx::window, T>::value, "Type must inherit from window class");
+        if constexpr (std::is_same<T, lynx::window>::value)
+            return m_window.get();
+        else
+            return dynamic_cast<const T *>(m_window.get());
+    }
+
+    template <typename T = lynx::window> T *window()
     {
         static_assert(std::is_base_of<lynx::window, T>::value, "Type must inherit from window class");
         if constexpr (std::is_same<T, lynx::window>::value)
@@ -85,7 +94,13 @@ class app2D : public app
   public:
     app2D(std::uint32_t width = 800, std::uint32_t height = 600, const char *name = "App 2D");
 
-    template <typename T = window2D> T *window() const
+    template <typename T = window2D> const T *window() const
+    {
+        static_assert(std::is_base_of<lynx::window2D, T>::value, "Window type must inherit from window2D");
+        return app::window<T>();
+    }
+
+    template <typename T = window2D> T *window()
     {
         static_assert(std::is_base_of<lynx::window2D, T>::value, "Window type must inherit from window2D");
         return app::window<T>();
@@ -103,7 +118,13 @@ class app3D : public app
   public:
     app3D(std::uint32_t width = 800, std::uint32_t height = 600, const char *name = "App 3D");
 
-    template <typename T = window3D> T *window() const
+    template <typename T = window3D> const T *window() const
+    {
+        static_assert(std::is_base_of<lynx::window3D, T>::value, "Window type must inherit from window3D");
+        return app::window<T>();
+    }
+
+    template <typename T = window3D> T *window()
     {
         static_assert(std::is_base_of<lynx::window3D, T>::value, "Window type must inherit from window3D");
         return app::window<T>();

@@ -45,7 +45,7 @@ class window
     void create_surface(VkInstance instance, VkSurfaceKHR *surface) const;
 
     bool display(const std::function<void(VkCommandBuffer)> &submission = nullptr) const;
-    void clear() const;
+    void clear();
 
     bool should_close() const;
     bool closed();
@@ -65,7 +65,16 @@ class window
     const lynx::renderer &renderer() const;
     const lynx::device &device() const;
 
-    template <typename T = camera> T *camera() const
+    template <typename T = lynx::camera> const T *camera() const
+    {
+        static_assert(std::is_base_of<lynx::camera, T>::value, "Type must inherit from camera");
+        if constexpr (std::is_same<T, lynx::camera>::value)
+            return m_camera.get();
+        else
+            return dynamic_cast<const T *>(m_camera.get());
+    }
+
+    template <typename T = lynx::camera> T *camera()
     {
         static_assert(std::is_base_of<lynx::camera, T>::value, "Type must inherit from camera");
         if constexpr (std::is_same<T, lynx::camera>::value)
@@ -88,12 +97,12 @@ class window
     template <typename T, typename B, class... Args>
     T *add_render_system(std::vector<scope<B>> &systems, Args &&...args)
     {
-        static_assert(std::is_base_of<lynx::render_system, B>::value,
-                      "Can only use add_render_system with a type that inherits from render_system");
+        static_assert(std::is_base_of<lynx::render_system, B>::value, "Type must inherit from render_system");
         static_assert(
             std::is_base_of<B, T>::value,
             "Type must inherit from render_system2D or render_system3D, depending on the window you are using");
 
+        DBG_ASSERT_ERROR(!render_system<T>(systems), "A system with the provided type already exists")
         auto system = make_scope<T>(std::forward<Args>(args)...);
         T *ptr = system.get();
 
@@ -102,9 +111,28 @@ class window
         return ptr;
     }
 
-    template <typename T, typename B> T *render_system(std::vector<scope<B>> &systems) const noexcept
+    template <typename T, typename B> const T *render_system(const std::vector<scope<B>> &systems) const
     {
-        for (auto &rs : systems)
+        static_assert(std::is_base_of<lynx::render_system, B>::value, "Type must inherit from render_system");
+        static_assert(
+            std::is_base_of<B, T>::value,
+            "Type must inherit from render_system2D or render_system3D, depending on the window you are using");
+        for (const auto &rs : systems)
+        {
+            auto cast = dynamic_cast<const T *>(rs.get());
+            if (cast)
+                return cast;
+        }
+        return nullptr;
+    }
+
+    template <typename T, typename B> T *render_system(const std::vector<scope<B>> &systems)
+    {
+        static_assert(std::is_base_of<lynx::render_system, B>::value, "Type must inherit from render_system");
+        static_assert(
+            std::is_base_of<B, T>::value,
+            "Type must inherit from render_system2D or render_system3D, depending on the window you are using");
+        for (const auto &rs : systems)
         {
             auto cast = dynamic_cast<T *>(rs.get());
             if (cast)
@@ -134,7 +162,7 @@ class window
 
     void init();
     virtual void render(VkCommandBuffer command_buffer) const = 0;
-    virtual void clear_render_data() const = 0;
+    virtual void clear_render_data() = 0;
 
     window(const window &) = delete;
     window &operator=(const window &) = delete;
@@ -150,17 +178,28 @@ class window2D : public window
         return window::add_render_system<T>(m_render_systems, std::forward<Args>(args)...);
     }
 
-    template <typename T> T *render_system() const noexcept
+    template <typename T> const T *render_system() const
     {
         return window::render_system<T>(m_render_systems);
     }
 
-    void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {}) const;
-    void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
-              const transform2D &transform = {}) const;
-    void draw(const drawable2D &drawable) const;
+    template <typename T> T *render_system()
+    {
+        return window::render_system<T>(m_render_systems);
+    }
 
-    template <typename T = camera2D> T *camera() const
+    void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {});
+    void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
+              const transform2D &transform = {});
+    void draw(const drawable2D &drawable);
+
+    template <typename T = camera2D> const T *camera() const
+    {
+        static_assert(std::is_base_of<camera2D, T>::value, "Type must inherit from camera2D");
+        return window::camera<T>();
+    }
+
+    template <typename T = camera2D> T *camera()
     {
         static_assert(std::is_base_of<camera2D, T>::value, "Type must inherit from camera2D");
         return window::camera<T>();
@@ -176,7 +215,7 @@ class window2D : public window
     std::vector<scope<render_system2D>> m_render_systems;
 
     void render(VkCommandBuffer command_buffer) const override;
-    void clear_render_data() const override;
+    void clear_render_data() override;
 };
 
 class window3D : public window
@@ -189,7 +228,12 @@ class window3D : public window
         return window::add_render_system<T>(m_render_systems, std::forward<Args>(args)...);
     }
 
-    template <typename T> T *render_system() const noexcept
+    template <typename T> const T *render_system() const
+    {
+        return window::render_system<T>(m_render_systems);
+    }
+
+    template <typename T> T *render_system()
     {
         return window::render_system<T>(m_render_systems);
     }
@@ -199,7 +243,13 @@ class window3D : public window
               const transform3D &transform = {}) const;
     void draw(const drawable3D &drawable) const;
 
-    template <typename T = camera3D> T *camera() const
+    template <typename T = camera3D> const T *camera() const
+    {
+        static_assert(std::is_base_of<camera3D, T>::value, "Type must inherit from camera3D");
+        return window::camera<T>();
+    }
+
+    template <typename T = camera3D> T *camera()
     {
         static_assert(std::is_base_of<camera3D, T>::value, "Type must inherit from camera3D");
         return window::camera<T>();
@@ -215,7 +265,7 @@ class window3D : public window
     std::vector<scope<render_system3D>> m_render_systems;
 
     void render(VkCommandBuffer command_buffer) const override;
-    void clear_render_data() const override;
+    void clear_render_data() override;
 };
 } // namespace lynx
 

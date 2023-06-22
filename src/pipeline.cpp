@@ -25,6 +25,19 @@ void pipeline::bind(VkCommandBuffer command_buffer) const
     vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphics_pipeline);
 }
 
+static std::vector<char> read_file(const char *path)
+{
+    std::ifstream file{path, std::ios::ate | std::ios::binary};
+    DBG_ASSERT_ERROR(file.is_open(), "File at path {0} not found", path)
+
+    const long file_size = file.tellg();
+    std::vector<char> buffer((std::size_t)file_size);
+
+    file.seekg(0);
+    file.read(buffer.data(), file_size);
+    return buffer;
+}
+
 void pipeline::init(const config_info &config)
 {
     DBG_ASSERT_ERROR(config.pipeline_layout, "Pipeline layout must be provided to create graphics pipeline!")
@@ -158,18 +171,5 @@ void pipeline::config_info::default_config(config_info &config)
     config.dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     config.dynamic_state_info.pDynamicStates = config.dynamic_state_enables.data();
     config.dynamic_state_info.dynamicStateCount = (std::uint32_t)config.dynamic_state_enables.size();
-}
-
-std::vector<char> pipeline::read_file(const char *path)
-{
-    std::ifstream file{path, std::ios::ate | std::ios::binary};
-    DBG_ASSERT_ERROR(file.is_open(), "File at path {0} not found", path)
-
-    const long file_size = file.tellg();
-    std::vector<char> buffer((std::size_t)file_size);
-
-    file.seekg(0);
-    file.read(buffer.data(), file_size);
-    return buffer;
 }
 } // namespace lynx

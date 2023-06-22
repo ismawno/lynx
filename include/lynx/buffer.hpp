@@ -17,17 +17,17 @@ class buffer
     VkResult map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
     bool unmap();
 
-    void write(const buffer &src_buffer) const;
+    void write(const buffer &src_buffer);
 
-    void write(const void *data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
-    VkResult flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
+    void write(const void *data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+    VkResult flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
     VkDescriptorBufferInfo descriptor_info(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
-    VkResult invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
+    VkResult invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
-    void write_at_index(const void *data, std::size_t index) const;
-    VkResult flush_at_index(std::size_t index) const;
+    void write_at_index(const void *data, std::size_t index);
+    VkResult flush_at_index(std::size_t index);
     VkDescriptorBufferInfo descriptor_info_at_index(std::size_t index) const;
-    VkResult invalidate_at_index(std::size_t index) const;
+    VkResult invalidate_at_index(std::size_t index);
 
     VkBuffer vulkan_buffer() const;
     VkDeviceSize instance_size() const;
@@ -51,8 +51,7 @@ class buffer
     VkBufferUsageFlags m_usage;
     VkMemoryPropertyFlags m_properties;
 
-    VkMappedMemoryRange mapped_memory_range(VkDeviceSize size, VkDeviceSize offset) const;
-    static VkDeviceSize alignment(VkDeviceSize instance_size, VkDeviceSize min_offset_alignment);
+    VkMappedMemoryRange mapped_memory_range(VkDeviceSize size, VkDeviceSize offset);
 
     buffer(const buffer &) = delete;
     void operator=(const buffer &) = delete;
