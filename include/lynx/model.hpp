@@ -6,7 +6,7 @@
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 namespace lynx
 {
@@ -36,12 +36,12 @@ class model
     void draw(VkCommandBuffer command_buffer) const;
 
   private:
-    scope<buffer> m_vertex_buffer;
-    scope<buffer> m_index_buffer;
+    scope<buffer> m_device_vertex_buffer;
+    scope<buffer> m_host_vertex_buffer;
 
-    template <typename T>
-    static scope<buffer> create_buffer(const ref<const device> &dev, const std::vector<T> &data,
-                                       VkBufferUsageFlags usage);
+    scope<buffer> m_device_index_buffer;
+    scope<buffer> m_host_index_buffer;
+
     template <typename T> void create_vertex_buffer(const ref<const device> &dev, const std::vector<T> &vertices);
     void create_index_buffer(const ref<const device> &dev, const std::vector<std::uint32_t> &indices);
 };
@@ -56,8 +56,8 @@ class model2D : public model
             const std::vector<std::uint32_t> &indices);
     model2D(const ref<const device> &dev, const vertex_index_pair &build);
     // create NGon. HACER STATIC UNORDERED MAP
-    static const vertex_index_pair &rect(const glm::vec3 &color = glm::vec3(1.f));
-    static const std::vector<vertex2D> &line(const glm::vec3 &color = glm::vec3(1.f));
+    static const vertex_index_pair &rect(const glm::vec4 &color = glm::vec4(1.f));
+    static const std::vector<vertex2D> &line(const glm::vec4 &color = glm::vec4(1.f));
 };
 
 class model3D : public model
@@ -69,9 +69,9 @@ class model3D : public model
             const std::vector<std::uint32_t> &indices);
     model3D(const ref<const device> &dev, const vertex_index_pair &build);
 
-    static const vertex_index_pair &rect(const glm::vec3 &color = glm::vec3(1.f));
-    static const vertex_index_pair &cube(const glm::vec3 &color = glm::vec3(1.f));
-    static const std::vector<vertex3D> &line(const glm::vec3 &color = glm::vec3(1.f));
+    static const vertex_index_pair &rect(const glm::vec4 &color = glm::vec4(1.f));
+    static const vertex_index_pair &cube(const glm::vec4 &color = glm::vec4(1.f));
+    static const std::vector<vertex3D> &line(const glm::vec4 &color = glm::vec4(1.f));
 };
 } // namespace lynx
 

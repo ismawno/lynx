@@ -27,7 +27,10 @@ class example_app2D : public lynx::app2D
             m_cam->transform.rotation -= ts;
 
         m_rect.transform.rotation += (float)M_PI * ts;
+
+        static lynx::rect2D rect;
         m_window2D->draw(m_rect);
+        m_window2D->draw(rect);
     }
     lynx::window2D *m_window2D;
     lynx::rect2D m_rect;

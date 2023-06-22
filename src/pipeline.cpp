@@ -125,13 +125,13 @@ void pipeline::config_info::default_config(config_info &config)
 
     config.color_blend_attachment.colorWriteMask =
         VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    config.color_blend_attachment.blendEnable = VK_FALSE;
-    config.color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;  // Optional
-    config.color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-    config.color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;             // Optional
-    config.color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;  // Optional
-    config.color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-    config.color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;             // Optional
+    config.color_blend_attachment.blendEnable = VK_TRUE;
+    config.color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;           // Optional
+    config.color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA; // Optional
+    config.color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;                            // Optional
+    config.color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;           // Optional
+    config.color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA; // Optional
+    config.color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;                            // Optional
 
     config.color_blend_info.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     config.color_blend_info.logicOpEnable = VK_FALSE;
