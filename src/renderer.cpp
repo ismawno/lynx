@@ -57,7 +57,7 @@ void renderer::create_command_buffers()
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     alloc_info.commandPool = m_device->command_pool();
-    alloc_info.commandBufferCount = (std::uint32_t)m_command_buffers.size() + 1;
+    alloc_info.commandBufferCount = (std::uint32_t)m_command_buffers.size();
 
     DBG_CHECK_RETURN_VALUE(vkAllocateCommandBuffers(m_device->vulkan_device(), &alloc_info, m_command_buffers.data()),
                            VK_SUCCESS, CRITICAL, "Failed to create command buffers")
@@ -157,20 +157,8 @@ void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
 
 void renderer::immediate_submission(const std::function<void(VkCommandBuffer)> &submission) const
 {
-    VkCommandBufferBeginInfo begin_info{};
-    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-    const VkCommandBuffer command_buffer = m_command_buffers.back();
-
-    DBG_CHECK_RETURN_VALUE(vkBeginCommandBuffer(command_buffer, &begin_info), VK_SUCCESS, CRITICAL,
-                           "Failed to begin command buffer")
+    const VkCommandBuffer command_buffer = m_device->begin_single_time_commands();
     submission(command_buffer);
-    DBG_CHECK_RETURN_VALUE(vkEndCommandBuffer(command_buffer), VK_SUCCESS, CRITICAL, "Failed to end command buffer")
-
-    VkSubmitInfo submit_info = {};
-    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit_info.commandBufferCount = 1;
-    submit_info.pCommandBuffers = &command_buffer;
-    vkQueueSubmit(m_device->graphics_queue(), 1, &submit_info, VK_NULL_HANDLE);
+    m_device->end_single_time_commands(command_buffer);
 }
 } // namespace lynx

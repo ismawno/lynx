@@ -441,13 +441,15 @@ VkCommandBuffer device::begin_single_time_commands() const
     alloc_info.commandBufferCount = 1;
 
     VkCommandBuffer command_buffer;
-    vkAllocateCommandBuffers(m_device, &alloc_info, &command_buffer);
+    DBG_CHECK_RETURN_VALUE(vkAllocateCommandBuffers(m_device, &alloc_info, &command_buffer), VK_SUCCESS, CRITICAL,
+                           "Failed to allocate command buffer")
 
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    VkCommandBufferBeginInfo begin_info{};
+    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-    vkBeginCommandBuffer(command_buffer, &beginInfo);
+    DBG_CHECK_RETURN_VALUE(vkBeginCommandBuffer(command_buffer, &begin_info), VK_SUCCESS, CRITICAL,
+                           "Failed to begin command buffer")
     return command_buffer;
 }
 

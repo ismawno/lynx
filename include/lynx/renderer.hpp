@@ -33,8 +33,7 @@ class renderer
     window &m_window;
     ref<const device> m_device;
     scope<lynx::swap_chain> m_swap_chain;
-    std::array<VkCommandBuffer, swap_chain::MAX_FRAMES_IN_FLIGHT + 1>
-        m_command_buffers; // Last one for immediate submissions
+    std::array<VkCommandBuffer, swap_chain::MAX_FRAMES_IN_FLIGHT> m_command_buffers;
 
     std::uint32_t m_image_index;
     std::uint32_t m_frame_index = 0;
