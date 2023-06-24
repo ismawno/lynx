@@ -3,6 +3,7 @@
 
 #include "lynx/window.hpp"
 #include "lynx/layer.hpp"
+#include "lynx/context.hpp"
 
 #include <chrono>
 
@@ -23,6 +24,9 @@ class app
     template <typename T, class... Args> ref<T> push_layer(Args &&...args)
     {
         static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
+        DBG_ASSERT_ERROR(!m_terminated, "Cannot push layers to a terminated app")
+
+        context::set(m_window.get());
         auto ly = make_ref<T>(std::forward<Args>(args)...);
 
         ly->m_parent = this;

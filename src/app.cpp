@@ -15,6 +15,7 @@ void app::run()
     start();
     while (next_frame())
         ;
+    shutdown();
 }
 
 void app::start()
@@ -23,6 +24,7 @@ void app::start()
     DBG_ASSERT_ERROR(!m_started, "Cannot call start on a started app")
     m_current_timestamp = std::chrono::high_resolution_clock::now();
     m_started = true;
+    context::set(m_window.get());
     on_start();
 }
 
@@ -32,9 +34,13 @@ bool app::next_frame()
     DBG_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
     m_ongoing_frame = true;
 
+    context::set(m_window.get());
     input::poll_events();
     if (m_window->closed())
+    {
+        m_ongoing_frame = false;
         return false;
+    }
 
     while (const event ev = m_window->poll_event())
         if (!on_event(ev))
@@ -65,6 +71,7 @@ bool app::next_frame()
 
 void app::shutdown()
 {
+    context::set(m_window.get());
     if (m_ongoing_frame)
     {
         m_to_finish_next_frame = true;
@@ -80,9 +87,11 @@ void app::shutdown()
 
 bool app::pop_layer(const layer *ly)
 {
+    context::set(m_window.get());
     for (auto it = m_layers.begin(); it != m_layers.end(); ++it)
         if (it->get() == ly)
         {
+            (*it)->on_detach();
             m_layers.erase(it);
             return true;
         }
