@@ -41,12 +41,11 @@ class model
     template <typename T> void write_vertex(std::size_t buffer_index, const T &vertex);
     void write_index(std::size_t buffer_index, std::uint32_t index);
 
-    template <typename T> void update_vertex_buffer(std::function<void(T *, std::size_t)> update_fn = nullptr);
-    void update_index_buffer(std::function<void(std::uint32_t *, std::size_t)> update_fn = nullptr);
+    template <typename T> const T &read_vertex(std::size_t buffer_index) const;
+    std::uint32_t read_index(std::size_t buffer_index) const;
 
-  protected:
-    template <typename T> T *vertex_buffer_mapped_data() const;
-    std::uint32_t *index_buffer_mapped_data() const;
+    template <typename T> void update_vertex_buffer(std::function<void(T &)> for_each_fn = nullptr);
+    void update_index_buffer(std::function<void(std::uint32_t &)> for_each_fn = nullptr);
 
   private:
     scope<buffer> m_device_vertex_buffer;
@@ -70,13 +69,15 @@ class model2D : public model
     model2D(const ref<const device> &dev, const vertex_index_pair &build);
 
     void write_vertex(std::size_t buffer_index, const vertex2D &vertex);
-    void update_vertex_buffer(std::function<void(vertex2D *, std::size_t)> update_fn = nullptr);
+    const vertex2D &read_vertex(std::size_t buffer_index) const;
+
+    void update_vertex_buffer(std::function<void(vertex2D &)> for_each_fn = nullptr);
 
     const vertex2D &operator[](std::size_t index) const;
 
     // create NGon. HACER STATIC UNORDERED MAP
-    static const vertex_index_pair &rect(const glm::vec4 &color = glm::vec4(1.f));
-    static const std::vector<vertex2D> &line(const glm::vec4 &color = glm::vec4(1.f));
+    static const vertex_index_pair &rect(const glm::vec4 &color);
+    static const std::vector<vertex2D> &line(const glm::vec4 &color1, const glm::vec4 &color2);
 };
 
 class model3D : public model
@@ -89,13 +90,15 @@ class model3D : public model
     model3D(const ref<const device> &dev, const vertex_index_pair &build);
 
     void write_vertex(std::size_t buffer_index, const vertex3D &vertex);
-    void update_vertex_buffer(std::function<void(vertex3D *, std::size_t)> update_fn = nullptr);
+    const vertex3D &read_vertex(std::size_t buffer_index) const;
+
+    void update_vertex_buffer(std::function<void(vertex3D &)> for_each_fn = nullptr);
 
     const vertex3D &operator[](std::size_t index) const;
 
-    static const vertex_index_pair &rect(const glm::vec4 &color = glm::vec4(1.f));
-    static const vertex_index_pair &cube(const glm::vec4 &color = glm::vec4(1.f));
-    static const std::vector<vertex3D> &line(const glm::vec4 &color = glm::vec4(1.f));
+    static const vertex_index_pair &rect(const glm::vec4 &color);
+    static const vertex_index_pair &cube(const std::array<glm::vec4, 6> &face_colors);
+    static const std::vector<vertex3D> &line(const glm::vec4 &color1, const glm::vec4 &color2);
 };
 } // namespace lynx
 

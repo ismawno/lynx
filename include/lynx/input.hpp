@@ -174,9 +174,6 @@ glm::vec2 mouse_position();
 
 const char *key_name(key::key_code kc);
 
-void push_window(const window *win);
-void pop_window();
-
 void install_callbacks(window *win);
 
 } // namespace lynx::input

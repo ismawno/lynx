@@ -1,10 +1,10 @@
 #include "lynx/pch.hpp"
-#include "lynx/render_systems.hpp"
+#include "lynx/render_system.hpp"
 #include "lynx/device.hpp"
 #include "lynx/vertex.hpp"
-#include "lynx/primitives.hpp"
 #include "lynx/camera.hpp"
 #include "lynx/buffer.hpp"
+#include "lynx/drawable.hpp"
 
 #define VERTEX_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.vert.spv"
 #define FRAGMENT_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.frag.spv"
@@ -92,13 +92,13 @@ void render_system::pipeline_config(pipeline::config_info &config) const
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const transform2D &transform)
 {
-    push_render_data({make_ref<model2D>(m_device, vertices), {transform}});
+    push_render_data({make_ref<model2D>(m_device, vertices), transform});
 }
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
                            const transform2D &transform)
 {
-    push_render_data({make_ref<model2D>(m_device, vertices, indices), {transform}});
+    push_render_data({make_ref<model2D>(m_device, vertices, indices), transform});
 }
 
 void render_system2D::draw(const drawable2D &drawable)
@@ -117,13 +117,13 @@ void render_system2D::pipeline_config(pipeline::config_info &config) const
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const transform3D &transform)
 {
-    push_render_data({make_ref<model3D>(m_device, vertices), {transform}});
+    push_render_data({make_ref<model3D>(m_device, vertices), transform});
 }
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
                            const transform3D &transform)
 {
-    push_render_data({make_ref<model3D>(m_device, vertices, indices), {transform}});
+    push_render_data({make_ref<model3D>(m_device, vertices, indices), transform});
 }
 
 void render_system3D::draw(const drawable3D &drawable)

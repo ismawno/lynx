@@ -43,7 +43,7 @@ void imgui_layer::on_attach()
     pool_info.pPoolSizes = pool_sizes;
 
     DBG_CHECK_RETURN_VALUE(
-        vkCreateDescriptorPool(parent_app->window()->device().vulkan_device(), &pool_info, nullptr, &m_imgui_pool),
+        vkCreateDescriptorPool(parent_app->window()->device()->vulkan_device(), &pool_info, nullptr, &m_imgui_pool),
         VK_SUCCESS, CRITICAL, "Failed to create descriptor pool")
 
     m_imgui_context = ImGui::CreateContext();
@@ -58,10 +58,10 @@ void imgui_layer::on_attach()
     ImGui_ImplGlfw_InitForVulkan(parent_app->window()->glfw_window(), true);
 
     ImGui_ImplVulkan_InitInfo init_info{};
-    init_info.Instance = parent_app->window()->device().vulkan_instance();
-    init_info.PhysicalDevice = parent_app->window()->device().vulkan_physical_device();
-    init_info.Device = parent_app->window()->device().vulkan_device();
-    init_info.Queue = parent_app->window()->device().graphics_queue();
+    init_info.Instance = parent_app->window()->device()->vulkan_instance();
+    init_info.PhysicalDevice = parent_app->window()->device()->vulkan_physical_device();
+    init_info.Device = parent_app->window()->device()->vulkan_device();
+    init_info.Queue = parent_app->window()->device()->graphics_queue();
     init_info.DescriptorPool = m_imgui_pool;
     init_info.MinImageCount = 3;
     init_info.ImageCount = 3;
@@ -72,7 +72,7 @@ void imgui_layer::on_attach()
     parent_app->window()->renderer().immediate_submission(
         [](const VkCommandBuffer cmd) { ImGui_ImplVulkan_CreateFontsTexture(cmd); });
 
-    vkDeviceWaitIdle(parent_app->window()->device().vulkan_device());
+    vkDeviceWaitIdle(parent_app->window()->device()->vulkan_device());
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
@@ -93,8 +93,8 @@ void imgui_layer::on_detach()
 {
     const app *parent_app = parent();
     ImGui::SetCurrentContext(m_imgui_context);
-    vkDeviceWaitIdle(parent_app->window()->device().vulkan_device());
-    vkDestroyDescriptorPool(parent_app->window()->device().vulkan_device(), m_imgui_pool, nullptr);
+    vkDeviceWaitIdle(parent_app->window()->device()->vulkan_device());
+    vkDestroyDescriptorPool(parent_app->window()->device()->vulkan_device(), m_imgui_pool, nullptr);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext(m_imgui_context);

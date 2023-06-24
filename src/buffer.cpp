@@ -25,6 +25,14 @@ buffer::~buffer()
     vkFreeMemory(m_device->vulkan_device(), m_memory, nullptr);
 }
 
+void buffer::map(VkDeviceSize size, VkDeviceSize offset, VkMemoryMapFlags flags)
+{
+    if (m_mapped_data)
+        unmap();
+    DBG_CHECK_RETURN_VALUE(vkMapMemory(m_device->vulkan_device(), m_memory, offset, size, flags, &m_mapped_data),
+                           VK_SUCCESS, CRITICAL, "Failed to map memory");
+}
+
 bool buffer::unmap()
 {
     if (!m_mapped_data)

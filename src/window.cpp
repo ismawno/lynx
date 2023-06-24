@@ -1,10 +1,11 @@
 #include "lynx/pch.hpp"
 #include "lynx/window.hpp"
-#include "lynx/render_systems.hpp"
+#include "lynx/render_system.hpp"
 #include "lynx/device.hpp"
 #include "lynx/model.hpp"
 #include "lynx/camera.hpp"
 #include "lynx/buffer.hpp"
+#include "lynx/context.hpp"
 
 namespace lynx
 {
@@ -12,7 +13,6 @@ window::window(const std::uint32_t width, const std::uint32_t height, const char
     : m_width(width), m_height(height), m_name(name)
 {
     init();
-    s_active_windows.insert(this);
     input::install_callbacks(this);
 }
 
@@ -29,6 +29,8 @@ void window::init()
 
     m_window = glfwCreateWindow((int)m_width, (int)m_height, m_name, nullptr, nullptr);
     glfwSetWindowUserPointer(m_window, this);
+
+    context::create(this);
     m_device = make_ref<lynx::device>(*this);
     m_renderer = make_scope<lynx::renderer>(m_device, *this);
 }
@@ -70,7 +72,6 @@ void window::close()
     vkDeviceWaitIdle(m_device->vulkan_device());
     glfwDestroyWindow(m_window);
     m_window = nullptr;
-    s_active_windows.erase(this);
 }
 
 bool window::closed()
@@ -138,19 +139,14 @@ const renderer &window::renderer() const
     return *m_renderer;
 }
 
-const device &window::device() const
+const ref<const lynx::device> &window::device() const
 {
-    return *m_device;
+    return m_device;
 }
 
 GLFWwindow *window::glfw_window() const
 {
     return m_window;
-}
-
-const std::unordered_set<const window *> window::active_windows()
-{
-    return s_active_windows;
 }
 
 std::uint32_t window::width() const
@@ -160,6 +156,10 @@ std::uint32_t window::width() const
 std::uint32_t window::height() const
 {
     return m_height;
+}
+const char *window::name() const
+{
+    return m_name;
 }
 
 float window::aspect() const
@@ -192,6 +192,15 @@ window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) 
     add_render_system<triangle_strip_render_system2D>();
 }
 
+const render_system2D &window2D::render_system(const topology tplg) const
+{
+    return *m_render_systems[(std::size_t)tplg];
+}
+render_system2D &window2D::render_system(const topology tplg)
+{
+    return *m_render_systems[(std::size_t)tplg];
+}
+
 void window2D::draw(const std::vector<vertex2D> &vertices, const topology tplg, const transform2D &transform)
 {
     m_render_systems[(std::size_t)tplg]->draw(vertices, transform);
@@ -205,8 +214,7 @@ void window2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std
 
 void window2D::draw(const drawable2D &drawable)
 {
-    const topology top = drawable.primitive_topology();
-    drawable.draw(*m_render_systems[(std::size_t)top]);
+    drawable.draw(*this);
 }
 
 void window2D::render(const VkCommandBuffer command_buffer) const
@@ -232,21 +240,29 @@ window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) 
     add_render_system<triangle_strip_render_system3D>();
 }
 
-void window3D::draw(const std::vector<vertex3D> &vertices, const topology tplg, const transform3D &transform) const
+const render_system3D &window3D::render_system(const topology tplg) const
+{
+    return *m_render_systems[(std::size_t)tplg];
+}
+render_system3D &window3D::render_system(const topology tplg)
+{
+    return *m_render_systems[(std::size_t)tplg];
+}
+
+void window3D::draw(const std::vector<vertex3D> &vertices, const topology tplg, const transform3D &transform)
 {
     m_render_systems[(std::size_t)tplg]->draw(vertices, transform);
 }
 
 void window3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
-                    const topology tplg, const transform3D &transform) const
+                    const topology tplg, const transform3D &transform)
 {
     m_render_systems[(std::size_t)tplg]->draw(vertices, indices, transform);
 }
 
-void window3D::draw(const drawable3D &drawable) const
+void window3D::draw(const drawable3D &drawable)
 {
-    const topology top = drawable.primitive_topology();
-    drawable.draw(*m_render_systems[(std::size_t)top]);
+    drawable.draw(*this);
 }
 
 void window3D::render(const VkCommandBuffer command_buffer) const

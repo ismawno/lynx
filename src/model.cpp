@@ -30,13 +30,15 @@ static void create_buffer(const ref<const device> &dev, const std::vector<T> &da
                           scope<buffer> &device_buffer, scope<buffer> &host_buffer)
 {
     host_buffer = make_scope<buffer>(dev, sizeof(T), data.size(), (VkBufferUsageFlags)VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                     (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+                                     (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT),
+                                     dev->properties().limits.nonCoherentAtomSize);
     host_buffer->map();
     host_buffer->write((void *)data.data());
     host_buffer->flush();
 
-    device_buffer = make_scope<buffer>(dev, sizeof(T), data.size(), usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-                                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    device_buffer =
+        make_scope<buffer>(dev, sizeof(T), data.size(), usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                           VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, dev->properties().limits.nonCoherentAtomSize);
     device_buffer->write(*host_buffer);
 }
 
@@ -72,44 +74,33 @@ bool model::has_index_buffers() const
     return m_device_index_buffer && m_host_index_buffer;
 }
 
-template <typename T> void model::update_vertex_buffer(std::function<void(T *, std::size_t)> update_fn)
+template <typename T>
+static void update_buffer(std::function<void(T &)> for_each_fn, buffer &host_buffer, buffer &device_buffer)
 {
-    if (update_fn)
+    if (for_each_fn)
     {
-        T *data = m_host_vertex_buffer->mapped_data<T>();
-        update_fn(data, m_host_vertex_buffer->instance_count());
-        m_host_vertex_buffer->flush();
+        for (std::size_t i = 0; i < host_buffer.instance_count(); i++)
+            for_each_fn(host_buffer.read_at_index<T>(i));
+        host_buffer.flush();
     }
-    m_device_vertex_buffer->write(*m_host_vertex_buffer);
-}
-void model::update_index_buffer(std::function<void(std::uint32_t *, std::size_t)> update_fn)
-{
-    DBG_ASSERT_ERROR(has_index_buffers(), "Cannot update index buffer in a model that does not have index buffers")
-    if (update_fn)
-    {
-        std::uint32_t *data = m_host_index_buffer->mapped_data<std::uint32_t>();
-        update_fn(data, m_host_index_buffer->instance_count());
-        m_host_index_buffer->flush();
-    }
-    m_device_index_buffer->write(*m_host_index_buffer);
+    device_buffer.write(host_buffer);
 }
 
-template <typename T> T *model::vertex_buffer_mapped_data() const
+template <typename T> void model::update_vertex_buffer(std::function<void(T &)> for_each_fn)
 {
-    return m_host_vertex_buffer->mapped_data<T>();
+    update_buffer(for_each_fn, *m_host_vertex_buffer, *m_device_vertex_buffer);
 }
-std::uint32_t *model::index_buffer_mapped_data() const
+void model::update_index_buffer(std::function<void(std::uint32_t &)> for_each_fn)
 {
-    DBG_ASSERT_ERROR(has_index_buffers(),
-                     "Cannot retrieve mapped index buffer data in a model that does not have index buffers")
-    return m_host_index_buffer->mapped_data<std::uint32_t>();
+    DBG_ASSERT_ERROR(has_index_buffers(), "Cannot update index buffer in a model that does not have index buffers")
+    update_buffer(for_each_fn, *m_host_index_buffer, *m_device_index_buffer);
 }
 
 template <typename T> void model::write_vertex(const std::size_t buffer_index, const T &vertex)
 {
     m_host_vertex_buffer->write_at_index(&vertex, buffer_index);
     m_host_vertex_buffer->flush_at_index(buffer_index);
-    update_vertex_buffer<void>();
+    update_vertex_buffer<T>();
 }
 
 void model::write_index(const std::size_t buffer_index, const std::uint32_t index)
@@ -118,6 +109,17 @@ void model::write_index(const std::size_t buffer_index, const std::uint32_t inde
     m_host_index_buffer->write_at_index(&index, buffer_index);
     m_host_index_buffer->flush_at_index(buffer_index);
     update_index_buffer();
+}
+
+template <typename T> const T &model::read_vertex(const std::size_t buffer_index) const
+{
+    return m_host_vertex_buffer->read_at_index<T>(buffer_index);
+}
+
+std::uint32_t model::read_index(const std::size_t buffer_index) const
+{
+    DBG_ASSERT_ERROR(has_index_buffers(), "Cannot write to index buffer in a model that does not have index buffers")
+    return m_host_index_buffer->read_at_index<std::uint32_t>(buffer_index);
 }
 
 model2D::model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices) : model(dev, vertices)
@@ -149,20 +151,24 @@ void model2D::write_vertex(std::size_t buffer_index, const vertex2D &vertex)
     model::write_vertex(buffer_index, vertex);
 }
 
-void model2D::update_vertex_buffer(std::function<void(vertex2D *, std::size_t)> update_fn)
+const vertex2D &model2D::read_vertex(std::size_t buffer_index) const
 {
-    model::update_vertex_buffer(update_fn);
+    return model::read_vertex<vertex2D>(buffer_index);
+}
+
+void model2D::update_vertex_buffer(std::function<void(vertex2D &)> for_each_fn)
+{
+    model::update_vertex_buffer(for_each_fn);
 }
 
 const vertex2D &model2D::operator[](const std::size_t index) const
 {
-    vertex2D *data = vertex_buffer_mapped_data<vertex2D>();
-    return *(data + index);
+    return read_vertex(index);
 }
 
-const std::vector<vertex2D> &model2D::line(const glm::vec4 &color)
+const std::vector<vertex2D> &model2D::line(const glm::vec4 &color1, const glm::vec4 &color2)
 {
-    static std::vector<vertex2D> vertices = {{{-1.f, 0.f}, color}, {{1.f, 0.f}, color}};
+    static std::vector<vertex2D> vertices = {{{-1.f, 0.f}, color1}, {{1.f, 0.f}, color2}};
     return vertices;
 }
 
@@ -184,16 +190,19 @@ void model3D::write_vertex(std::size_t buffer_index, const vertex3D &vertex)
 {
     model::write_vertex(buffer_index, vertex);
 }
-
-void model3D::update_vertex_buffer(std::function<void(vertex3D *, std::size_t)> update_fn)
+const vertex3D &model3D::read_vertex(std::size_t buffer_index) const
 {
-    model::update_vertex_buffer(update_fn);
+    return model::read_vertex<vertex3D>(buffer_index);
+}
+
+void model3D::update_vertex_buffer(std::function<void(vertex3D &)> for_each_fn)
+{
+    model::update_vertex_buffer(for_each_fn);
 }
 
 const vertex3D &model3D::operator[](const std::size_t index) const
 {
-    vertex3D *data = vertex_buffer_mapped_data<vertex3D>();
-    return *(data + index);
+    return read_vertex(index);
 }
 
 const model3D::vertex_index_pair &model3D::rect(const glm::vec4 &color)
@@ -206,44 +215,44 @@ const model3D::vertex_index_pair &model3D::rect(const glm::vec4 &color)
     return build;
 }
 
-const model3D::vertex_index_pair &model3D::cube(const glm::vec4 &color)
+const model3D::vertex_index_pair &model3D::cube(const std::array<glm::vec4, 6> &face_colors)
 {
     static const std::vector<vertex3D> vertices = {
         // left face (white)
-        {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f, 1.f}},
-        {{-.5f, .5f, .5f}, {.9f, .9f, .9f, 1.f}},
-        {{-.5f, -.5f, .5f}, {.9f, .9f, .9f, 1.f}},
-        {{-.5f, .5f, -.5f}, {.9f, .9f, .9f, 1.f}},
+        {{-.5f, -.5f, -.5f}, face_colors[0]},
+        {{-.5f, .5f, .5f}, face_colors[0]},
+        {{-.5f, -.5f, .5f}, face_colors[0]},
+        {{-.5f, .5f, -.5f}, face_colors[0]},
 
         // right face (yellow)
-        {{.5f, -.5f, -.5f}, {.8f, .8f, .1f, 1.f}},
-        {{.5f, .5f, .5f}, {.8f, .8f, .1f, 1.f}},
-        {{.5f, -.5f, .5f}, {.8f, .8f, .1f, 1.f}},
-        {{.5f, .5f, -.5f}, {.8f, .8f, .1f, 1.f}},
+        {{.5f, -.5f, -.5f}, face_colors[1]},
+        {{.5f, .5f, .5f}, face_colors[1]},
+        {{.5f, -.5f, .5f}, face_colors[1]},
+        {{.5f, .5f, -.5f}, face_colors[1]},
 
         // top face (orange, remember y axis points down)
-        {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f, 1.f}},
-        {{.5f, -.5f, .5f}, {.9f, .6f, .1f, 1.f}},
-        {{-.5f, -.5f, .5f}, {.9f, .6f, .1f, 1.f}},
-        {{.5f, -.5f, -.5f}, {.9f, .6f, .1f, 1.f}},
+        {{-.5f, -.5f, -.5f}, face_colors[2]},
+        {{.5f, -.5f, .5f}, face_colors[2]},
+        {{-.5f, -.5f, .5f}, face_colors[2]},
+        {{.5f, -.5f, -.5f}, face_colors[2]},
 
         // bottom face (red)
-        {{-.5f, .5f, -.5f}, {.8f, .1f, .1f, 1.f}},
-        {{.5f, .5f, .5f}, {.8f, .1f, .1f, 1.f}},
-        {{-.5f, .5f, .5f}, {.8f, .1f, .1f, 1.f}},
-        {{.5f, .5f, -.5f}, {.8f, .1f, .1f, 1.f}},
+        {{-.5f, .5f, -.5f}, face_colors[3]},
+        {{.5f, .5f, .5f}, face_colors[3]},
+        {{-.5f, .5f, .5f}, face_colors[3]},
+        {{.5f, .5f, -.5f}, face_colors[3]},
 
         // nose face (blue)
-        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f, 1.f}},
-        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f, 1.f}},
-        {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f, 1.f}},
-        {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f, 1.f}},
+        {{-.5f, -.5f, 0.5f}, face_colors[4]},
+        {{.5f, .5f, 0.5f}, face_colors[4]},
+        {{-.5f, .5f, 0.5f}, face_colors[4]},
+        {{.5f, -.5f, 0.5f}, face_colors[4]},
 
         // tail face (green)
-        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f, 1.f}},
-        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f, 1.f}},
-        {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f, 1.f}},
-        {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f, 1.f}},
+        {{-.5f, -.5f, -0.5f}, face_colors[5]},
+        {{.5f, .5f, -0.5f}, face_colors[5]},
+        {{-.5f, .5f, -0.5f}, face_colors[5]},
+        {{.5f, -.5f, -0.5f}, face_colors[5]},
     };
 
     static const std::vector<std::uint32_t> indices = {0,  1,  2,  0,  3,  1,  4,  5,  6,  4,  7,  5,
@@ -253,9 +262,9 @@ const model3D::vertex_index_pair &model3D::cube(const glm::vec4 &color)
     return build;
 }
 
-const std::vector<vertex3D> &model3D::line(const glm::vec4 &color)
+const std::vector<vertex3D> &model3D::line(const glm::vec4 &color1, const glm::vec4 &color2)
 {
-    static std::vector<vertex3D> vertices = {{{-1.f, 0.f, 0.f}, color}, {{1.f, 0.f, 0.f}, color}};
+    static std::vector<vertex3D> vertices = {{{-1.f, 0.f, 0.f}, color1}, {{1.f, 0.f, 0.f}, color2}};
     return vertices;
 }
 

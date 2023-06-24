@@ -2,6 +2,7 @@
 #include "lynx/camera.hpp"
 #include "lynx/input.hpp"
 #include "lynx/layer.hpp"
+#include "lynx/shape.hpp"
 #include <iostream>
 
 class example_app2D : public lynx::app2D
@@ -47,7 +48,6 @@ class example_app3D : public lynx::app3D
     }
     void on_update(const float ts) override
     {
-        lynx::input::push_window(m_window3D);
         if (lynx::input::key_pressed(lynx::input::key::A))
             cube.transform.position.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::D))
@@ -70,7 +70,6 @@ class example_app3D : public lynx::app3D
         cam->point_to(cube.transform.position);
 
         m_window3D->draw(cube);
-        lynx::input::pop_window();
     }
     lynx::window3D *m_window3D;
     lynx::perspective3D *cam;
@@ -118,8 +117,9 @@ int main()
     DBG_SET_LEVEL(info)
     example_app2D app;
 
-    app.push_layer<imgui_demo>();
     app.run();
+
+    // app.run();
 
     // example_app2D app2;
     // example_app3D app3;

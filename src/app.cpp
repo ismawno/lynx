@@ -30,11 +30,12 @@ bool app::next_frame()
 {
     DBG_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     DBG_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
-    if (m_window->closed())
-        return false;
     m_ongoing_frame = true;
 
     input::poll_events();
+    if (m_window->closed())
+        return false;
+
     while (const event ev = m_window->poll_event())
         if (!on_event(ev))
             for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)

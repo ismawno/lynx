@@ -140,12 +140,12 @@ void device::create_logical_device()
     const float queue_priority = 1.0f;
     for (std::uint32_t queue_family : unique_queue_family)
     {
-        VkDeviceQueueCreateInfo queueCreateInfo{};
-        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = queue_family;
-        queueCreateInfo.queueCount = 1;
-        queueCreateInfo.pQueuePriorities = &queue_priority;
-        queue_create_infos.push_back(queueCreateInfo);
+        VkDeviceQueueCreateInfo queue_create_info{};
+        queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queue_create_info.queueFamilyIndex = queue_family;
+        queue_create_info.queueCount = 1;
+        queue_create_info.pQueuePriorities = &queue_priority;
+        queue_create_infos.push_back(queue_create_info);
     }
 
     VkPhysicalDeviceFeatures device_features{};

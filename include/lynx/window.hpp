@@ -1,18 +1,17 @@
 #ifndef LYNX_WINDOW_HPP
 #define LYNX_WINDOW_HPP
 
-#include "lynx/render_systems.hpp"
+#include "lynx/render_system.hpp"
 #include "lynx/core.hpp"
 #include "lynx/renderer.hpp"
 #include "lynx/swap_chain.hpp"
-#include "lynx/primitives.hpp"
 #include "lynx/input.hpp"
+#include "lynx/drawable.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <vulkan/vulkan.hpp>
-#include <unordered_set>
 #include <functional>
 #include <queue>
 
@@ -36,6 +35,7 @@ class window
 
     std::uint32_t width() const;
     std::uint32_t height() const;
+    const char *name() const;
 
     float aspect() const;
     float swap_chain_aspect() const;
@@ -63,7 +63,7 @@ class window
     event poll_event();
 
     const lynx::renderer &renderer() const;
-    const lynx::device &device() const;
+    const ref<const lynx::device> &device() const;
 
     template <typename T = lynx::camera> const T *camera() const
     {
@@ -141,8 +141,6 @@ class window
         return nullptr;
     }
 
-    static const std::unordered_set<const window *> active_windows();
-
   protected:
     bool m_maintain_camera_aspect_ratio = true;
 
@@ -155,8 +153,6 @@ class window
     scope<lynx::renderer> m_renderer;
     scope<lynx::camera> m_camera;
     std::queue<event> m_event_queue;
-
-    static inline std::unordered_set<const window *> s_active_windows{};
 
     bool m_frame_buffer_resized = false;
 
@@ -187,6 +183,9 @@ class window2D : public window
     {
         return window::render_system<T>(m_render_systems);
     }
+
+    const render_system2D &render_system(topology tplg) const;
+    render_system2D &render_system(topology tplg);
 
     void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {});
     void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
@@ -238,10 +237,13 @@ class window3D : public window
         return window::render_system<T>(m_render_systems);
     }
 
-    void draw(const std::vector<vertex3D> &vertices, topology tplg, const transform3D &transform = {}) const;
+    const render_system3D &render_system(topology tplg) const;
+    render_system3D &render_system(topology tplg);
+
+    void draw(const std::vector<vertex3D> &vertices, topology tplg, const transform3D &transform = {});
     void draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
-              const transform3D &transform = {}) const;
-    void draw(const drawable3D &drawable) const;
+              const transform3D &transform = {});
+    void draw(const drawable3D &drawable);
 
     template <typename T = camera3D> const T *camera() const
     {

@@ -14,26 +14,7 @@ class buffer
            VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize min_offset_alignment = 1);
     ~buffer();
 
-    template <typename T = void>
-    T *map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0, VkMemoryMapFlags flags = 0)
-    {
-        if (m_mapped_data)
-            unmap();
-        DBG_CHECK_RETURN_VALUE(vkMapMemory(m_device->vulkan_device(), m_memory, offset, size, flags, &m_mapped_data),
-                               VK_SUCCESS, CRITICAL, "Failed to map memory");
-        if constexpr (std::is_same<T, void>::value)
-            return m_mapped_data;
-        else
-            return (T *)m_mapped_data;
-    }
-    template <typename T = void> T *mapped_data() const
-    {
-        DBG_ASSERT_ERROR(m_mapped_data, "Buffer does not have mapped data")
-        if constexpr (std::is_same<T, void>::value)
-            return m_mapped_data;
-        else
-            return (T *)m_mapped_data;
-    }
+    void map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0, VkMemoryMapFlags flags = 0);
     bool unmap();
 
     void write(const buffer &src_buffer);
@@ -47,6 +28,20 @@ class buffer
     VkResult flush_at_index(std::size_t index);
     VkDescriptorBufferInfo descriptor_info_at_index(std::size_t index) const;
     VkResult invalidate_at_index(std::size_t index);
+
+    template <typename T = void> const T &read_at_index(const std::size_t index) const
+    {
+        DBG_ASSERT_ERROR(m_mapped_data, "Cannot read from unmapped buffer")
+        const char *offsetted = (const char *)m_mapped_data + index * m_alignment_size;
+        return *((const T *)offsetted);
+    }
+
+    template <typename T = void> T &read_at_index(const std::size_t index)
+    {
+        DBG_ASSERT_ERROR(m_mapped_data, "Cannot read from unmapped buffer")
+        char *offsetted = (char *)m_mapped_data + index * m_alignment_size;
+        return *((T *)offsetted);
+    }
 
     VkBuffer vulkan_buffer() const;
     VkDeviceSize instance_size() const;

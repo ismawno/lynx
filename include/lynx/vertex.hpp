@@ -11,15 +11,6 @@
 
 namespace lynx
 {
-enum topology
-{
-    POINT_LIST = 0,
-    LINE_LIST = 1,
-    LINE_STRIP = 2,
-    TRIANGLE_LIST = 3,
-    TRIANGLE_STRIP = 4
-};
-
 struct vertex2D
 {
     glm::vec2 position;
