@@ -227,6 +227,7 @@ void window2D::clear_render_data()
 {
     for (const auto &sys : m_render_systems)
         sys->clear_render_data();
+    transform2D::reset_z_offset_counter();
 }
 
 window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) : window(width, height, name)

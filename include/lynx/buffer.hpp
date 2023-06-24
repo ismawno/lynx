@@ -20,14 +20,14 @@ class buffer
     void write(const buffer &src_buffer);
 
     void write(const void *data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
-    VkResult flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+    void flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
     VkDescriptorBufferInfo descriptor_info(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0) const;
-    VkResult invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+    void invalidate(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
     void write_at_index(const void *data, std::size_t index);
-    VkResult flush_at_index(std::size_t index);
+    void flush_at_index(std::size_t index);
     VkDescriptorBufferInfo descriptor_info_at_index(std::size_t index) const;
-    VkResult invalidate_at_index(std::size_t index);
+    void invalidate_at_index(std::size_t index);
 
     template <typename T = void> const T &read_at_index(const std::size_t index) const
     {
@@ -59,6 +59,7 @@ class buffer
 
     std::size_t m_instance_count;
     VkDeviceSize m_instance_size;
+    VkDeviceSize m_min_offset_alignment;
     VkDeviceSize m_alignment_size;
     VkDeviceSize m_buffer_size = 0;
 

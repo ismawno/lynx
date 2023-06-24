@@ -14,6 +14,7 @@
 #include <utility>
 #include <functional>
 #include <unordered_set>
+#include <limits>
 #include <queue>
 #include <vulkan/vulkan.hpp>
 #include <imgui.h>

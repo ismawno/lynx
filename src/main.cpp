@@ -3,6 +3,7 @@
 #include "lynx/input.hpp"
 #include "lynx/layer.hpp"
 #include "lynx/shape.hpp"
+#include "lynx/line.hpp"
 #include <iostream>
 
 class example_app2D : public lynx::app2D
@@ -11,6 +12,7 @@ class example_app2D : public lynx::app2D
     {
         m_window2D = window();
         m_cam = m_window2D->camera<lynx::orthographic2D>();
+        m_rect.color({1.f, 0.f, 0.f, 1.f});
     }
     void on_update(const float ts) override
     {
@@ -29,9 +31,13 @@ class example_app2D : public lynx::app2D
 
         m_rect.transform.rotation += (float)M_PI * ts;
 
-        static lynx::rect2D rect;
+        static lynx::thin_line2D line{{-4.f, 0.f}, {4.f, 0.f}};
+        static float t = 0.f;
+        line.color1({sinf(t), 0.f, 1.f, 1.f});
+        t += ts;
+
+        m_window2D->draw(line);
         m_window2D->draw(m_rect);
-        m_window2D->draw(rect);
     }
     lynx::window2D *m_window2D;
     lynx::rect2D m_rect;

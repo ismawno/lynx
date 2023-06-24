@@ -8,7 +8,7 @@
 namespace lynx
 {
 thin_line2D::thin_line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1, const glm::vec4 &color2)
-    : m_transform(as_transform())
+    : m_p1(p1), m_p2(p2), m_transform(as_transform())
 {
     m_model = make_ref<model2D>(context::current()->device(), model2D::line(color1, color2));
 }
@@ -48,6 +48,15 @@ void thin_line2D::p2(const glm::vec2 &p2)
 {
     m_p2 = p2;
     m_transform = as_transform();
+}
+
+const glm::vec4 &thin_line2D::color1() const
+{
+    return m_model->read_vertex(0).color;
+}
+const glm::vec4 &thin_line2D::color2() const
+{
+    return m_model->read_vertex(1).color;
 }
 
 template <typename T> void update_vertex_color(const std::size_t index, T &model, const glm::vec4 &color)
@@ -107,6 +116,15 @@ void thin_line3D::p2(const glm::vec3 &p2)
 {
     m_p2 = p2;
     m_transform = as_transform();
+}
+
+const glm::vec4 &thin_line3D::color1() const
+{
+    return m_model->read_vertex(0).color;
+}
+const glm::vec4 &thin_line3D::color2() const
+{
+    return m_model->read_vertex(1).color;
 }
 
 void thin_line3D::color1(const glm::vec4 &color1)

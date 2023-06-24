@@ -3,8 +3,13 @@
 
 namespace lynx
 {
+void transform2D::reset_z_offset_counter()
+{
+    s_z_offset_counter = 0;
+}
 transform2D::operator glm::mat4() const
 {
+    const float z_offset = s_z_offset_counter++ * std::numeric_limits<float>::epsilon();
     const float c = cosf(rotation);
     const float s = sinf(rotation);
     return glm::mat4{{
@@ -25,7 +30,7 @@ transform2D::operator glm::mat4() const
                          0.f,
                          0.f,
                      },
-                     {position.x, position.y, 0.5f, 1.0f}};
+                     {position.x, position.y, z_offset, 1.f}};
 }
 
 transform3D::operator glm::mat4() const // YXZ
@@ -54,6 +59,6 @@ transform3D::operator glm::mat4() const // YXZ
                          scale.z * (c1 * c2),
                          0.f,
                      },
-                     {position.x, position.y, position.z, 1.0f}};
+                     {position.x, position.y, position.z, 1.f}};
 }
 } // namespace lynx

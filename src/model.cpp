@@ -30,15 +30,13 @@ static void create_buffer(const ref<const device> &dev, const std::vector<T> &da
                           scope<buffer> &device_buffer, scope<buffer> &host_buffer)
 {
     host_buffer = make_scope<buffer>(dev, sizeof(T), data.size(), (VkBufferUsageFlags)VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                     (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT),
-                                     dev->properties().limits.nonCoherentAtomSize);
+                                     (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
     host_buffer->map();
     host_buffer->write((void *)data.data());
     host_buffer->flush();
 
-    device_buffer =
-        make_scope<buffer>(dev, sizeof(T), data.size(), usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-                           VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, dev->properties().limits.nonCoherentAtomSize);
+    device_buffer = make_scope<buffer>(dev, sizeof(T), data.size(), usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     device_buffer->write(*host_buffer);
 }
 

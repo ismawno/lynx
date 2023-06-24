@@ -15,6 +15,11 @@ struct transform2D
     glm::vec2 scale{1.f};
     float rotation = 0.f;
     operator glm::mat4() const;
+
+    static void reset_z_offset_counter();
+
+  private:
+    inline static std::size_t s_z_offset_counter = 0;
 };
 
 struct transform3D
