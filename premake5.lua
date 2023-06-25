@@ -39,8 +39,8 @@ kind "ConsoleApp"
 targetdir("bin/" .. outputdir)
 objdir("build/" .. outputdir)
 
-pchheader "lynx/pch.hpp"
-pchsource "src/pch.cpp"
+pchheader "lynx/internal/pch.hpp"
+pchsource "src/internal/pch.cpp"
 
 files {
    "src/**.cpp",

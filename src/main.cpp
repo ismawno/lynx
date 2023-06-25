@@ -1,9 +1,9 @@
-#include "lynx/app.hpp"
-#include "lynx/camera.hpp"
-#include "lynx/input.hpp"
-#include "lynx/layer.hpp"
-#include "lynx/shape.hpp"
-#include "lynx/line.hpp"
+#include "lynx/app/app.hpp"
+#include "lynx/geometry/camera.hpp"
+#include "lynx/app/input.hpp"
+#include "lynx/app/layer.hpp"
+#include "lynx/drawing/shape.hpp"
+#include "lynx/drawing/line.hpp"
 #include <iostream>
 
 class example_app2D : public lynx::app2D
@@ -39,8 +39,6 @@ class example_app2D : public lynx::app2D
         // m_window2D->draw(line);
         // m_window2D->draw(m_rect);
         m_ellipse.radius(cosf(t) * cosf(t));
-        auto col = m_ellipse.color();
-        DBG_INFO("{0} {1} {2} {3}", col.x, col.y, col.z, col.w)
         m_window2D->draw(m_ellipse);
     }
     lynx::window2D *m_window2D;
