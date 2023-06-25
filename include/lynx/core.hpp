@@ -21,6 +21,8 @@
 #define DBG_ASSERT_ERROR(...)
 #define DBG_ASSERT_CRITICAL(...)
 #define DBG_ASSERT_FATAL(...)
+
+#define DBG_CHECK_RETURN_VALUE(expression, expected, level, ...) expression;
 #endif
 
 #if !defined(HAS_PROFILE_TOOLS) && !defined(HAS_PROFILE_MACROS)

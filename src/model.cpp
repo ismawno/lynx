@@ -7,6 +7,7 @@ namespace lynx
 {
 template <typename T> model::model(const ref<const device> &dev, const std::vector<T> &vertices)
 {
+    DBG_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
     create_vertex_buffer(dev, vertices);
     m_device_index_buffer = nullptr;
     m_host_index_buffer = nullptr;
@@ -15,6 +16,8 @@ template <typename T> model::model(const ref<const device> &dev, const std::vect
 template <typename T>
 model::model(const ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices)
 {
+    DBG_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
+    DBG_ASSERT_ERROR(!indices.empty(), "If specified, indices must not be empty")
     create_vertex_buffer(dev, vertices);
     create_index_buffer(dev, indices);
 }
@@ -134,16 +137,6 @@ model2D::model2D(const ref<const device> &dev, const vertex_index_pair &build) :
 {
 }
 
-const model2D::vertex_index_pair &model2D::rect(const glm::vec4 &color)
-{
-    static const std::vector<vertex2D> vertices = {
-        {{-.5f, -.5f}, color}, {{.5f, .5f}, color}, {{-.5f, .5f}, color}, {{.5f, -.5f}, color}};
-
-    static const std::vector<std::uint32_t> indices = {0, 1, 2, 0, 3, 1};
-    static const vertex_index_pair build = {vertices, indices};
-    return build;
-}
-
 void model2D::write_vertex(std::size_t buffer_index, const vertex2D &vertex)
 {
     model::write_vertex(buffer_index, vertex);
@@ -164,10 +157,40 @@ const vertex2D &model2D::operator[](const std::size_t index) const
     return read_vertex(index);
 }
 
+const model2D::vertex_index_pair &model2D::rect(const glm::vec4 &color)
+{
+    static const std::vector<vertex2D> vertices = {
+        {{-.5f, -.5f}, color}, {{.5f, .5f}, color}, {{-.5f, .5f}, color}, {{.5f, -.5f}, color}};
+
+    static const std::vector<std::uint32_t> indices = {0, 1, 2, 0, 3, 1};
+    static const vertex_index_pair build = {vertices, indices};
+    return build;
+}
+
 const std::vector<vertex2D> &model2D::line(const glm::vec4 &color1, const glm::vec4 &color2)
 {
     static std::vector<vertex2D> vertices = {{{-1.f, 0.f}, color1}, {{1.f, 0.f}, color2}};
     return vertices;
+}
+
+model2D::vertex_index_pair model2D::circle(const std::uint32_t partitions, const glm::vec4 &color)
+{
+    DBG_ASSERT_ERROR(partitions > 2, "Must at least have 3 partitions")
+
+    std::vector<vertex2D> vertices = {{{0.f, 0.f}, color}};
+    std::vector<std::uint32_t> indices(partitions * 3);
+    vertices.reserve(partitions);
+
+    const float dangle = 2.f * glm::pi<float>() / (partitions - 1);
+    for (std::uint32_t i = 0; i < partitions; i++)
+    {
+        const float angle = i * dangle;
+        vertices.emplace_back(glm::vec2(cosf(angle), sinf(angle)), color);
+        indices[3 * i] = 0;
+        indices[3 * i + 1] = i;
+        indices[3 * i + 2] = i + 1;
+    }
+    return {vertices, indices};
 }
 
 model3D::model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices) : model(dev, vertices)

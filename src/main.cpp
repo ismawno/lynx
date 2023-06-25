@@ -36,12 +36,17 @@ class example_app2D : public lynx::app2D
         line.color1({sinf(t), 0.f, 1.f, 1.f});
         t += ts;
 
-        m_window2D->draw(line);
-        m_window2D->draw(m_rect);
+        // m_window2D->draw(line);
+        // m_window2D->draw(m_rect);
+        m_ellipse.radius(cosf(t) * cosf(t));
+        auto col = m_ellipse.color();
+        DBG_INFO("{0} {1} {2} {3}", col.x, col.y, col.z, col.w)
+        m_window2D->draw(m_ellipse);
     }
     lynx::window2D *m_window2D;
     lynx::rect2D m_rect;
     lynx::orthographic2D *m_cam;
+    lynx::ellipse2D m_ellipse{{1.f, 0.f, 0.f, 0.4f}};
 };
 
 class example_app3D : public lynx::app3D
@@ -121,24 +126,24 @@ class imgui_demo : public lynx::imgui_layer
 int main()
 {
     DBG_SET_LEVEL(info)
-    // example_app2D app;
+    example_app2D app;
 
-    // app.push_layer<imgui_demo>();
-    // app.run();
+    app.push_layer<imgui_demo>();
+    app.run();
 
-    example_app2D app2;
-    example_app3D app3;
+    // example_app2D app2;
+    // example_app3D app3;
 
-    // app2.push_layer<imgui_demo>();
-    // app3.push_layer<imgui_demo>();
+    // // app2.push_layer<imgui_demo>();
+    // // app3.push_layer<imgui_demo>();
 
-    app2.start();
-    app3.start();
-    while (true)
-    {
-        const bool done2 = !app2.next_frame();
-        const bool done3 = !app3.next_frame();
-        if (done2 && done3)
-            break;
-    }
+    // app2.start();
+    // app3.start();
+    // while (true)
+    // {
+    //     const bool done2 = !app2.next_frame();
+    //     const bool done3 = !app3.next_frame();
+    //     if (done2 && done3)
+    //         break;
+    // }
 }

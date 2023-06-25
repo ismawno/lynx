@@ -78,6 +78,7 @@ class model2D : public model
     // create NGon. HACER STATIC UNORDERED MAP
     static const vertex_index_pair &rect(const glm::vec4 &color);
     static const std::vector<vertex2D> &line(const glm::vec4 &color1, const glm::vec4 &color2);
+    static vertex_index_pair circle(std::uint32_t partitions, const glm::vec4 &color);
 };
 
 class model3D : public model

@@ -22,7 +22,7 @@ struct vertex3D;
 class shape2D : public drawable2D
 {
   public:
-    template <class... ModelArgs> shape2D(const glm::vec4 &color, ModelArgs &&...args);
+    template <class... ModelArgs> shape2D(ModelArgs &&...args);
 
     const glm::vec4 &color() const;
     void color(const glm::vec4 &color);
@@ -30,14 +30,13 @@ class shape2D : public drawable2D
     transform2D transform;
 
   protected:
-    glm::vec4 m_color;
     ref<model2D> m_model;
 };
 
 class shape3D : public drawable3D
 {
   public:
-    template <class... ModelArgs> shape3D(const glm::vec4 &color, ModelArgs &&...args);
+    template <class... ModelArgs> shape3D(ModelArgs &&...args);
 
     const glm::vec4 &color() const;
     void color(const glm::vec4 &color);
@@ -45,7 +44,6 @@ class shape3D : public drawable3D
     transform3D transform;
 
   protected:
-    glm::vec4 m_color;
     ref<model3D> m_model;
 };
 
@@ -60,8 +58,17 @@ class rect2D : public shape2D
 
     static inline constexpr topology TOPOLOGY = TRIANGLE_LIST;
 };
-class circle2D : public shape2D
+class ellipse2D : public shape2D
 {
+  public:
+    ellipse2D(float ra, float rb, const glm::vec4 &color = glm::vec4(1.f), std::uint32_t partitions = 30);
+    ellipse2D(float radius = 1.f, const glm::vec4 &color = glm::vec4(1.f), std::uint32_t partitions = 30);
+    ellipse2D(const glm::vec4 &color, std::uint32_t partitions = 30);
+
+    float radius() const;
+    void radius(float radius);
+
+    void draw(window2D &win) const override;
 };
 class polygon2D : public shape2D
 {

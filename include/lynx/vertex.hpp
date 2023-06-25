@@ -13,6 +13,8 @@ namespace lynx
 {
 struct vertex2D
 {
+    vertex2D() = default;
+    vertex2D(const glm::vec2 &position, const glm::vec4 &color);
     glm::vec2 position;
     glm::vec4 color;
 
@@ -22,6 +24,8 @@ struct vertex2D
 
 struct vertex3D
 {
+    vertex3D() = default;
+    vertex3D(const glm::vec3 &position, const glm::vec4 &color);
     glm::vec3 position;
     glm::vec4 color;
 
