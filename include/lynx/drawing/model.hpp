@@ -14,6 +14,8 @@ namespace lynx
 struct vertex2D;
 struct vertex3D;
 
+class camera2D;
+
 class buffer;
 class device;
 
@@ -79,6 +81,7 @@ class model2D : public model
     static const vertex_index_pair &rect(const glm::vec4 &color);
     static const std::vector<vertex2D> &line(const glm::vec4 &color1, const glm::vec4 &color2);
     static vertex_index_pair circle(std::uint32_t partitions, const glm::vec4 &color);
+    static vertex_index_pair polygon(const std::vector<glm::vec2> &local_vertices, const glm::vec4 &color);
 };
 
 class model3D : public model

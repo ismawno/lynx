@@ -12,7 +12,10 @@ class example_app2D : public lynx::app2D
     {
         m_window2D = window();
         m_cam = m_window2D->camera<lynx::orthographic2D>();
-        m_rect.color({1.f, 0.f, 0.f, 1.f});
+        m_poly.vertex(0, {-2.f, 1.f});
+        m_poly.vertex(1, {2.f, 1.f});
+        m_poly.vertex(2, {0.f, -1.f});
+        m_poly.color({1.f, 1.f, 0.f, 1.f});
     }
     void on_update(const float ts) override
     {
@@ -29,22 +32,12 @@ class example_app2D : public lynx::app2D
         if (lynx::input::key_pressed(lynx::input::key::E))
             m_cam->transform.rotation -= ts;
 
-        m_rect.transform.rotation += (float)M_PI * ts;
-
-        static lynx::thin_line2D line{{-4.f, 0.f}, {4.f, 0.f}};
-        static float t = 0.f;
-        line.color1({sinf(t), 0.f, 1.f, 1.f});
-        t += ts;
-
-        // m_window2D->draw(line);
-        // m_window2D->draw(m_rect);
-        m_ellipse.radius(cosf(t) * cosf(t));
-        m_window2D->draw(m_ellipse);
+        m_window2D->draw(m_poly);
     }
     lynx::window2D *m_window2D;
-    lynx::rect2D m_rect;
     lynx::orthographic2D *m_cam;
-    lynx::ellipse2D m_ellipse{{1.f, 0.f, 0.f, 0.4f}};
+    lynx::ellipse2D m_ellipse;
+    lynx::polygon2D m_poly;
 };
 
 class example_app3D : public lynx::app3D

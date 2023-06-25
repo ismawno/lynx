@@ -2,6 +2,7 @@
 #include "lynx/drawing/model.hpp"
 #include "lynx/geometry/vertex.hpp"
 #include "lynx/rendering/buffer.hpp"
+#include "lynx/geometry/camera.hpp"
 
 namespace lynx
 {
@@ -175,22 +176,42 @@ const std::vector<vertex2D> &model2D::line(const glm::vec4 &color1, const glm::v
 
 model2D::vertex_index_pair model2D::circle(const std::uint32_t partitions, const glm::vec4 &color)
 {
-    DBG_ASSERT_ERROR(partitions > 2, "Must at least have 3 partitions")
+    DBG_ASSERT_ERROR(partitions > 2, "Must at least have 3 partitions. Current: {0}", partitions)
 
-    std::vector<vertex2D> vertices = {{{0.f, 0.f}, color}};
-    std::vector<std::uint32_t> indices(partitions * 3);
-    vertices.reserve(partitions);
+    vertex_index_pair build;
+    build.vertices.emplace_back(glm::vec2(0.f), color);
+    build.indices.resize(partitions * 3);
+    build.vertices.reserve(partitions);
 
     const float dangle = 2.f * glm::pi<float>() / (partitions - 1);
     for (std::uint32_t i = 0; i < partitions; i++)
     {
         const float angle = i * dangle;
-        vertices.emplace_back(glm::vec2(cosf(angle), sinf(angle)), color);
-        indices[3 * i] = 0;
-        indices[3 * i + 1] = i;
-        indices[3 * i + 2] = i + 1;
+        build.vertices.emplace_back(glm::vec2(cosf(angle), sinf(angle)), color);
+        build.indices[3 * i] = 0;
+        build.indices[3 * i + 1] = i + 1;
+        build.indices[3 * i + 2] = i + 2;
     }
-    return {vertices, indices};
+    return build;
+}
+
+model2D::vertex_index_pair model2D::polygon(const std::vector<glm::vec2> &local_vertices, const glm::vec4 &color)
+{
+    DBG_ASSERT_ERROR(local_vertices.size() > 2, "Must at least have 3 vertices. Current: {0}", local_vertices.size())
+    vertex_index_pair build;
+    build.vertices.reserve(local_vertices.size() + 1);
+    build.vertices.emplace_back(glm::vec2(0.f), color);
+    build.indices.resize(3 * local_vertices.size());
+
+    for (std::uint32_t i = 0; i < local_vertices.size(); i++)
+    {
+        build.vertices.emplace_back(local_vertices[i], color);
+        build.indices[3 * i] = 0;
+        build.indices[3 * i + 1] = i + 1;
+        build.indices[3 * i + 2] = i + 2;
+    }
+    build.indices.back() = 1;
+    return build;
 }
 
 model3D::model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices) : model(dev, vertices)

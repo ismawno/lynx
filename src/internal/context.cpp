@@ -21,6 +21,7 @@ const context *context::current()
 {
     DBG_ASSERT_ERROR(s_active_contexts > 0,
                      "No contexts have been created yet. Contexts are created automatically when creating windows")
+    DBG_ASSERT_WARN(s_current->valid(), "Current context is not valid")
     return s_current;
 }
 

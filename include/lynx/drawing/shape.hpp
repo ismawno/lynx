@@ -22,7 +22,7 @@ struct vertex3D;
 class shape2D : public drawable2D
 {
   public:
-    template <class... ModelArgs> shape2D(ModelArgs &&...args);
+    template <class... ModelArgs> shape2D(topology tplg, ModelArgs &&...args);
 
     const glm::vec4 &color() const;
     void color(const glm::vec4 &color);
@@ -31,6 +31,11 @@ class shape2D : public drawable2D
 
   protected:
     ref<model2D> m_model;
+
+  private:
+    topology m_topology;
+
+    virtual void draw(window2D &win) const override;
 };
 
 class shape3D : public drawable3D
@@ -53,10 +58,6 @@ class rect2D : public shape2D
     rect2D(const glm::vec2 &position = {0.f, 0.f}, const glm::vec2 &dimensions = {1.f, 1.f},
            const glm::vec4 &color = glm::vec4(1.f));
     rect2D(const glm::vec4 &color);
-
-    void draw(window2D &win) const override;
-
-    static inline constexpr topology TOPOLOGY = TRIANGLE_LIST;
 };
 class ellipse2D : public shape2D
 {
@@ -67,16 +68,21 @@ class ellipse2D : public shape2D
 
     float radius() const;
     void radius(float radius);
-
-    void draw(window2D &win) const override;
 };
 class polygon2D : public shape2D
 {
   public:
-    polygon2D(const std::vector<glm::vec3> &vertices, const glm::vec4 &color);
-    polygon2D(const std::vector<vertex2D> &vertices);
+    polygon2D(const std::vector<glm::vec2> &local_vertices = {{-1.f, 0.5f}, {1.f, 0.5f}, {0.f, -0.5f}},
+              const glm::vec4 &color = glm::vec4(1.f));
 
-    void draw(window2D &win) const override;
+    const glm::vec2 &vertex(std::size_t index) const;
+    void vertex(std::size_t index, const glm::vec2 &vertex);
+
+    const glm::vec2 &operator[](std::size_t index) const;
+    std::size_t size() const;
+
+  private:
+    const std::size_t m_size;
 };
 
 class rect3D : public shape3D
