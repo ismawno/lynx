@@ -27,7 +27,7 @@ class shape2D : public drawable2D
     const glm::vec4 &color() const;
     void color(const glm::vec4 &color);
 
-    transform2D transform;
+    transform2D transform{};
 
   protected:
     ref<model2D> m_model;
@@ -46,7 +46,7 @@ class shape3D : public drawable3D
     const glm::vec4 &color() const;
     void color(const glm::vec4 &color);
 
-    transform3D transform;
+    transform3D transform{};
 
   protected:
     ref<model3D> m_model;

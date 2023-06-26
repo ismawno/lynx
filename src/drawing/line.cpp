@@ -21,7 +21,7 @@ void thin_line2D::draw(window2D &win) const
 
 transform2D thin_line2D::as_transform() const
 {
-    transform2D transform;
+    transform2D transform{};
 
     const glm::vec2 dp = m_p2 - m_p1;
     transform.position = 0.5f * (m_p1 + m_p2);
@@ -89,7 +89,7 @@ void thin_line3D::draw(window3D &win) const
 
 transform3D thin_line3D::as_transform() const
 {
-    transform3D transform;
+    transform3D transform{};
 
     const glm::vec3 dp = m_p2 - m_p1;
     transform.position = 0.5f * (m_p1 + m_p2);
