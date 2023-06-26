@@ -18,6 +18,9 @@ class example_app2D : public lynx::app2D
         m_poly.color({1.f, 1.f, 0.f, 1.f});
 
         m_rect.transform.origin = {0.5f, 0.5f};
+        m_rect.transform.scale.x = 2.f;
+        m_rect.transform.rotation = 0.5f;
+
         m_ellipse.color({1.f, 0.f, 0.f, 1.f});
         m_ellipse.transform.position = m_rect.transform.origin;
         m_ellipse.radius(0.1f);
@@ -38,7 +41,7 @@ class example_app2D : public lynx::app2D
             m_cam->transform.rotation -= ts;
         m_window2D->draw(m_rect);
         m_window2D->draw(m_ellipse);
-        m_rect.transform.rotation += ts;
+        // m_rect.transform.rotation += ts;
     }
     lynx::window2D *m_window2D;
     lynx::orthographic2D *m_cam;
@@ -74,6 +77,10 @@ class example_app3D : public lynx::app3D
             cube.transform.rotation.y += ts;
         if (lynx::input::key_pressed(lynx::input::key::X))
             cube.transform.rotation.y -= ts;
+        if (lynx::input::key_pressed(lynx::input::key::N))
+            cube.transform.scale.x += ts;
+        if (lynx::input::key_pressed(lynx::input::key::M))
+            cube.transform.scale.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 

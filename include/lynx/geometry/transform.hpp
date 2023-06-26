@@ -11,7 +11,10 @@ namespace lynx
 {
 struct transform2D
 {
-    glm::vec2 position{0.f};
+    glm::vec2 position{
+        0.f}; // RENOMBRAR A TRANSLATION Y DONDEQUIERA Q HAYA USADE .position CORREGIR PARA Q SE USE EL NUEVO FIELD
+    // La posicion sera simplemente un valor informativo, no se usara para calcular la mat4. Con origin y translation
+    // basta
     glm::vec2 scale{1.f};
     glm::vec2 origin{0.f};
     float rotation = 0.f;

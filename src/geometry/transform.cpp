@@ -30,8 +30,8 @@ transform2D::operator glm::mat4() const
                          0.f,
                          0.f,
                      },
-                     {position.x + origin.x * (1.f - c) + origin.y * s,
-                      position.y + origin.y * (1.f - c) - origin.x * s, z_offset, 1.f}};
+                     {position.x + origin.x * (1.f - c * scale.x) + origin.y * s * scale.y,
+                      position.y + origin.y * (1.f - c * scale.y) - origin.x * s * scale.x, z_offset, 1.f}};
 }
 
 transform3D::operator glm::mat4() const // YXZ
@@ -55,26 +55,27 @@ transform3D::operator glm::mat4() const // YXZ
     const float e23 = -s2;
     const float e33 = c1 * c2;
 
-    return glm::mat4{{
-                         scale.x * e11,
-                         scale.x * e21,
-                         scale.x * e31,
-                         0.f,
-                     },
-                     {
-                         scale.y * e12,
-                         scale.y * e22,
-                         scale.y * e32,
-                         0.f,
-                     },
-                     {
-                         scale.z * e13,
-                         scale.z * e23,
-                         scale.z * e33,
-                         0.f,
-                     },
-                     {position.x + origin.x * (1.f - e11) - e12 * origin.y - e13 * origin.z,
-                      position.y + origin.y * (1.f - e22) - e21 * origin.x - e23 * origin.z,
-                      position.z + origin.z * (1.f - e33) - e31 * origin.x - e32 * origin.y, 1.f}};
+    return glm::mat4{
+        {
+            scale.x * e11,
+            scale.x * e21,
+            scale.x * e31,
+            0.f,
+        },
+        {
+            scale.y * e12,
+            scale.y * e22,
+            scale.y * e32,
+            0.f,
+        },
+        {
+            scale.z * e13,
+            scale.z * e23,
+            scale.z * e33,
+            0.f,
+        },
+        {position.x + origin.x * (1.f - e11 * scale.x) - e12 * origin.y * scale.y - e13 * origin.z * scale.z,
+         position.y + origin.y * (1.f - e22 * scale.y) - e21 * origin.x * scale.x - e23 * origin.z * scale.z,
+         position.z + origin.z * (1.f - e33 * scale.z) - e31 * origin.x * scale.x - e32 * origin.y * scale.y, 1.f}};
 }
 } // namespace lynx
