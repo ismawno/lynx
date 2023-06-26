@@ -92,13 +92,13 @@ void render_system::pipeline_config(pipeline::config_info &config) const
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const transform2D &transform)
 {
-    push_render_data({make_ref<model2D>(m_device, vertices), transform});
+    push_render_data({make_ref<model2D>(m_device, vertices), transform.transform()});
 }
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
                            const transform2D &transform)
 {
-    push_render_data({make_ref<model2D>(m_device, vertices, indices), transform});
+    push_render_data({make_ref<model2D>(m_device, vertices, indices), transform.transform()});
 }
 
 void render_system2D::draw(const drawable2D &drawable)
@@ -117,13 +117,13 @@ void render_system2D::pipeline_config(pipeline::config_info &config) const
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const transform3D &transform)
 {
-    push_render_data({make_ref<model3D>(m_device, vertices), transform});
+    push_render_data({make_ref<model3D>(m_device, vertices), transform.transform()});
 }
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
                            const transform3D &transform)
 {
-    push_render_data({make_ref<model3D>(m_device, vertices, indices), transform});
+    push_render_data({make_ref<model3D>(m_device, vertices, indices), transform.transform()});
 }
 
 void render_system3D::draw(const drawable3D &drawable)

@@ -17,31 +17,35 @@ class example_app2D : public lynx::app2D
         m_poly.vertex(2, {0.f, -1.f});
         m_poly.color({1.f, 1.f, 0.f, 1.f});
 
-        m_rect.transform.origin = {0.5f, 0.5f};
-        m_rect.transform.scale.x = 2.f;
-        m_rect.transform.rotation = 0.5f;
+        m_rect.transform.origin({0.5f, 0.5f});
+        m_rect.transform.xscale(2.f);
+        m_rect.transform.rotation(0.5f);
 
         m_ellipse.color({1.f, 0.f, 0.f, 1.f});
-        m_ellipse.transform.position = m_rect.transform.origin;
+        m_ellipse.transform.position(m_rect.transform.origin());
         m_ellipse.radius(0.1f);
     }
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_cam->transform.position.x -= ts;
+            m_cam->transform.xtranslate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::D))
-            m_cam->transform.position.x += ts;
+            m_cam->transform.xtranslate(ts);
         if (lynx::input::key_pressed(lynx::input::key::W))
-            m_cam->transform.position.y -= ts;
+            m_cam->transform.ytranslate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::S))
-            m_cam->transform.position.y += ts;
+            m_cam->transform.ytranslate(ts);
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            m_cam->transform.rotation += ts;
+            m_cam->transform.rotate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::E))
-            m_cam->transform.rotation -= ts;
+            m_cam->transform.rotate(ts);
         m_window2D->draw(m_rect);
         m_window2D->draw(m_ellipse);
-        // m_rect.transform.rotation += ts;
+
+        // auto mat = m_rect.transform.transform() * m_rect.transform.inverse();
+        // for (auto i = 0; i < 4; i++)
+        //     for (auto j = 0; j < 4; j++)
+        //         DBG_INFO("{0}, {1}: {2}", i, j, mat[i][j])
     }
     lynx::window2D *m_window2D;
     lynx::orthographic2D *m_cam;
@@ -56,35 +60,35 @@ class example_app3D : public lynx::app3D
     {
         m_window3D = window();
         cam = m_window3D->camera<lynx::perspective3D>();
-        cube.transform.position.z = 3.f;
-        cube.transform.origin = {0.5f, 0.5f, -0.5f};
+        cube.transform.zposition(3.f);
+        cube.transform.origin({0.5f, 0.5f, -0.5f});
     }
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            cube.transform.position.x -= ts;
+            cube.transform.xtranslate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::D))
-            cube.transform.position.x += ts;
+            cube.transform.xtranslate(ts);
         if (lynx::input::key_pressed(lynx::input::key::W))
-            cube.transform.position.y -= ts;
+            cube.transform.ytranslate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::S))
-            cube.transform.position.y += ts;
+            cube.transform.ytranslate(ts);
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            cube.transform.rotation.z += ts;
+            cube.transform.zrotate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::E))
-            cube.transform.rotation.z -= ts;
+            cube.transform.zrotate(ts);
         if (lynx::input::key_pressed(lynx::input::key::Z))
-            cube.transform.rotation.y += ts;
+            cube.transform.yrotate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::X))
-            cube.transform.rotation.y -= ts;
+            cube.transform.yrotate(ts);
         if (lynx::input::key_pressed(lynx::input::key::N))
-            cube.transform.scale.x += ts;
+            cube.transform.xstretch(-ts);
         if (lynx::input::key_pressed(lynx::input::key::M))
-            cube.transform.scale.x -= ts;
+            cube.transform.xstretch(ts);
         if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 
-        cam->point_to(cube.transform.position);
+        cam->point_to(cube.transform.position());
 
         m_window3D->draw(cube);
     }
@@ -132,7 +136,7 @@ class imgui_demo : public lynx::imgui_layer
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app3D app;
+    example_app2D app;
 
     // app.push_layer<imgui_demo>();
     app.run();

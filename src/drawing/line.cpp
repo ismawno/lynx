@@ -16,7 +16,7 @@ thin_line2D::thin_line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::ve
 void thin_line2D::draw(window2D &win) const
 {
     render_system2D &rs = win.render_system(LINE_LIST);
-    rs.push_render_data({m_model, m_transform});
+    rs.push_render_data({m_model, m_transform.transform()});
 }
 
 transform2D thin_line2D::as_transform() const
@@ -24,9 +24,9 @@ transform2D thin_line2D::as_transform() const
     transform2D transform{};
 
     const glm::vec2 dp = m_p2 - m_p1;
-    transform.position = 0.5f * (m_p1 + m_p2);
-    transform.rotation = atan2f(dp.y, dp.x);
-    transform.scale.x = 0.5f * glm::length(dp);
+    transform.position(0.5f * (m_p1 + m_p2));
+    transform.rotation(atan2f(dp.y, dp.x));
+    transform.xscale(0.5f * glm::length(dp));
     return transform;
 }
 
@@ -84,7 +84,7 @@ thin_line3D::thin_line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::ve
 void thin_line3D::draw(window3D &win) const
 {
     render_system3D &rs = win.render_system(LINE_LIST);
-    rs.push_render_data({m_model, m_transform});
+    rs.push_render_data({m_model, m_transform.transform()});
 }
 
 transform3D thin_line3D::as_transform() const
@@ -92,9 +92,9 @@ transform3D thin_line3D::as_transform() const
     transform3D transform{};
 
     const glm::vec3 dp = m_p2 - m_p1;
-    transform.position = 0.5f * (m_p1 + m_p2);
-    transform.rotation = {0.f, -atan2f(dp.z, dp.x), atan2f(dp.y, dp.x)};
-    transform.scale.x = 0.5f * glm::length(dp);
+    transform.position(0.5f * (m_p1 + m_p2));
+    transform.rotation({0.f, -atan2f(dp.z, dp.x), atan2f(dp.y, dp.x)});
+    transform.xscale(0.5f * glm::length(dp));
     return transform;
 }
 
