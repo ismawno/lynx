@@ -16,7 +16,7 @@ thin_line2D::thin_line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::ve
 void thin_line2D::draw(window2D &win) const
 {
     render_system2D &rs = win.render_system(LINE_LIST);
-    render_data rdata = {m_model, m_transform.scale_rotate_translate()};
+    render_data rdata = {m_model, m_transform.transform()};
     rs.push_render_data(rdata);
 }
 
@@ -85,7 +85,7 @@ thin_line3D::thin_line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::ve
 void thin_line3D::draw(window3D &win) const
 {
     render_system3D &rs = win.render_system(LINE_LIST);
-    render_data rdata = {m_model, m_transform.scale_rotate_translate()};
+    render_data rdata = {m_model, m_transform.transform()};
     rs.push_render_data(rdata);
 }
 

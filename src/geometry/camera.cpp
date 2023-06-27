@@ -53,8 +53,8 @@ orthographic2D::orthographic2D(const glm::vec2 &position, const glm::vec2 &size,
 
 void orthographic2D::update_transformation_matrices()
 {
-    m_projection = transform.inverse_scale_rotate_translate();
-    m_inv_projection = transform.scale_rotate_translate();
+    m_projection = transform.inverse();
+    m_inv_projection = transform.transform();
 }
 
 void camera3D::keep_aspect_ratio(const float aspect)
@@ -111,8 +111,8 @@ orthographic3D::orthographic3D(const glm::vec3 &position, const glm::vec3 &size,
 
 void orthographic3D::update_transformation_matrices()
 {
-    m_projection = transform.inverse_scale_rotate_translate();
-    m_inv_projection = transform.scale_rotate_translate();
+    m_projection = transform.inverse_as_camera();
+    m_inv_projection = transform.transform_as_camera();
 }
 
 perspective3D::perspective3D(const float aspect, const float fovy, const glm::vec3 &rotation, const float near,

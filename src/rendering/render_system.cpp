@@ -92,14 +92,14 @@ void render_system::pipeline_config(pipeline::config_info &config) const
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const transform2D &transform)
 {
-    render_data rdata = {make_ref<model2D>(m_device, vertices), transform.scale_rotate_translate()};
+    render_data rdata = {make_ref<model2D>(m_device, vertices), transform.transform()};
     push_render_data(rdata);
 }
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
                            const transform2D &transform)
 {
-    render_data rdata = {make_ref<model2D>(m_device, vertices, indices), transform.scale_rotate_translate()};
+    render_data rdata = {make_ref<model2D>(m_device, vertices, indices), transform.transform()};
     push_render_data(rdata);
 }
 
@@ -131,14 +131,14 @@ void render_system2D::pipeline_config(pipeline::config_info &config) const
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const transform3D &transform)
 {
-    render_data rdata = {make_ref<model3D>(m_device, vertices), transform.scale_rotate_translate()};
+    render_data rdata = {make_ref<model3D>(m_device, vertices), transform.transform()};
     push_render_data(rdata);
 }
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
                            const transform3D &transform)
 {
-    render_data rdata = {make_ref<model3D>(m_device, vertices, indices), transform.scale_rotate_translate()};
+    render_data rdata = {make_ref<model3D>(m_device, vertices, indices), transform.transform()};
     push_render_data(rdata);
 }
 

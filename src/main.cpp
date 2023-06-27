@@ -137,9 +137,9 @@ class imgui_demo : public lynx::imgui_layer
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app3D app;
+    example_app2D app;
 
-    // app.push_layer<imgui_demo>();
+    app.push_layer<imgui_demo>();
     app.run();
 
     // example_app2D app2;

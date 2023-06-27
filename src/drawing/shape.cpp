@@ -32,7 +32,7 @@ void shape2D::color(const glm::vec4 &color)
 void shape2D::draw(window2D &win) const
 {
     render_system2D &rs = win.render_system(m_topology);
-    render_data rdata = {m_model, transform.scale_rotate_translate()};
+    render_data rdata = {m_model, transform.transform()};
     rs.push_render_data(rdata);
 }
 
@@ -130,7 +130,7 @@ rect3D::rect3D(const glm::vec4 &color) : shape3D(model3D::rect(color))
 void rect3D::draw(window3D &win) const
 {
     render_system3D &rs = win.render_system(TRIANGLE_LIST);
-    render_data rdata = {m_model, transform.scale_rotate_translate()};
+    render_data rdata = {m_model, transform.transform()};
     rs.push_render_data(rdata); // TODO: Esto que se implemente en shape3D!! q
                                 // se pase la topology a su ctor
 }
@@ -149,7 +149,7 @@ cube3D::cube3D(const std::array<glm::vec4, 6> &face_colors) : shape3D(model3D::c
 void cube3D::draw(window3D &win) const
 {
     render_system3D &rs = win.render_system(TRIANGLE_LIST);
-    render_data rdata = {m_model, transform.scale_rotate_translate()};
+    render_data rdata = {m_model, transform.transform()};
     rs.push_render_data(rdata);
 }
 } // namespace lynx

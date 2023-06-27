@@ -3,7 +3,7 @@
 
 namespace lynx
 {
-glm::mat4 transform2D::scale_rotate_translate() const
+glm::mat4 transform2D::transform() const
 {
     const auto [c, s] = trigonometric_functions(rotation);
     const glm::vec2 u = glm::vec2(c, -s) * scale;
@@ -30,7 +30,7 @@ glm::mat4 transform2D::scale_rotate_translate() const
                      },
                      {t.x, t.y, 0.f, 1.f}};
 }
-glm::mat4 transform2D::inverse_scale_rotate_translate() const
+glm::mat4 transform2D::inverse() const
 {
     const auto [c, s] = trigonometric_functions(rotation);
     const glm::vec2 iu = glm::vec2(c, s) / scale.x;
@@ -58,11 +58,59 @@ glm::mat4 transform2D::inverse_scale_rotate_translate() const
                      {it.x, it.y, 0.f, 1.f}};
 }
 
-glm::mat4 transform2D::rotate_translate_scale() const
+glm::mat4 transform2D::transform_as_camera() const
 {
+    const auto [c, s] = trigonometric_functions(rotation);
+    const glm::vec2 u = glm::vec2(c, -s);
+    const glm::vec2 v = glm::vec2(s, c);
+    const glm::vec2 t = (position - glm::vec2(glm::dot(u, origin), glm::dot(v, origin))) * scale;
+
+    return glm::mat4{{
+                         u.x * scale.x,
+                         v.x * scale.y,
+                         0.f,
+                         0.f,
+                     },
+                     {
+                         u.y * scale.x,
+                         v.y * scale.y,
+                         0.f,
+                         0.f,
+                     },
+                     {
+                         0.f,
+                         0.f,
+                         1.f,
+                         0.f,
+                     },
+                     {t.x, t.y, 0.f, 1.f}};
 }
-glm::mat4 transform2D::inverse_rotate_translate_scale() const
+glm::mat4 transform2D::inverse_as_camera() const
 {
+    const auto [c, s] = trigonometric_functions(rotation);
+    const glm::vec2 iu = glm::vec2(c, s);
+    const glm::vec2 iv = glm::vec2(-s, c);
+    const glm::vec2 it = origin - glm::vec2(glm::dot(iu, position), glm::dot(iv, position));
+
+    return glm::mat4{{
+                         iu.x / scale.x,
+                         iv.x / scale.x,
+                         0.f,
+                         0.f,
+                     },
+                     {
+                         iu.y / scale.y,
+                         iv.y / scale.y,
+                         0.f,
+                         0.f,
+                     },
+                     {
+                         0.f,
+                         0.f,
+                         1.f,
+                         0.f,
+                     },
+                     {it.x, it.y, 0.f, 1.f}};
 }
 
 transform2D::trigonometry transform2D::trigonometric_functions(const float rotation)
@@ -70,7 +118,7 @@ transform2D::trigonometry transform2D::trigonometric_functions(const float rotat
     return {cosf(rotation), sinf(rotation)};
 }
 
-glm::mat4 transform3D::scale_rotate_translate() const // YXZ
+glm::mat4 transform3D::transform() const // YXZ
 {
     auto [u, v, w] = rotation_basis(rotation);
     u *= scale;
@@ -99,7 +147,7 @@ glm::mat4 transform3D::scale_rotate_translate() const // YXZ
                      {t.x, t.y, t.z, 1.f}};
 }
 
-glm::mat4 transform3D::inverse_scale_rotate_translate() const // YXZ
+glm::mat4 transform3D::inverse() const // YXZ
 {
     auto [iu, iv, iw] = inverse_rotation_basis(rotation);
     iu /= scale.x;
@@ -128,10 +176,10 @@ glm::mat4 transform3D::inverse_scale_rotate_translate() const // YXZ
                      {it.x, it.y, it.z, 1.f}};
 }
 
-glm::mat4 transform3D::rotate_translate_scale() const
+glm::mat4 transform3D::transform_as_camera() const
 {
 }
-glm::mat4 transform3D::inverse_rotate_translate_scale() const
+glm::mat4 transform3D::inverse_as_camera() const
 {
 }
 
