@@ -46,6 +46,7 @@ class example_app2D : public lynx::app2D
         // for (auto i = 0; i < 4; i++)
         //     for (auto j = 0; j < 4; j++)
         //         DBG_INFO("{0}, {1}: {2}", i, j, mat[i][j])
+        m_rect.transform.rotate(ts);
     }
     lynx::window2D *m_window2D;
     lynx::orthographic2D *m_cam;
@@ -59,7 +60,7 @@ class example_app3D : public lynx::app3D
     void on_start() override
     {
         m_window3D = window();
-        cam = m_window3D->camera<lynx::perspective3D>();
+        m_cam = m_window3D->camera<lynx::perspective3D>();
         cube.transform.zposition(3.f);
         cube.transform.origin({0.5f, 0.5f, -0.5f});
     }
@@ -88,12 +89,12 @@ class example_app3D : public lynx::app3D
         if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 
-        cam->point_to(cube.transform.position());
+        m_cam->point_to(cube.transform.position());
 
         m_window3D->draw(cube);
     }
     lynx::window3D *m_window3D;
-    lynx::perspective3D *cam;
+    lynx::perspective3D *m_cam;
     lynx::cube3D cube;
 };
 
@@ -136,7 +137,7 @@ class imgui_demo : public lynx::imgui_layer
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app2D app;
+    example_app3D app;
 
     // app.push_layer<imgui_demo>();
     app.run();

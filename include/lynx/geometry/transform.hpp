@@ -12,8 +12,21 @@ namespace lynx
 class transform2D
 {
   public:
+    struct trigonometry
+    {
+        float c;
+        float s;
+    };
+    struct rbasis
+    {
+        glm::vec2 x;
+        glm::vec2 y;
+    };
+
     glm::mat4 transform() const;
     glm::mat4 inverse() const;
+
+    static trigonometry trigonometric_functions(float rotation);
 
     const glm::vec2 &position() const;
     const glm::vec2 &translation() const;
@@ -66,8 +79,28 @@ class transform2D
 class transform3D
 {
   public:
+    struct trigonometry
+    {
+        float c1;
+        float s1;
+        float c2;
+        float s2;
+        float c3;
+        float s3;
+    };
+    struct rbasis
+    {
+        glm::vec3 x;
+        glm::vec3 y;
+        glm::vec3 z;
+    };
+
     glm::mat4 transform() const;
     glm::mat4 inverse() const;
+
+    static trigonometry trigonometric_functions(const glm::vec3 &rotation);
+    static rbasis rotation_basis(const glm::vec3 &rotation);
+    static rbasis inverse_rotation_basis(const glm::vec3 &rotation);
 
     const glm::vec3 &position() const;
     const glm::vec3 &translation() const;

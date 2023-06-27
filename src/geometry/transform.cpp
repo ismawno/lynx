@@ -6,17 +6,21 @@ namespace lynx
 glm::mat4 transform2D::transform() const
 {
     m_z_offset = 1.f - ++s_z_offset_counter * std::numeric_limits<float>::epsilon();
-    const float c = cosf(m_rotation);
-    const float s = sinf(m_rotation);
+
+    const auto [c, s] = trigonometric_functions(m_rotation);
+    const glm::vec2 u = glm::vec2(c, -s) * m_scale;
+    const glm::vec2 v = glm::vec2(s, c) * m_scale;
+    const glm::vec2 t = m_translation + m_origin - glm::vec2(glm::dot(u, m_origin), glm::dot(v, m_origin));
+
     return glm::mat4{{
-                         c * m_scale.x,
-                         s * m_scale.x,
+                         u.x,
+                         v.x,
                          0.f,
                          0.f,
                      },
                      {
-                         -s * m_scale.y,
-                         c * m_scale.y,
+                         u.y,
+                         v.y,
                          0.f,
                          0.f,
                      },
@@ -26,36 +30,40 @@ glm::mat4 transform2D::transform() const
                          1.f,
                          0.f,
                      },
-                     {m_translation.x + m_origin.x - c * m_origin.x * m_scale.x + s * m_origin.y * m_scale.y,
-                      m_translation.y + m_origin.y - c * m_origin.y * m_scale.y - s * m_origin.x * m_scale.x,
-                      m_z_offset, 1.f}};
+                     {t.x, t.y, m_z_offset, 1.f}};
 }
 glm::mat4 transform2D::inverse() const
 {
-    const float c = cosf(m_rotation);
-    const float s = sinf(m_rotation);
-    return glm::mat4{
-        {
-            c / m_scale.x,
-            -s / m_scale.y,
-            0.f,
-            0.f,
-        },
-        {
-            s / m_scale.x,
-            c / m_scale.y,
-            0.f,
-            0.f,
-        },
-        {
-            0.f,
-            0.f,
-            1.f,
-            0.f,
-        },
-        {(m_origin.x * m_scale.x - c * (m_origin.x + m_translation.x) - s * (m_origin.y + m_translation.y)) / m_scale.x,
-         (m_origin.y * m_scale.y - c * (m_origin.y + m_translation.y) + s * (m_origin.x + m_translation.x)) / m_scale.y,
-         -m_z_offset, 1.f}};
+    const auto [c, s] = trigonometric_functions(m_rotation);
+    const glm::vec2 iu = glm::vec2(c, s) / m_scale.x;
+    const glm::vec2 iv = glm::vec2(-s, c) / m_scale.y;
+    const glm::vec2 displacement = m_translation + m_origin;
+    const glm::vec2 it = m_origin - glm::vec2(glm::dot(iu, displacement), glm::dot(iv, displacement));
+
+    return glm::mat4{{
+                         iu.x,
+                         iv.x,
+                         0.f,
+                         0.f,
+                     },
+                     {
+                         iu.y,
+                         iv.y,
+                         0.f,
+                         0.f,
+                     },
+                     {
+                         0.f,
+                         0.f,
+                         1.f,
+                         0.f,
+                     },
+                     {it.x, it.y, -m_z_offset, 1.f}};
+}
+
+transform2D::trigonometry transform2D::trigonometric_functions(const float rotation)
+{
+    return {cosf(rotation), sinf(rotation)};
 }
 
 const glm::vec2 &transform2D::position() const
@@ -186,101 +194,84 @@ void transform2D::reset_z_offset_counter()
 
 glm::mat4 transform3D::transform() const // YXZ
 {
-    const float c3 = cosf(m_rotation.z);
-    const float s3 = sinf(m_rotation.z);
-    const float c2 = cosf(m_rotation.x);
-    const float s2 = sinf(m_rotation.x);
-    const float c1 = cosf(m_rotation.y);
-    const float s1 = sinf(m_rotation.y);
-
-    const float e11 = c1 * c3 + s1 * s2 * s3;
-    const float e21 = c2 * s3;
-    const float e31 = c1 * s2 * s3 - c3 * s1;
-
-    const float e12 = c3 * s1 * s2 - c1 * s3;
-    const float e22 = c2 * c3;
-    const float e32 = c1 * c3 * s2 + s1 * s3;
-
-    const float e13 = c2 * s1;
-    const float e23 = -s2;
-    const float e33 = c1 * c2;
+    auto [u, v, w] = rotation_basis(m_rotation);
+    u *= m_scale;
+    v *= m_scale;
+    w *= m_scale;
+    const glm::vec3 t =
+        m_translation + m_origin - glm::vec3(glm::dot(u, m_origin), glm::dot(v, m_origin), glm::dot(w, m_origin));
 
     return glm::mat4{{
-                         e11 * m_scale.x,
-                         e21 * m_scale.x,
-                         e31 * m_scale.x,
+                         u.x,
+                         v.x,
+                         w.x,
                          0.f,
                      },
                      {
-                         e12 * m_scale.y,
-                         e22 * m_scale.y,
-                         e32 * m_scale.y,
+                         u.y,
+                         v.y,
+                         w.y,
                          0.f,
                      },
                      {
-                         e13 * m_scale.z,
-                         e23 * m_scale.z,
-                         e33 * m_scale.z,
+                         u.z,
+                         v.z,
+                         w.z,
                          0.f,
                      },
-                     {m_translation.x + m_origin.x - e11 * m_origin.x * m_scale.x - e12 * m_origin.y * m_scale.y -
-                          e13 * m_origin.z * m_scale.z,
-                      m_translation.y + m_origin.y - e22 * m_origin.y * m_scale.y - e21 * m_origin.x * m_scale.x -
-                          e23 * m_origin.z * m_scale.z,
-                      m_translation.z + m_origin.z - e33 * m_origin.z * m_scale.z - e31 * m_origin.x * m_scale.x -
-                          e32 * m_origin.y * m_scale.y,
-                      1.f}};
+                     {t.x, t.y, t.z, 1.f}};
 }
 
 glm::mat4 transform3D::inverse() const // YXZ
 {
-    const float c3 = cosf(m_rotation.z);
-    const float s3 = sinf(m_rotation.z);
-    const float c2 = cosf(m_rotation.x);
-    const float s2 = sinf(m_rotation.x);
-    const float c1 = cosf(m_rotation.y);
-    const float s1 = sinf(m_rotation.y);
-
-    const float e11 = c1 * c3 + s1 * s2 * s3;
-    const float e21 = c2 * s3;
-    const float e31 = c1 * s2 * s3 - c3 * s1;
-
-    const float e12 = c3 * s1 * s2 - c1 * s3;
-    const float e22 = c2 * c3;
-    const float e32 = c1 * c3 * s2 + s1 * s3;
-
-    const float e13 = c2 * s1;
-    const float e23 = -s2;
-    const float e33 = c1 * c2;
+    auto [iu, iv, iw] = inverse_rotation_basis(m_rotation);
+    iu /= m_scale.x;
+    iv /= m_scale.y;
+    iw /= m_scale.z;
+    const glm::vec3 displacement = m_translation + m_origin;
+    const glm::vec3 it =
+        m_origin - glm::vec3(glm::dot(iu, displacement), glm::dot(iv, displacement), glm::dot(iw, displacement));
 
     return glm::mat4{{
-                         e11 / m_scale.x,
-                         e12 / m_scale.y,
-                         e13 / m_scale.z,
+                         iu.x,
+                         iv.x,
+                         iw.x,
                          0.f,
                      },
                      {
-                         e21 / m_scale.x,
-                         e22 / m_scale.y,
-                         e23 / m_scale.z,
+                         iu.y,
+                         iv.y,
+                         iw.y,
                          0.f,
                      },
                      {
-                         e31 / m_scale.x,
-                         e32 / m_scale.y,
-                         e33 / m_scale.z,
+                         iu.z,
+                         iv.z,
+                         iw.z,
                          0.f,
                      },
-                     {(m_origin.x * m_scale.x - e11 * (m_origin.x + m_translation.x) -
-                       e21 * (m_origin.y + m_translation.y) - e31 * (m_origin.z + m_translation.z)) /
-                          m_scale.x,
-                      (m_origin.y * m_scale.y - e22 * (m_origin.y + m_translation.y) -
-                       e12 * (m_origin.x + m_translation.x) - e32 * (m_origin.z + m_translation.z)) /
-                          m_scale.y,
-                      (m_origin.z * m_scale.z - e33 * (m_origin.z + m_translation.z) -
-                       e13 * (m_origin.x + m_translation.x) - e23 * (m_origin.y + m_translation.y)) /
-                          m_scale.z,
-                      1.f}};
+                     {it.x, it.y, it.z, 1.f}};
+}
+
+transform3D::trigonometry transform3D::trigonometric_functions(const glm::vec3 &rotation)
+{
+    return {cosf(rotation.x), sinf(rotation.x), cosf(rotation.y), sinf(rotation.y), cosf(rotation.z), sinf(rotation.z)};
+}
+
+transform3D::rbasis transform3D::rotation_basis(const glm::vec3 &rotation)
+{
+    const auto [c1, s1, c2, s2, c3, s3] = trigonometric_functions(rotation);
+    return {{(c1 * c3 + s1 * s2 * s3), (c3 * s1 * s2 - c1 * s3), (c2 * s1)},
+            {(c2 * s3), (c2 * c3), (-s2)},
+            {(c1 * s2 * s3 - c3 * s1), (c1 * c3 * s2 + s1 * s3), (c1 * c2)}};
+}
+
+transform3D::rbasis transform3D::inverse_rotation_basis(const glm::vec3 &rotation)
+{
+    const auto [c1, s1, c2, s2, c3, s3] = trigonometric_functions(rotation);
+    return {{(c1 * c3 + s1 * s2 * s3), (c2 * s3), (c1 * s2 * s3 - c3 * s1)},
+            {(c3 * s1 * s2 - c1 * s3), (c2 * c3), (c1 * c3 * s2 + s1 * s3)},
+            {(c2 * s1), (-s2), (c1 * c2)}};
 }
 
 const glm::vec3 &transform3D::position() const
