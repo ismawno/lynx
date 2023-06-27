@@ -28,16 +28,13 @@ struct transform2D
         glm::vec2 y;
     };
 
-    glm::mat4 transform() const;
-    glm::mat4 inverse() const;
+    glm::mat4 scale_rotate_translate() const;
+    glm::mat4 inverse_scale_rotate_translate() const;
+
+    glm::mat4 rotate_translate_scale() const;
+    glm::mat4 inverse_rotate_translate_scale() const;
 
     static trigonometry trigonometric_functions(float rotation);
-
-    static void reset_z_offset_counter();
-
-  private:
-    mutable float m_z_offset = 0.f;
-    inline static std::size_t s_z_offset_counter = 0;
 };
 
 struct transform3D
@@ -64,8 +61,11 @@ struct transform3D
         glm::vec3 z;
     };
 
-    glm::mat4 transform() const;
-    glm::mat4 inverse() const;
+    glm::mat4 scale_rotate_translate() const;
+    glm::mat4 inverse_scale_rotate_translate() const;
+
+    glm::mat4 rotate_translate_scale() const;
+    glm::mat4 inverse_rotate_translate_scale() const;
 
     static trigonometry trigonometric_functions(const glm::vec3 &rotation);
     static rbasis rotation_basis(const glm::vec3 &rotation);

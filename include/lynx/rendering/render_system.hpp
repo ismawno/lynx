@@ -35,7 +35,7 @@ class render_system
     void init(const ref<const device> &dev, VkRenderPass render_pass);
     void render(VkCommandBuffer command_buffer, const camera &cam) const;
 
-    void push_render_data(const render_data &rdata);
+    virtual void push_render_data(render_data &rdata);
     void clear_render_data();
 
   protected:
@@ -65,8 +65,14 @@ class render_system2D : public render_system
         return make_ref<model2D>(m_device, std::forward<Args>(args)...);
     }
 
+    void push_render_data(render_data &data) override;
+    static void reset_z_offset_counter();
+
   protected:
     virtual void pipeline_config(pipeline::config_info &config) const override;
+
+  private:
+    static inline std::uint32_t s_z_offset_counter = 0;
 };
 
 class render_system3D : public render_system

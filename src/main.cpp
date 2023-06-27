@@ -42,7 +42,7 @@ class example_app2D : public lynx::app2D
         m_window2D->draw(m_rect);
         m_window2D->draw(m_ellipse);
 
-        // auto mat = m_rect.transform.transform() * m_rect.transform.inverse();
+        // auto mat = m_rect.transform.scale_rotate_translate() * m_rect.transform.inverse_scale_rotate_translate();
         // for (auto i = 0; i < 4; i++)
         //     for (auto j = 0; j < 4; j++)
         //         DBG_INFO("{0}, {1}: {2}", i, j, mat[i][j])

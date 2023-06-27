@@ -3,10 +3,8 @@
 
 namespace lynx
 {
-glm::mat4 transform2D::transform() const
+glm::mat4 transform2D::scale_rotate_translate() const
 {
-    m_z_offset = 1.f - ++s_z_offset_counter * std::numeric_limits<float>::epsilon();
-
     const auto [c, s] = trigonometric_functions(rotation);
     const glm::vec2 u = glm::vec2(c, -s) * scale;
     const glm::vec2 v = glm::vec2(s, c) * scale;
@@ -30,9 +28,9 @@ glm::mat4 transform2D::transform() const
                          1.f,
                          0.f,
                      },
-                     {t.x, t.y, m_z_offset, 1.f}};
+                     {t.x, t.y, 0.f, 1.f}};
 }
-glm::mat4 transform2D::inverse() const
+glm::mat4 transform2D::inverse_scale_rotate_translate() const
 {
     const auto [c, s] = trigonometric_functions(rotation);
     const glm::vec2 iu = glm::vec2(c, s) / scale.x;
@@ -57,7 +55,14 @@ glm::mat4 transform2D::inverse() const
                          1.f,
                          0.f,
                      },
-                     {it.x, it.y, -m_z_offset, 1.f}};
+                     {it.x, it.y, 0.f, 1.f}};
+}
+
+glm::mat4 transform2D::rotate_translate_scale() const
+{
+}
+glm::mat4 transform2D::inverse_rotate_translate_scale() const
+{
 }
 
 transform2D::trigonometry transform2D::trigonometric_functions(const float rotation)
@@ -65,12 +70,7 @@ transform2D::trigonometry transform2D::trigonometric_functions(const float rotat
     return {cosf(rotation), sinf(rotation)};
 }
 
-void transform2D::reset_z_offset_counter()
-{
-    s_z_offset_counter = 0;
-}
-
-glm::mat4 transform3D::transform() const // YXZ
+glm::mat4 transform3D::scale_rotate_translate() const // YXZ
 {
     auto [u, v, w] = rotation_basis(rotation);
     u *= scale;
@@ -99,7 +99,7 @@ glm::mat4 transform3D::transform() const // YXZ
                      {t.x, t.y, t.z, 1.f}};
 }
 
-glm::mat4 transform3D::inverse() const // YXZ
+glm::mat4 transform3D::inverse_scale_rotate_translate() const // YXZ
 {
     auto [iu, iv, iw] = inverse_rotation_basis(rotation);
     iu /= scale.x;
@@ -126,6 +126,13 @@ glm::mat4 transform3D::inverse() const // YXZ
                          0.f,
                      },
                      {it.x, it.y, it.z, 1.f}};
+}
+
+glm::mat4 transform3D::rotate_translate_scale() const
+{
+}
+glm::mat4 transform3D::inverse_rotate_translate_scale() const
+{
 }
 
 transform3D::trigonometry transform3D::trigonometric_functions(const glm::vec3 &rotation)

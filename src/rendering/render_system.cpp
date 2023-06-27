@@ -74,7 +74,7 @@ void render_system::render(VkCommandBuffer command_buffer, const camera &cam) co
     }
 }
 
-void render_system::push_render_data(const render_data &rdata)
+void render_system::push_render_data(render_data &rdata)
 {
     m_render_data.push_back(rdata);
 }
@@ -92,18 +92,32 @@ void render_system::pipeline_config(pipeline::config_info &config) const
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const transform2D &transform)
 {
-    push_render_data({make_ref<model2D>(m_device, vertices), transform.transform()});
+    render_data rdata = {make_ref<model2D>(m_device, vertices), transform.scale_rotate_translate()};
+    push_render_data(rdata);
 }
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
                            const transform2D &transform)
 {
-    push_render_data({make_ref<model2D>(m_device, vertices, indices), transform.transform()});
+    render_data rdata = {make_ref<model2D>(m_device, vertices, indices), transform.scale_rotate_translate()};
+    push_render_data(rdata);
 }
 
 void render_system2D::draw(const drawable2D &drawable)
 {
     drawable.draw(*this);
+}
+
+void render_system2D::push_render_data(render_data &data)
+{
+    const float z_offset = 1.f - ++s_z_offset_counter * std::numeric_limits<float>::epsilon();
+    data.mdl_transform[3][2] = z_offset;
+    render_system::push_render_data(data);
+}
+
+void render_system2D::reset_z_offset_counter()
+{
+    s_z_offset_counter = 0;
 }
 
 void render_system2D::pipeline_config(pipeline::config_info &config) const
@@ -117,13 +131,15 @@ void render_system2D::pipeline_config(pipeline::config_info &config) const
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const transform3D &transform)
 {
-    push_render_data({make_ref<model3D>(m_device, vertices), transform.transform()});
+    render_data rdata = {make_ref<model3D>(m_device, vertices), transform.scale_rotate_translate()};
+    push_render_data(rdata);
 }
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
                            const transform3D &transform)
 {
-    push_render_data({make_ref<model3D>(m_device, vertices, indices), transform.transform()});
+    render_data rdata = {make_ref<model3D>(m_device, vertices, indices), transform.scale_rotate_translate()};
+    push_render_data(rdata);
 }
 
 void render_system3D::draw(const drawable3D &drawable)
