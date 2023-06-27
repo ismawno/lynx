@@ -61,19 +61,19 @@ glm::mat4 transform2D::inverse() const
 glm::mat4 transform2D::transform_as_camera() const
 {
     const auto [c, s] = trigonometric_functions(rotation);
-    const glm::vec2 u = glm::vec2(c, -s);
-    const glm::vec2 v = glm::vec2(s, c);
-    const glm::vec2 t = (position - glm::vec2(glm::dot(u, origin), glm::dot(v, origin))) * scale;
+    const glm::vec2 u = glm::vec2(c, s);
+    const glm::vec2 v = glm::vec2(-s, c);
+    const glm::vec2 t = (origin - glm::vec2(glm::dot(u, position), glm::dot(v, position))) / scale;
 
     return glm::mat4{{
-                         u.x * scale.x,
-                         v.x * scale.y,
+                         u.x / scale.x,
+                         v.x / scale.y,
                          0.f,
                          0.f,
                      },
                      {
-                         u.y * scale.x,
-                         v.y * scale.y,
+                         u.y / scale.x,
+                         v.y / scale.y,
                          0.f,
                          0.f,
                      },
@@ -88,19 +88,19 @@ glm::mat4 transform2D::transform_as_camera() const
 glm::mat4 transform2D::inverse_as_camera() const
 {
     const auto [c, s] = trigonometric_functions(rotation);
-    const glm::vec2 iu = glm::vec2(c, s);
-    const glm::vec2 iv = glm::vec2(-s, c);
-    const glm::vec2 it = origin - glm::vec2(glm::dot(iu, position), glm::dot(iv, position));
+    const glm::vec2 iu = glm::vec2(c, -s);
+    const glm::vec2 iv = glm::vec2(s, c);
+    const glm::vec2 it = position - glm::vec2(glm::dot(iu, origin), glm::dot(iv, origin));
 
     return glm::mat4{{
-                         iu.x / scale.x,
-                         iv.x / scale.x,
+                         iu.x * scale.x,
+                         iv.x * scale.x,
                          0.f,
                          0.f,
                      },
                      {
-                         iu.y / scale.y,
-                         iv.y / scale.y,
+                         iu.y * scale.y,
+                         iv.y * scale.y,
                          0.f,
                          0.f,
                      },
@@ -178,9 +178,54 @@ glm::mat4 transform3D::inverse() const // YXZ
 
 glm::mat4 transform3D::transform_as_camera() const
 {
+    auto [u, v, w] = inverse_rotation_basis(rotation);
+    const glm::vec3 it =
+        (origin - glm::vec3(glm::dot(u, position), glm::dot(v, position), glm::dot(w, position))) / scale;
+
+    return glm::mat4{{
+                         u.x / scale.x,
+                         v.x / scale.y,
+                         w.x / scale.z,
+                         0.f,
+                     },
+                     {
+                         u.y / scale.x,
+                         v.y / scale.y,
+                         w.y / scale.z,
+                         0.f,
+                     },
+                     {
+                         u.z / scale.x,
+                         v.z / scale.y,
+                         w.z / scale.z,
+                         0.f,
+                     },
+                     {it.x, it.y, it.z, 1.f}};
 }
 glm::mat4 transform3D::inverse_as_camera() const
 {
+    auto [u, v, w] = rotation_basis(rotation);
+    const glm::vec3 t = position - glm::vec3(glm::dot(u, origin), glm::dot(v, origin), glm::dot(w, origin));
+
+    return glm::mat4{{
+                         u.x * scale.x,
+                         v.x * scale.x,
+                         w.x * scale.x,
+                         0.f,
+                     },
+                     {
+                         u.y * scale.y,
+                         v.y * scale.y,
+                         w.y * scale.y,
+                         0.f,
+                     },
+                     {
+                         u.z * scale.z,
+                         v.z * scale.z,
+                         w.z * scale.z,
+                         0.f,
+                     },
+                     {t.x, t.y, t.z, 1.f}};
 }
 
 transform3D::trigonometry transform3D::trigonometric_functions(const glm::vec3 &rotation)

@@ -78,6 +78,7 @@ void app::shutdown()
         return;
     }
     DBG_ASSERT_ERROR(!m_terminated, "Cannot terminate an already terminated app")
+    vkDeviceWaitIdle(m_window->device()->vulkan_device());
 
     on_shutdown();
     for (const auto &ly : m_layers)

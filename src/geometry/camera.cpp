@@ -51,10 +51,21 @@ orthographic2D::orthographic2D(const glm::vec2 &position, const glm::vec2 &size,
     transform.rotation = rotation;
 }
 
+float orthographic2D::size() const
+{
+    return transform.scale.y;
+}
+void orthographic2D::size(const float size)
+{
+    const float aspect = transform.scale.x / transform.scale.y;
+    transform.scale.y = size;
+    transform.scale.x = aspect * size;
+}
+
 void orthographic2D::update_transformation_matrices()
 {
-    m_projection = transform.inverse();
-    m_inv_projection = transform.transform();
+    m_projection = transform.transform_as_camera();
+    m_inv_projection = transform.inverse_as_camera();
 }
 
 void camera3D::keep_aspect_ratio(const float aspect)
@@ -111,8 +122,19 @@ orthographic3D::orthographic3D(const glm::vec3 &position, const glm::vec3 &size,
 
 void orthographic3D::update_transformation_matrices()
 {
-    m_projection = transform.inverse_as_camera();
-    m_inv_projection = transform.transform_as_camera();
+    m_projection = transform.transform_as_camera();
+    m_inv_projection = transform.inverse_as_camera();
+}
+
+float orthographic3D::size() const
+{
+    return transform.scale.y;
+}
+void orthographic3D::size(const float size)
+{
+    const float aspect = transform.scale.x / transform.scale.y;
+    transform.scale.y = size;
+    transform.scale.x = aspect * size;
 }
 
 perspective3D::perspective3D(const float aspect, const float fovy, const glm::vec3 &rotation, const float near,
@@ -122,13 +144,12 @@ perspective3D::perspective3D(const float aspect, const float fovy, const glm::ve
 }
 perspective3D::perspective3D(const glm::vec3 &position, const float aspect, const float fovy, const glm::vec3 &rotation,
                              const float near, const float far)
-    : m_near(near), m_far(far)
+    : m_near(near), m_far(far), m_fov(fovy), m_half_tan_fovy(tanf(0.5f * fovy)), m_aspect(aspect)
 {
     transform.position = position;
     transform.rotation = rotation;
-    fov(aspect, fovy);
     DBG_ASSERT_ERROR(aspect > 0.0f, "Aspect ratio must be greater than 0");
-    DBG_ASSERT_ERROR(fov() > 0.0f, "The tangent of the field of view must be greater than 0");
+    DBG_ASSERT_ERROR(m_fov > 0.0f, "The tangent of the field of view must be greater than 0");
 }
 
 float perspective3D::near() const
@@ -141,7 +162,7 @@ float perspective3D::far() const
 }
 float perspective3D::fov() const
 {
-    return 2.f * atanf(transform.scale.y / m_near);
+    return m_fov;
 }
 
 void perspective3D::near(const float near)
@@ -152,77 +173,34 @@ void perspective3D::far(const float far)
 {
     m_far = far;
 }
-void perspective3D::fov(const float aspect, const float fovy)
+void perspective3D::fov(const float fovy)
 {
-    const float tan_half = tanf(0.5f * fovy);
-    transform.scale.x = m_near * aspect * tan_half;
-    transform.scale.y = m_near * tan_half;
+    m_fov = fovy;
+    m_half_tan_fovy = tanf(0.5f * fovy);
+}
+
+void perspective3D::keep_aspect_ratio(const float aspect)
+{
+    m_aspect = aspect;
 }
 
 void perspective3D::update_transformation_matrices()
 {
-    update_projection();
-    update_view();
-}
+    glm::mat4 perspective = glm::mat4{0.0f};
+    perspective[0][0] = 1.f / (m_aspect * m_half_tan_fovy);
+    perspective[1][1] = 1.f / m_half_tan_fovy;
+    perspective[2][2] = m_far / (m_far - m_near);
+    perspective[2][3] = 1.f;
+    perspective[3][2] = m_far * m_near / (m_near - m_far);
 
-void perspective3D::update_projection()
-{
-    m_projection = glm::mat4{0.0f};
-    m_projection[0][0] = m_near / transform.scale.x;
-    m_projection[1][1] = m_near / transform.scale.y;
-    m_projection[2][2] = m_far / (m_far - m_near);
-    m_projection[2][3] = 1.f;
-    m_projection[3][2] = m_far * m_near / (m_near - m_far);
+    glm::mat4 inv_perspective = glm::mat4{0.0f};
+    inv_perspective[0][0] = m_aspect * m_half_tan_fovy;
+    inv_perspective[1][1] = m_half_tan_fovy;
+    inv_perspective[3][3] = 1.f / m_near;
+    inv_perspective[3][2] = 1.f;
+    inv_perspective[2][3] = (m_near - m_far) / (m_far * m_near);
 
-    m_inv_projection = glm::mat4{0.0f};
-    m_inv_projection[0][0] = transform.scale.x / m_near;
-    m_inv_projection[1][1] = transform.scale.y / m_near;
-    m_inv_projection[3][3] = 1.f / m_near;
-    m_inv_projection[3][2] = 1.f;
-    m_inv_projection[2][3] = (m_near - m_far) / (m_far * m_near);
-}
-
-void perspective3D::update_view()
-{
-    const float c3 = cosf(transform.rotation.z);
-    const float s3 = sinf(transform.rotation.z);
-    const float c2 = cosf(transform.rotation.x);
-    const float s2 = sinf(transform.rotation.x);
-    const float c1 = cosf(transform.rotation.y);
-    const float s1 = sinf(transform.rotation.y);
-    const glm::vec3 u{(c1 * c3 + s1 * s2 * s3), (c2 * s3), (c1 * s2 * s3 - c3 * s1)};
-    const glm::vec3 v{(c3 * s1 * s2 - c1 * s3), (c2 * c3), (c1 * c3 * s2 + s1 * s3)};
-    const glm::vec3 w{(c2 * s1), (-s2), (c1 * c2)};
-
-    glm::mat4 view = glm::mat4{1.f};
-    view[0][0] = u.x;
-    view[1][0] = u.y;
-    view[2][0] = u.z;
-    view[0][1] = v.x;
-    view[1][1] = v.y;
-    view[2][1] = v.z;
-    view[0][2] = w.x;
-    view[1][2] = w.y;
-    view[2][2] = w.z;
-    view[3][0] = -glm::dot(u, transform.position);
-    view[3][1] = -glm::dot(v, transform.position);
-    view[3][2] = -glm::dot(w, transform.position);
-
-    glm::mat4 inv_view = glm::mat4{1.f};
-    inv_view[0][0] = u.x;
-    inv_view[1][0] = v.x;
-    inv_view[2][0] = w.x;
-    inv_view[0][1] = u.y;
-    inv_view[1][1] = v.y;
-    inv_view[2][1] = w.y;
-    inv_view[0][2] = u.z;
-    inv_view[1][2] = v.z;
-    inv_view[2][2] = w.z;
-    inv_view[3][0] = transform.position.x;
-    inv_view[3][1] = transform.position.y;
-    inv_view[3][2] = transform.position.z;
-
-    m_projection = m_projection * view;
-    m_inv_projection = inv_view * m_inv_projection;
+    m_projection = perspective * transform.transform_as_camera();
+    m_inv_projection = transform.inverse_as_camera() * inv_perspective;
 }
 } // namespace lynx

@@ -17,28 +17,34 @@ class example_app2D : public lynx::app2D
         m_poly.vertex(2, {0.f, -1.f});
         m_poly.color({1.f, 1.f, 0.f, 1.f});
 
-        // m_rect.transform.origin({0.5f, 0.5f});
+        // m_rect.transform.origin = {0.5f, 0.5f};
 
         m_cam->transform.origin = {0.5f, 0.5f};
         // m_cam->transform.position({0.5f, 0.5f});
         m_ellipse.color({1.f, 0.f, 0.f, 1.f});
-        m_ellipse.transform.position = m_cam->transform.origin;
+        m_ellipse.transform.position = -m_cam->transform.origin;
         m_ellipse.radius(0.1f);
+        m_rect.transform.position = -m_cam->transform.origin;
     }
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_cam->transform.position -= ts;
-        if (lynx::input::key_pressed(lynx::input::key::D))
-            m_cam->transform.position += ts;
-        if (lynx::input::key_pressed(lynx::input::key::W))
             m_cam->transform.position.x -= ts;
-        if (lynx::input::key_pressed(lynx::input::key::S))
+        if (lynx::input::key_pressed(lynx::input::key::D))
             m_cam->transform.position.x += ts;
+        if (lynx::input::key_pressed(lynx::input::key::W))
+            m_cam->transform.position.y -= ts;
+        if (lynx::input::key_pressed(lynx::input::key::S))
+            m_cam->transform.position.y += ts;
         if (lynx::input::key_pressed(lynx::input::key::Q))
             m_cam->transform.rotation -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
             m_cam->transform.rotation += ts;
+        if (lynx::input::key_pressed(lynx::input::key::N))
+            m_cam->size(m_cam->size() - 5.f * ts);
+        if (lynx::input::key_pressed(lynx::input::key::M))
+            m_cam->size(m_cam->size() + 5.f * ts);
+
         m_window2D->draw(m_rect);
         m_window2D->draw(m_ellipse);
 
@@ -62,10 +68,12 @@ class example_app3D : public lynx::app3D
         m_window3D = window();
         m_cam = m_window3D->camera<lynx::perspective3D>();
         cube.transform.position.z = 3.f;
-        cube.transform.origin = {0.5f, 0.5f, -0.5f};
+
+        // cube.transform.origin = {0.5f, 0.5f, -0.5f};
     }
     void on_update(const float ts) override
     {
+
         if (lynx::input::key_pressed(lynx::input::key::A))
             cube.transform.position.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::D))
@@ -137,9 +145,9 @@ class imgui_demo : public lynx::imgui_layer
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app2D app;
+    example_app3D app;
 
-    app.push_layer<imgui_demo>();
+    // app.push_layer<imgui_demo>();
     app.run();
 
     // example_app2D app2;
