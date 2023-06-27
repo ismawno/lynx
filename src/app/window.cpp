@@ -183,7 +183,7 @@ bool window::should_close() const
 
 window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) : window(width, height, name)
 {
-    set_camera<orthographic2D>(swap_chain_aspect(), 10.f);
+    set_camera<orthographic2D>(swap_chain_aspect(), 5.f);
 
     add_render_system<point_render_system2D>();
     add_render_system<line_render_system2D>();

@@ -13,17 +13,11 @@ class camera
     virtual void keep_aspect_ratio(float aspect) = 0;
 
     const glm::mat4 &projection() const;
-    const glm::mat4 &view() const;
-
     const glm::mat4 &inverse_projection() const;
-    const glm::mat4 &inverse_view() const;
 
   protected:
     glm::mat4 m_projection{1.f};
-    glm::mat4 m_view{1.f};
-
     glm::mat4 m_inv_projection{1.f};
-    glm::mat4 m_inv_view{1.f};
 
   private:
     camera &operator=(const camera &) = delete;
@@ -63,10 +57,6 @@ class orthographic2D : public camera2D
     orthographic2D(const glm::vec2 &position, const glm::vec2 &size, float rotation = 0.f);
 
     void update_transformation_matrices() override;
-
-  private:
-    void update_projection();
-    void update_view();
 };
 
 class orthographic3D : public camera3D
@@ -81,10 +71,6 @@ class orthographic3D : public camera3D
     orthographic3D(const glm::vec3 &position, const glm::vec3 &size, const glm::vec3 &rotation = glm::vec3(0.f));
 
     void update_transformation_matrices() override;
-
-  private:
-    void update_projection();
-    void update_view();
 };
 
 class perspective3D : public camera3D

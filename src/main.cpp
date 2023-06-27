@@ -17,12 +17,12 @@ class example_app2D : public lynx::app2D
         m_poly.vertex(2, {0.f, -1.f});
         m_poly.color({1.f, 1.f, 0.f, 1.f});
 
-        m_rect.transform.origin({0.5f, 0.5f});
-        m_rect.transform.xscale(2.f);
-        m_rect.transform.rotation(0.5f);
+        // m_rect.transform.origin({0.5f, 0.5f});
 
+        m_cam->transform.origin({0.5f, 0.5f});
+        // m_cam->transform.position({0.5f, 0.5f});
         m_ellipse.color({1.f, 0.f, 0.f, 1.f});
-        m_ellipse.transform.position(m_rect.transform.origin());
+        m_ellipse.transform.position(m_cam->transform.origin());
         m_ellipse.radius(0.1f);
     }
     void on_update(const float ts) override
@@ -46,7 +46,7 @@ class example_app2D : public lynx::app2D
         // for (auto i = 0; i < 4; i++)
         //     for (auto j = 0; j < 4; j++)
         //         DBG_INFO("{0}, {1}: {2}", i, j, mat[i][j])
-        m_rect.transform.rotate(ts);
+        // m_rect.transform.rotate(ts);
     }
     lynx::window2D *m_window2D;
     lynx::orthographic2D *m_cam;
@@ -60,9 +60,10 @@ class example_app3D : public lynx::app3D
     void on_start() override
     {
         m_window3D = window();
-        m_cam = m_window3D->camera<lynx::perspective3D>();
-        cube.transform.zposition(3.f);
-        cube.transform.origin({0.5f, 0.5f, -0.5f});
+        m_cam = m_window3D->set_camera<lynx::orthographic3D>(m_window3D->swap_chain_aspect(), 5.f, 5.f);
+        cube.transform.zposition(1.f);
+        m_cam->transform.origin({0.2f, 0.2f, -0.2f});
+        // cube.transform.origin({0.5f, 0.5f, -0.5f});
     }
     void on_update(const float ts) override
     {
@@ -75,13 +76,13 @@ class example_app3D : public lynx::app3D
         if (lynx::input::key_pressed(lynx::input::key::S))
             cube.transform.ytranslate(ts);
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            cube.transform.zrotate(-ts);
+            m_cam->transform.zrotate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::E))
-            cube.transform.zrotate(ts);
+            m_cam->transform.zrotate(ts);
         if (lynx::input::key_pressed(lynx::input::key::Z))
-            cube.transform.yrotate(-ts);
+            m_cam->transform.yrotate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::X))
-            cube.transform.yrotate(ts);
+            m_cam->transform.yrotate(ts);
         if (lynx::input::key_pressed(lynx::input::key::N))
             cube.transform.xstretch(-ts);
         if (lynx::input::key_pressed(lynx::input::key::M))
@@ -89,12 +90,12 @@ class example_app3D : public lynx::app3D
         if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 
-        m_cam->point_to(cube.transform.position());
+        // m_cam->point_to(cube.transform.position());
 
         m_window3D->draw(cube);
     }
     lynx::window3D *m_window3D;
-    lynx::perspective3D *m_cam;
+    lynx::orthographic3D *m_cam;
     lynx::cube3D cube;
 };
 
@@ -137,9 +138,9 @@ class imgui_demo : public lynx::imgui_layer
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app3D app;
+    example_app2D app;
 
-    // app.push_layer<imgui_demo>();
+    app.push_layer<imgui_demo>();
     app.run();
 
     // example_app2D app2;
