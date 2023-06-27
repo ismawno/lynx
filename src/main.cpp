@@ -19,26 +19,26 @@ class example_app2D : public lynx::app2D
 
         // m_rect.transform.origin({0.5f, 0.5f});
 
-        m_cam->transform.origin({0.5f, 0.5f});
+        m_cam->transform.origin = {0.5f, 0.5f};
         // m_cam->transform.position({0.5f, 0.5f});
         m_ellipse.color({1.f, 0.f, 0.f, 1.f});
-        m_ellipse.transform.position(m_cam->transform.origin());
+        m_ellipse.transform.position = m_cam->transform.origin;
         m_ellipse.radius(0.1f);
     }
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_cam->transform.xtranslate(-ts);
+            m_cam->transform.position -= ts;
         if (lynx::input::key_pressed(lynx::input::key::D))
-            m_cam->transform.xtranslate(ts);
+            m_cam->transform.position += ts;
         if (lynx::input::key_pressed(lynx::input::key::W))
-            m_cam->transform.ytranslate(-ts);
+            m_cam->transform.position.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::S))
-            m_cam->transform.ytranslate(ts);
+            m_cam->transform.position.x += ts;
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            m_cam->transform.rotate(-ts);
+            m_cam->transform.rotation -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
-            m_cam->transform.rotate(ts);
+            m_cam->transform.rotation += ts;
         m_window2D->draw(m_rect);
         m_window2D->draw(m_ellipse);
 
@@ -60,42 +60,41 @@ class example_app3D : public lynx::app3D
     void on_start() override
     {
         m_window3D = window();
-        m_cam = m_window3D->set_camera<lynx::orthographic3D>(m_window3D->swap_chain_aspect(), 5.f, 5.f);
-        cube.transform.zposition(1.f);
-        m_cam->transform.origin({0.2f, 0.2f, -0.2f});
-        // cube.transform.origin({0.5f, 0.5f, -0.5f});
+        m_cam = m_window3D->camera<lynx::perspective3D>();
+        cube.transform.position.z = 3.f;
+        cube.transform.origin = {0.5f, 0.5f, -0.5f};
     }
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            cube.transform.xtranslate(-ts);
+            cube.transform.position.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::D))
-            cube.transform.xtranslate(ts);
+            cube.transform.position.x += ts;
         if (lynx::input::key_pressed(lynx::input::key::W))
-            cube.transform.ytranslate(-ts);
+            cube.transform.position.y -= ts;
         if (lynx::input::key_pressed(lynx::input::key::S))
-            cube.transform.ytranslate(ts);
+            cube.transform.position.y += ts;
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            m_cam->transform.zrotate(-ts);
+            cube.transform.rotation.z -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
-            m_cam->transform.zrotate(ts);
+            cube.transform.rotation.z += ts;
         if (lynx::input::key_pressed(lynx::input::key::Z))
-            m_cam->transform.yrotate(-ts);
+            cube.transform.rotation.y -= ts;
         if (lynx::input::key_pressed(lynx::input::key::X))
-            m_cam->transform.yrotate(ts);
+            cube.transform.rotation.y += ts;
         if (lynx::input::key_pressed(lynx::input::key::N))
-            cube.transform.xstretch(-ts);
+            cube.transform.scale.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::M))
-            cube.transform.xstretch(ts);
+            cube.transform.scale.x += ts;
         if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 
-        // m_cam->point_to(cube.transform.position());
+        m_cam->point_to(cube.transform.position);
 
         m_window3D->draw(cube);
     }
     lynx::window3D *m_window3D;
-    lynx::orthographic3D *m_cam;
+    lynx::perspective3D *m_cam;
     lynx::cube3D cube;
 };
 
@@ -138,9 +137,9 @@ class imgui_demo : public lynx::imgui_layer
 int main()
 {
     DBG_SET_LEVEL(info)
-    example_app2D app;
+    example_app3D app;
 
-    app.push_layer<imgui_demo>();
+    // app.push_layer<imgui_demo>();
     app.run();
 
     // example_app2D app2;

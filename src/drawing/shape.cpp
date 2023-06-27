@@ -55,8 +55,8 @@ void shape3D::color(const glm::vec4 &color)
 rect2D::rect2D(const glm::vec2 &position, const glm::vec2 &dimensions, const glm::vec4 &color)
     : shape2D(TRIANGLE_LIST, model2D::rect(color))
 {
-    transform.position(position);
-    transform.scale(dimensions);
+    transform.position = position;
+    transform.scale = dimensions;
 }
 
 rect2D::rect2D(const glm::vec4 &color) : shape2D(TRIANGLE_LIST, model2D::rect(color))
@@ -66,12 +66,12 @@ rect2D::rect2D(const glm::vec4 &color) : shape2D(TRIANGLE_LIST, model2D::rect(co
 ellipse2D::ellipse2D(const float ra, const float rb, const glm::vec4 &color, const std::uint32_t partitions)
     : shape2D(TRIANGLE_LIST, model2D::circle(partitions, color))
 {
-    transform.scale({ra, rb});
+    transform.scale = {ra, rb};
 }
 ellipse2D::ellipse2D(const float radius, const glm::vec4 &color, const std::uint32_t partitions)
     : shape2D(TRIANGLE_LIST, model2D::circle(partitions, color))
 {
-    transform.scale({radius, radius});
+    transform.scale = {radius, radius};
 }
 ellipse2D::ellipse2D(const glm::vec4 &color, const std::uint32_t partitions)
     : shape2D(TRIANGLE_LIST, model2D::circle(partitions, color))
@@ -80,12 +80,12 @@ ellipse2D::ellipse2D(const glm::vec4 &color, const std::uint32_t partitions)
 
 float ellipse2D::radius() const
 {
-    return 0.5f * (transform.scale().x + transform.scale().y);
+    return 0.5f * (transform.scale.x + transform.scale.y);
 }
 
 void ellipse2D::radius(const float radius)
 {
-    transform.scale({radius, radius});
+    transform.scale = {radius, radius};
 }
 
 polygon2D::polygon2D(const std::vector<glm::vec2> &local_vertices, const glm::vec4 &color)
@@ -118,8 +118,8 @@ std::size_t polygon2D::size() const
 rect3D::rect3D(const glm::vec3 &position, const glm::vec2 &dimensions, const glm::vec4 &color)
     : shape3D(model3D::rect(color))
 {
-    transform.position(position);
-    transform.scale(glm::vec3(dimensions, 1.f));
+    transform.position = position;
+    transform.scale = glm::vec3(dimensions, 1.f);
 }
 
 rect3D::rect3D(const glm::vec4 &color) : shape3D(model3D::rect(color))
@@ -136,8 +136,8 @@ void rect3D::draw(window3D &win) const
 cube3D::cube3D(const glm::vec3 &position, const glm::vec3 &dimensions, const std::array<glm::vec4, 6> &face_colors)
     : shape3D(model3D::cube(face_colors))
 {
-    transform.position(position);
-    transform.scale(dimensions);
+    transform.position = position;
+    transform.scale = dimensions;
 }
 
 cube3D::cube3D(const std::array<glm::vec4, 6> &face_colors) : shape3D(model3D::cube(face_colors))
