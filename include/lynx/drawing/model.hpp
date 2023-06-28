@@ -101,6 +101,8 @@ class model3D : public model
     const vertex3D &operator[](std::size_t index) const;
 
     static const vertex_index_pair &rect(const glm::vec4 &color);
+    static vertex_index_pair circle(std::uint32_t partitions, const glm::vec4 &color);
+    static vertex_index_pair polygon(const std::vector<glm::vec3> &local_vertices, const glm::vec4 &color);
     static const vertex_index_pair &cube(const std::array<glm::vec4, 6> &face_colors);
     static const std::vector<vertex3D> &line(const glm::vec4 &color1, const glm::vec4 &color2);
 };

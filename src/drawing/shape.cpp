@@ -37,7 +37,7 @@ void shape2D::draw(window2D &win) const
 }
 
 // Color should already be encoded in arguments when constructing the model
-template <class... ModelArgs> shape3D::shape3D(ModelArgs &&...args)
+template <class... ModelArgs> shape3D::shape3D(topology tplg, ModelArgs &&...args) : m_topology(tplg)
 {
     m_model = make_ref<model3D>(context::current()->device(), std::forward<ModelArgs>(args)...);
 }
@@ -51,6 +51,13 @@ void shape3D::color(const glm::vec4 &color)
 {
     const auto feach = [&color](vertex3D &vtx) { vtx.color = color; };
     m_model->update_vertex_buffer(feach);
+}
+
+void shape3D::draw(window3D &win) const
+{
+    render_system3D &rs = win.render_system(m_topology);
+    render_data rdata = {m_model, transform.transform()};
+    rs.push_render_data(rdata);
 }
 
 rect2D::rect2D(const glm::vec2 &position, const glm::vec2 &dimensions, const glm::vec4 &color)
@@ -117,39 +124,76 @@ std::size_t polygon2D::size() const
 }
 
 rect3D::rect3D(const glm::vec3 &position, const glm::vec2 &dimensions, const glm::vec4 &color)
-    : shape3D(model3D::rect(color))
+    : shape3D(TRIANGLE_LIST, model3D::rect(color))
 {
     transform.position = position;
     transform.scale = glm::vec3(dimensions, 1.f);
 }
 
-rect3D::rect3D(const glm::vec4 &color) : shape3D(model3D::rect(color))
+rect3D::rect3D(const glm::vec4 &color) : shape3D(TRIANGLE_LIST, model3D::rect(color))
 {
 }
 
-void rect3D::draw(window3D &win) const
+ellipse3D::ellipse3D(const float ra, const float rb, const glm::vec4 &color, const std::uint32_t partitions)
+    : shape3D(TRIANGLE_LIST, model3D::circle(partitions, color))
 {
-    render_system3D &rs = win.render_system(TRIANGLE_LIST);
-    render_data rdata = {m_model, transform.transform()};
-    rs.push_render_data(rdata); // TODO: Esto que se implemente en shape3D!! q
-                                // se pase la topology a su ctor
+    transform.scale = {ra, rb, 1.f};
+}
+ellipse3D::ellipse3D(const float radius, const glm::vec4 &color, const std::uint32_t partitions)
+    : shape3D(TRIANGLE_LIST, model3D::circle(partitions, color))
+{
+    transform.scale = {radius, radius, radius};
+}
+ellipse3D::ellipse3D(const glm::vec4 &color, const std::uint32_t partitions)
+    : shape3D(TRIANGLE_LIST, model3D::circle(partitions, color))
+{
+}
+
+float ellipse3D::radius() const
+{
+    return (transform.scale.x + transform.scale.y + transform.scale.z) / 3.f;
+}
+
+void ellipse3D::radius(const float radius)
+{
+    transform.scale = {radius, radius, radius};
+}
+
+polygon3D::polygon3D(const std::vector<glm::vec3> &local_vertices, const glm::vec4 &color)
+    : shape3D(TRIANGLE_LIST, model3D::polygon(local_vertices, color)), m_size(local_vertices.size())
+{
+}
+
+const glm::vec3 &polygon3D::vertex(const std::size_t index) const
+{
+    return m_model->read_vertex(index + 1).position; // +1 to account for center vertex
+}
+
+void polygon3D::vertex(const std::size_t index, const glm::vec3 &vertex)
+{
+    vertex3D v = m_model->read_vertex(index + 1);
+    v.position = vertex;
+    m_model->write_vertex(index + 1, v); //+1 to account for center vertex
+}
+
+const glm::vec3 &polygon3D::operator[](const std::size_t index) const
+{
+    return m_model->read_vertex(index + 1).position;
+}
+
+std::size_t polygon3D::size() const
+{
+    return m_size;
 }
 
 cube3D::cube3D(const glm::vec3 &position, const glm::vec3 &dimensions, const std::array<glm::vec4, 6> &face_colors)
-    : shape3D(model3D::cube(face_colors))
+    : shape3D(TRIANGLE_LIST, model3D::cube(face_colors))
 {
     transform.position = position;
     transform.scale = dimensions;
 }
 
-cube3D::cube3D(const std::array<glm::vec4, 6> &face_colors) : shape3D(model3D::cube(face_colors))
+cube3D::cube3D(const std::array<glm::vec4, 6> &face_colors) : shape3D(TRIANGLE_LIST, model3D::cube(face_colors))
 {
-}
-
-void cube3D::draw(window3D &win) const
-{
-    render_system3D &rs = win.render_system(TRIANGLE_LIST);
-    render_data rdata = {m_model, transform.transform()};
-    rs.push_render_data(rdata);
 }
 } // namespace lynx

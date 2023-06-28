@@ -67,43 +67,47 @@ class example_app3D : public lynx::app3D
     {
         m_window3D = window();
         m_cam = m_window3D->camera<lynx::perspective3D>();
-        cube.transform.position.z = 3.f;
+        m_cube.transform.position.z = 3.f;
+        m_ellipse.transform.position.z = 3.f;
+        m_ellipse.color({1.f, 1.f, 0.f, 1.f});
 
-        // cube.transform.origin = {0.5f, 0.5f, -0.5f};
+        // m_cube.transform.origin = {0.5f, 0.5f, -0.5f};
     }
     void on_update(const float ts) override
     {
 
         if (lynx::input::key_pressed(lynx::input::key::A))
-            cube.transform.position.x -= ts;
+            m_cube.transform.position.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::D))
-            cube.transform.position.x += ts;
+            m_cube.transform.position.x += ts;
         if (lynx::input::key_pressed(lynx::input::key::W))
-            cube.transform.position.y -= ts;
+            m_cube.transform.position.y -= ts;
         if (lynx::input::key_pressed(lynx::input::key::S))
-            cube.transform.position.y += ts;
+            m_cube.transform.position.y += ts;
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            cube.transform.rotation.z -= ts;
+            m_cube.transform.rotation.z -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
-            cube.transform.rotation.z += ts;
+            m_cube.transform.rotation.z += ts;
         if (lynx::input::key_pressed(lynx::input::key::Z))
-            cube.transform.rotation.y -= ts;
+            m_cube.transform.rotation.y -= ts;
         if (lynx::input::key_pressed(lynx::input::key::X))
-            cube.transform.rotation.y += ts;
+            m_cube.transform.rotation.y += ts;
         if (lynx::input::key_pressed(lynx::input::key::N))
-            cube.transform.scale.x -= ts;
+            m_cube.transform.scale.z -= ts;
         if (lynx::input::key_pressed(lynx::input::key::M))
-            cube.transform.scale.x += ts;
+            m_cube.transform.scale.z += ts;
         if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 
-        m_cam->point_to(cube.transform.position);
+        // m_cam->point_to(m_cube.transform.position);
 
-        m_window3D->draw(cube);
+        // m_window3D->draw(m_cube);
+        m_window3D->draw(m_cube);
     }
     lynx::window3D *m_window3D;
     lynx::perspective3D *m_cam;
-    lynx::cube3D cube;
+    lynx::cube3D m_cube;
+    lynx::ellipse3D m_ellipse;
 };
 
 class imgui_demo : public lynx::imgui_layer

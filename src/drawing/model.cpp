@@ -174,12 +174,13 @@ const std::vector<vertex2D> &model2D::line(const glm::vec4 &color1, const glm::v
     return vertices;
 }
 
-model2D::vertex_index_pair model2D::circle(const std::uint32_t partitions, const glm::vec4 &color)
+template <typename VecType, typename ReturnType>
+static ReturnType circle_model(const std::uint32_t partitions, const glm::vec4 &color)
 {
     DBG_ASSERT_ERROR(partitions > 2, "Must at least have 3 partitions. Current: {0}", partitions)
 
-    vertex_index_pair build;
-    build.vertices.emplace_back(glm::vec2(0.f), color);
+    ReturnType build;
+    build.vertices.emplace_back(VecType(0.f), color);
     build.indices.resize(partitions * 3);
     build.vertices.reserve(partitions);
 
@@ -187,7 +188,10 @@ model2D::vertex_index_pair model2D::circle(const std::uint32_t partitions, const
     for (std::uint32_t i = 0; i < partitions; i++)
     {
         const float angle = i * dangle;
-        build.vertices.emplace_back(glm::vec2(cosf(angle), sinf(angle)), color);
+        if constexpr (std::is_same<VecType, glm::vec2>::value)
+            build.vertices.emplace_back(VecType(cosf(angle), sinf(angle)), color);
+        else
+            build.vertices.emplace_back(VecType(cosf(angle), sinf(angle), 0.f), color);
         build.indices[3 * i] = 0;
         build.indices[3 * i + 1] = i + 1;
         build.indices[3 * i + 2] = i + 2;
@@ -195,12 +199,13 @@ model2D::vertex_index_pair model2D::circle(const std::uint32_t partitions, const
     return build;
 }
 
-model2D::vertex_index_pair model2D::polygon(const std::vector<glm::vec2> &local_vertices, const glm::vec4 &color)
+template <typename VecType, typename ReturnType>
+static ReturnType polygon_model(const std::vector<VecType> &local_vertices, const glm::vec4 &color)
 {
     DBG_ASSERT_ERROR(local_vertices.size() > 2, "Must at least have 3 vertices. Current: {0}", local_vertices.size())
-    vertex_index_pair build;
+    ReturnType build;
     build.vertices.reserve(local_vertices.size() + 1);
-    build.vertices.emplace_back(glm::vec2(0.f), color);
+    build.vertices.emplace_back(VecType(0.f), color);
     build.indices.resize(3 * local_vertices.size());
 
     for (std::uint32_t i = 0; i < local_vertices.size(); i++)
@@ -212,6 +217,16 @@ model2D::vertex_index_pair model2D::polygon(const std::vector<glm::vec2> &local_
     }
     build.indices.back() = 1;
     return build;
+}
+
+model2D::vertex_index_pair model2D::circle(const std::uint32_t partitions, const glm::vec4 &color)
+{
+    return circle_model<glm::vec2, vertex_index_pair>(partitions, color);
+}
+
+model2D::vertex_index_pair model2D::polygon(const std::vector<glm::vec2> &local_vertices, const glm::vec4 &color)
+{
+    return polygon_model<glm::vec2, vertex_index_pair>(local_vertices, color);
 }
 
 model3D::model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices) : model(dev, vertices)
@@ -255,6 +270,16 @@ const model3D::vertex_index_pair &model3D::rect(const glm::vec4 &color)
     static const std::vector<std::uint32_t> indices = {0, 1, 2, 0, 3, 1};
     static const vertex_index_pair build = {vertices, indices};
     return build;
+}
+
+model3D::vertex_index_pair model3D::circle(const std::uint32_t partitions, const glm::vec4 &color)
+{
+    return circle_model<glm::vec3, vertex_index_pair>(partitions, color);
+}
+
+model3D::vertex_index_pair model3D::polygon(const std::vector<glm::vec3> &local_vertices, const glm::vec4 &color)
+{
+    return polygon_model<glm::vec3, vertex_index_pair>(local_vertices, color);
 }
 
 const model3D::vertex_index_pair &model3D::cube(const std::array<glm::vec4, 6> &face_colors)

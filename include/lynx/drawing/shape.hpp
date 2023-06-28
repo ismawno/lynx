@@ -34,14 +34,13 @@ class shape2D : public drawable2D
 
   private:
     topology m_topology;
-
     virtual void draw(window2D &win) const override;
 };
 
 class shape3D : public drawable3D
 {
   public:
-    template <class... ModelArgs> shape3D(ModelArgs &&...args);
+    template <class... ModelArgs> shape3D(topology tplg, ModelArgs &&...args);
 
     const glm::vec4 &color() const;
     void color(const glm::vec4 &color);
@@ -50,6 +49,10 @@ class shape3D : public drawable3D
 
   protected:
     ref<model3D> m_model;
+
+  private:
+    topology m_topology;
+    virtual void draw(window3D &win) const override;
 };
 
 class rect2D : public shape2D
@@ -91,13 +94,37 @@ class rect3D : public shape3D
     rect3D(const glm::vec3 &position = glm::vec3(0.f), const glm::vec2 &dimensions = {1.f, 1.f},
            const glm::vec4 &color = glm::vec4(1.f));
     rect3D(const glm::vec4 &color);
-
-    void draw(window3D &win) const override;
 };
-class circle3D : public shape3D
+
+class ellipse3D : public shape3D
 {
+  public:
+    ellipse3D(float ra, float rb, const glm::vec4 &color = glm::vec4(1.f), std::uint32_t partitions = 30);
+    ellipse3D(float radius = 1.f, const glm::vec4 &color = glm::vec4(1.f), std::uint32_t partitions = 30);
+    ellipse3D(const glm::vec4 &color, std::uint32_t partitions = 30);
+
+    float radius() const;
+    void radius(float radius);
 };
 class polygon3D : public shape3D
+{
+    polygon3D(const std::vector<glm::vec3> &local_vertices = {{-1.f, 0.5f, 1.f}, {1.f, 0.5f, 1.f}, {0.f, -0.5f, 1.f}},
+              const glm::vec4 &color = glm::vec4(1.f));
+
+    const glm::vec3 &vertex(std::size_t index) const;
+    void vertex(std::size_t index, const glm::vec3 &vertex);
+
+    const glm::vec3 &operator[](std::size_t index) const;
+    std::size_t size() const;
+
+  private:
+    const std::size_t m_size;
+};
+
+class ellipsoid3D : public shape3D
+{
+};
+class polyhedron3D : public shape3D
 {
 };
 class cube3D : public shape3D
@@ -108,8 +135,6 @@ class cube3D : public shape3D
                glm::vec4(.9f, .9f, .9f, 1.f), glm::vec4(.8f, .8f, .1f, 1.f), glm::vec4(.9f, .6f, .1f, 1.f),
                glm::vec4(.8f, .1f, .1f, 1.f), glm::vec4(.1f, .1f, .8f, 1.f), glm::vec4(.1f, .8f, .1f, 1.f)});
     cube3D(const std::array<glm::vec4, 6> &face_colors);
-
-    void draw(window3D &win) const override;
 };
 } // namespace lynx
 
