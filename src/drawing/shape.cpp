@@ -186,6 +186,33 @@ std::size_t polygon3D::size() const
     return m_size;
 }
 
+ellipsoid3D::ellipsoid3D(const float ra, const float rb, float rc, const glm::vec4 &color,
+                         const std::uint32_t lat_partitions, const std::uint32_t lon_partitions)
+    : shape3D(TRIANGLE_LIST, model3D::sphere(lat_partitions, lon_partitions, color))
+{
+    transform.scale = {ra, rb, rc};
+}
+ellipsoid3D::ellipsoid3D(const float radius, const glm::vec4 &color, const std::uint32_t lat_partitions,
+                         const std::uint32_t lon_partitions)
+    : shape3D(TRIANGLE_LIST, model3D::sphere(lat_partitions, lon_partitions, color))
+{
+    transform.scale = {radius, radius, radius};
+}
+ellipsoid3D::ellipsoid3D(const glm::vec4 &color, const std::uint32_t lat_partitions, const std::uint32_t lon_partitions)
+    : shape3D(TRIANGLE_LIST, model3D::sphere(lat_partitions, lon_partitions, color))
+{
+}
+
+float ellipsoid3D::radius() const
+{
+    return (transform.scale.x + transform.scale.y + transform.scale.z) / 3.f;
+}
+
+void ellipsoid3D::radius(const float radius)
+{
+    transform.scale = {radius, radius, radius};
+}
+
 cube3D::cube3D(const glm::vec3 &position, const glm::vec3 &dimensions, const std::array<glm::vec4, 6> &face_colors)
     : shape3D(TRIANGLE_LIST, model3D::cube(face_colors))
 {

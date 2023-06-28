@@ -181,7 +181,7 @@ static ReturnType circle_model(const std::uint32_t partitions, const glm::vec4 &
 
     ReturnType build;
     build.vertices.emplace_back(VecType(0.f), color);
-    build.indices.resize(partitions * 3);
+    build.indices.resize(3 * partitions);
     build.vertices.reserve(partitions);
 
     const float dangle = 2.f * glm::pi<float>() / (partitions - 1);
@@ -280,6 +280,67 @@ model3D::vertex_index_pair model3D::circle(const std::uint32_t partitions, const
 model3D::vertex_index_pair model3D::polygon(const std::vector<glm::vec3> &local_vertices, const glm::vec4 &color)
 {
     return polygon_model<glm::vec3, vertex_index_pair>(local_vertices, color);
+}
+
+model3D::vertex_index_pair model3D::sphere(const std::uint32_t lat_partitions, const std::uint32_t lon_partitions,
+                                           const glm::vec4 &color)
+{
+    DBG_ASSERT_ERROR(lat_partitions > 2 && lon_partitions > 2,
+                     "Must at least have 3 partitions for each angle. lat partitions: {0}, lon_partitions",
+                     lat_partitions, lon_partitions)
+
+    vertex_index_pair build;
+    build.vertices.reserve(lon_partitions * lat_partitions);
+    build.indices.reserve(3 * lon_partitions * lat_partitions + 2);
+
+    const float dlon = glm::pi<float>() / (lon_partitions - 1);
+    const float dlat = 2.f * glm::pi<float>() / (lat_partitions - 1);
+
+    build.vertices.emplace_back(glm::vec3(0.f, 0.f, 1.f), color);
+    for (std::uint32_t i = 1; i < lon_partitions - 1; i++)
+    {
+        const float lon = i * dlon;
+        const float lon_xy = sinf(lon);
+        const float z = cosf(lon);
+        for (std::uint32_t j = 0; j < lat_partitions; j++)
+        {
+            const float lat = j * dlat;
+            const float x = lon_xy * cosf(lat);
+            const float y = lon_xy * sinf(lat);
+            build.vertices.emplace_back(glm::vec3(x, y, z), color);
+        }
+    }
+    build.vertices.emplace_back(glm::vec3(0.f, 0.f, -1.f), color);
+
+    for (std::uint32_t j = 0; j < lat_partitions; j++)
+    {
+        build.indices.emplace_back(0);
+        build.indices.emplace_back(j + 1);
+        build.indices.emplace_back((j + 2) % (lat_partitions + 1));
+    }
+    for (std::uint32_t i = 0; i < lon_partitions - 3; i++)
+        for (std::uint32_t j = 0; j < lat_partitions; j++)
+        {
+            const std::uint32_t idx1 = lat_partitions * i + j + 1;
+            const std::uint32_t idx21 = lat_partitions * (i + 1) + j + 1;
+            const std::uint32_t idx12 = lat_partitions * i + (j + 2) % (lat_partitions + 1);
+            const std::uint32_t idx2 = lat_partitions * (i + 1) + (j + 2) % (lat_partitions + 1);
+
+            build.indices.emplace_back(idx1);
+            build.indices.emplace_back(idx21);
+            build.indices.emplace_back(idx2);
+
+            build.indices.emplace_back(idx1);
+            build.indices.emplace_back(idx12);
+            build.indices.emplace_back(idx2);
+        }
+    for (std::uint32_t j = 0; j < lat_partitions; j++)
+    {
+        build.indices.emplace_back(build.vertices.size() - 1);
+        build.indices.emplace_back(lat_partitions * (lon_partitions - 3) + j + 1);
+        build.indices.emplace_back(lat_partitions * (lon_partitions - 3) + (j + 2) % (lat_partitions + 1));
+    }
+    return build;
 }
 
 const model3D::vertex_index_pair &model3D::cube(const std::array<glm::vec4, 6> &face_colors)

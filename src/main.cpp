@@ -75,39 +75,38 @@ class example_app3D : public lynx::app3D
     }
     void on_update(const float ts) override
     {
-
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_cube.transform.position.x -= ts;
+            m_ellipse.transform.position.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::D))
-            m_cube.transform.position.x += ts;
+            m_ellipse.transform.position.x += ts;
         if (lynx::input::key_pressed(lynx::input::key::W))
-            m_cube.transform.position.y -= ts;
+            m_ellipse.transform.position.y -= ts;
         if (lynx::input::key_pressed(lynx::input::key::S))
-            m_cube.transform.position.y += ts;
+            m_ellipse.transform.position.y += ts;
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            m_cube.transform.rotation.z -= ts;
+            m_ellipse.transform.rotation.z -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
-            m_cube.transform.rotation.z += ts;
+            m_ellipse.transform.rotation.z += ts;
         if (lynx::input::key_pressed(lynx::input::key::Z))
-            m_cube.transform.rotation.y -= ts;
+            m_ellipse.transform.rotation.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::X))
-            m_cube.transform.rotation.y += ts;
+            m_ellipse.transform.rotation.x += ts;
         if (lynx::input::key_pressed(lynx::input::key::N))
-            m_cube.transform.scale.z -= ts;
+            m_ellipse.transform.scale.z -= ts;
         if (lynx::input::key_pressed(lynx::input::key::M))
-            m_cube.transform.scale.z += ts;
+            m_ellipse.transform.scale.z += ts;
         if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 
         // m_cam->point_to(m_cube.transform.position);
 
         // m_window3D->draw(m_cube);
-        m_window3D->draw(m_cube);
+        m_window3D->draw(m_ellipse);
     }
     lynx::window3D *m_window3D;
     lynx::perspective3D *m_cam;
     lynx::cube3D m_cube;
-    lynx::ellipse3D m_ellipse;
+    lynx::ellipsoid3D m_ellipse;
 };
 
 class imgui_demo : public lynx::imgui_layer

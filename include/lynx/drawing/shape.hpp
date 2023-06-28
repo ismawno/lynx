@@ -123,9 +123,15 @@ class polygon3D : public shape3D
 
 class ellipsoid3D : public shape3D
 {
-};
-class polyhedron3D : public shape3D
-{
+  public:
+    ellipsoid3D(float ra, float rb, float rc, const glm::vec4 &color = glm::vec4(1.f),
+                std::uint32_t lat_partitions = 30, std::uint32_t lon_partitions = 15);
+    ellipsoid3D(float radius = 1.f, const glm::vec4 &color = glm::vec4(1.f), std::uint32_t lat_partitions = 30,
+                std::uint32_t lon_partitions = 15);
+    ellipsoid3D(const glm::vec4 &color, std::uint32_t lat_partitions = 30, std::uint32_t lon_partitions = 15);
+
+    float radius() const;
+    void radius(float radius);
 };
 class cube3D : public shape3D
 {
