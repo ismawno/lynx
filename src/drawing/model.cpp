@@ -343,49 +343,25 @@ model3D::vertex_index_pair model3D::sphere(const std::uint32_t lat_partitions, c
     return build;
 }
 
-const model3D::vertex_index_pair &model3D::cube(const std::array<glm::vec4, 6> &face_colors)
+const model3D::vertex_index_pair &model3D::cube(const glm::vec4 &color)
 {
     static const std::vector<vertex3D> vertices = {
         // left face (white)
-        {{-.5f, -.5f, -.5f}, face_colors[0]},
-        {{-.5f, .5f, .5f}, face_colors[0]},
-        {{-.5f, -.5f, .5f}, face_colors[0]},
-        {{-.5f, .5f, -.5f}, face_colors[0]},
+        {{-.5f, -.5f, -.5f}, color},
+        {{-.5f, .5f, .5f}, color},
+        {{-.5f, -.5f, .5f}, color},
+        {{-.5f, .5f, -.5f}, color},
 
         // right face (yellow)
-        {{.5f, -.5f, -.5f}, face_colors[1]},
-        {{.5f, .5f, .5f}, face_colors[1]},
-        {{.5f, -.5f, .5f}, face_colors[1]},
-        {{.5f, .5f, -.5f}, face_colors[1]},
+        {{.5f, -.5f, -.5f}, color},
+        {{.5f, .5f, .5f}, color},
+        {{.5f, -.5f, .5f}, color},
+        {{.5f, .5f, -.5f}, color},
 
-        // top face (orange, remember y axis points down)
-        {{-.5f, -.5f, -.5f}, face_colors[2]},
-        {{.5f, -.5f, .5f}, face_colors[2]},
-        {{-.5f, -.5f, .5f}, face_colors[2]},
-        {{.5f, -.5f, -.5f}, face_colors[2]},
-
-        // bottom face (red)
-        {{-.5f, .5f, -.5f}, face_colors[3]},
-        {{.5f, .5f, .5f}, face_colors[3]},
-        {{-.5f, .5f, .5f}, face_colors[3]},
-        {{.5f, .5f, -.5f}, face_colors[3]},
-
-        // nose face (blue)
-        {{-.5f, -.5f, 0.5f}, face_colors[4]},
-        {{.5f, .5f, 0.5f}, face_colors[4]},
-        {{-.5f, .5f, 0.5f}, face_colors[4]},
-        {{.5f, -.5f, 0.5f}, face_colors[4]},
-
-        // tail face (green)
-        {{-.5f, -.5f, -0.5f}, face_colors[5]},
-        {{.5f, .5f, -0.5f}, face_colors[5]},
-        {{-.5f, .5f, -0.5f}, face_colors[5]},
-        {{.5f, -.5f, -0.5f}, face_colors[5]},
     };
 
-    static const std::vector<std::uint32_t> indices = {0,  1,  2,  0,  3,  1,  4,  5,  6,  4,  7,  5,
-                                                       8,  9,  10, 8,  11, 9,  12, 13, 14, 12, 15, 13,
-                                                       16, 17, 18, 16, 19, 17, 20, 21, 22, 20, 23, 21};
+    static const std::vector<std::uint32_t> indices = {0, 1, 2, 0, 3, 1, 4, 5, 6, 4, 7, 5, 0, 6, 2, 0, 4, 6,
+                                                       3, 5, 1, 3, 7, 5, 2, 5, 1, 2, 6, 5, 0, 7, 3, 0, 4, 7};
     static const vertex_index_pair build = {vertices, indices};
     return build;
 }

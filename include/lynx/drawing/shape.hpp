@@ -136,11 +136,9 @@ class ellipsoid3D : public shape3D
 class cube3D : public shape3D
 {
   public:
-    cube3D(const glm::vec3 &position = glm::vec3(0.f), const glm::vec3 &dimensions = {1.f, 1.f, 1.f},
-           const std::array<glm::vec4, 6> &face_colors = {
-               glm::vec4(.9f, .9f, .9f, 1.f), glm::vec4(.8f, .8f, .1f, 1.f), glm::vec4(.9f, .6f, .1f, 1.f),
-               glm::vec4(.8f, .1f, .1f, 1.f), glm::vec4(.1f, .1f, .8f, 1.f), glm::vec4(.1f, .8f, .1f, 1.f)});
-    cube3D(const std::array<glm::vec4, 6> &face_colors);
+    cube3D(const glm::vec3 &position = glm::vec3(0.f), const glm::vec3 &dimensions = glm::vec3(1.f),
+           const glm::vec4 &color = glm::vec4(1.f));
+    cube3D(const glm::vec4 &color);
 };
 } // namespace lynx
 

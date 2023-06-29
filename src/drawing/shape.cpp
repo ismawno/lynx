@@ -213,14 +213,14 @@ void ellipsoid3D::radius(const float radius)
     transform.scale = {radius, radius, radius};
 }
 
-cube3D::cube3D(const glm::vec3 &position, const glm::vec3 &dimensions, const std::array<glm::vec4, 6> &face_colors)
-    : shape3D(TRIANGLE_LIST, model3D::cube(face_colors))
+cube3D::cube3D(const glm::vec3 &position, const glm::vec3 &dimensions, const glm::vec4 &color)
+    : shape3D(TRIANGLE_LIST, model3D::cube(color))
 {
     transform.position = position;
     transform.scale = dimensions;
 }
 
-cube3D::cube3D(const std::array<glm::vec4, 6> &face_colors) : shape3D(TRIANGLE_LIST, model3D::cube(face_colors))
+cube3D::cube3D(const glm::vec4 &color) : shape3D(TRIANGLE_LIST, model3D::cube(color))
 {
 }
 } // namespace lynx

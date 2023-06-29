@@ -70,38 +70,39 @@ class example_app3D : public lynx::app3D
         m_cube.transform.position.z = 3.f;
         m_ellipse.transform.position.z = 3.f;
         m_ellipse.color({1.f, 1.f, 0.f, 1.f});
+        m_cube.color(m_ellipse.color());
 
         // m_cube.transform.origin = {0.5f, 0.5f, -0.5f};
     }
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_ellipse.transform.position.x -= ts;
+            m_cube.transform.position.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::D))
-            m_ellipse.transform.position.x += ts;
+            m_cube.transform.position.x += ts;
         if (lynx::input::key_pressed(lynx::input::key::W))
-            m_ellipse.transform.position.y -= ts;
+            m_cube.transform.position.y -= ts;
         if (lynx::input::key_pressed(lynx::input::key::S))
-            m_ellipse.transform.position.y += ts;
+            m_cube.transform.position.y += ts;
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            m_ellipse.transform.rotation.z -= ts;
+            m_cube.transform.rotation.z -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
-            m_ellipse.transform.rotation.z += ts;
+            m_cube.transform.rotation.z += ts;
         if (lynx::input::key_pressed(lynx::input::key::Z))
-            m_ellipse.transform.rotation.x -= ts;
+            m_cube.transform.rotation.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::X))
-            m_ellipse.transform.rotation.x += ts;
+            m_cube.transform.rotation.x += ts;
         if (lynx::input::key_pressed(lynx::input::key::N))
-            m_ellipse.transform.scale.z -= ts;
+            m_cube.transform.scale.z -= ts;
         if (lynx::input::key_pressed(lynx::input::key::M))
-            m_ellipse.transform.scale.z += ts;
+            m_cube.transform.scale.z += ts;
         if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 
         // m_cam->point_to(m_cube.transform.position);
 
-        // m_window3D->draw(m_cube);
-        m_window3D->draw(m_ellipse);
+        m_window3D->draw(m_cube);
+        // m_window3D->draw(m_ellipse);
     }
     lynx::window3D *m_window3D;
     lynx::perspective3D *m_cam;
