@@ -34,6 +34,10 @@ struct transform2D
     glm::mat4 transform_as_camera() const;
     glm::mat4 inverse_as_camera() const;
 
+    void local_translate(const glm::vec2 &dpos);
+    void xlocal_translate(float dx);
+    void ylocal_translate(float dy);
+
     static trigonometry trigonometric_functions(float rotation);
 };
 
@@ -66,6 +70,11 @@ struct transform3D
 
     glm::mat4 transform_as_camera() const;
     glm::mat4 inverse_as_camera() const;
+
+    void local_translate(const glm::vec3 &dpos);
+    void xlocal_translate(float dx);
+    void ylocal_translate(float dy);
+    void zlocal_translate(float dz);
 
     static trigonometry trigonometric_functions(const glm::vec3 &rotation);
     static rbasis rotation_basis(const glm::vec3 &rotation);

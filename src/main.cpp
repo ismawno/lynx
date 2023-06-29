@@ -29,17 +29,17 @@ class example_app2D : public lynx::app2D
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_cam->transform.position.x -= ts;
+            m_rect.transform.xlocal_translate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::D))
-            m_cam->transform.position.x += ts;
+            m_rect.transform.xlocal_translate(ts);
         if (lynx::input::key_pressed(lynx::input::key::W))
-            m_cam->transform.position.y -= ts;
+            m_rect.transform.ylocal_translate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::S))
-            m_cam->transform.position.y += ts;
+            m_rect.transform.ylocal_translate(ts);
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            m_cam->transform.rotation -= ts;
+            m_rect.transform.rotation -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
-            m_cam->transform.rotation += ts;
+            m_rect.transform.rotation += ts;
         if (lynx::input::key_pressed(lynx::input::key::N))
             m_cam->size(m_cam->size() - 5.f * ts);
         if (lynx::input::key_pressed(lynx::input::key::M))
@@ -77,25 +77,25 @@ class example_app3D : public lynx::app3D
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_cube.transform.position.x -= ts;
+            m_cam->transform.xlocal_translate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::D))
-            m_cube.transform.position.x += ts;
+            m_cam->transform.xlocal_translate(ts);
         if (lynx::input::key_pressed(lynx::input::key::W))
-            m_cube.transform.position.y -= ts;
+            m_cam->transform.ylocal_translate(-ts);
         if (lynx::input::key_pressed(lynx::input::key::S))
-            m_cube.transform.position.y += ts;
+            m_cam->transform.ylocal_translate(ts);
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            m_cube.transform.rotation.z -= ts;
+            m_cam->transform.rotation.z -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
-            m_cube.transform.rotation.z += ts;
+            m_cam->transform.rotation.z += ts;
         if (lynx::input::key_pressed(lynx::input::key::Z))
-            m_cube.transform.rotation.x -= ts;
+            m_cam->transform.rotation.x -= ts;
         if (lynx::input::key_pressed(lynx::input::key::X))
-            m_cube.transform.rotation.x += ts;
+            m_cam->transform.rotation.x += ts;
         if (lynx::input::key_pressed(lynx::input::key::N))
-            m_cube.transform.scale.z -= ts;
+            m_cam->transform.scale.z -= ts;
         if (lynx::input::key_pressed(lynx::input::key::M))
-            m_cube.transform.scale.z += ts;
+            m_cam->transform.scale.z += ts;
         if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 

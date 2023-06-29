@@ -113,6 +113,24 @@ glm::mat4 transform2D::inverse_as_camera() const
                      {it.x, it.y, 0.f, 1.f}};
 }
 
+void transform2D::local_translate(const glm::vec2 &dpos)
+{
+    const auto [c, s] = trigonometric_functions(rotation);
+    const glm::vec2 u{c, -s};
+    const glm::vec2 v{s, c};
+    position += glm::vec2(glm::dot(u, dpos), glm::dot(v, dpos));
+}
+void transform2D::xlocal_translate(float dx)
+{
+    const auto [c, s] = trigonometric_functions(rotation);
+    position += glm::vec2(c * dx, s * dx);
+}
+void transform2D::ylocal_translate(float dy)
+{
+    const auto [c, s] = trigonometric_functions(rotation);
+    position += glm::vec2(-s * dy, c * dy);
+}
+
 transform2D::trigonometry transform2D::trigonometric_functions(const float rotation)
 {
     return {cosf(rotation), sinf(rotation)};
@@ -226,6 +244,27 @@ glm::mat4 transform3D::inverse_as_camera() const
                          0.f,
                      },
                      {t.x, t.y, t.z, 1.f}};
+}
+
+void transform3D::local_translate(const glm::vec3 &dpos)
+{
+    const auto [u, v, w] = rotation_basis(rotation);
+    position += glm::vec3(glm::dot(u, dpos), glm::dot(v, dpos), glm::dot(w, dpos));
+}
+void transform3D::xlocal_translate(float dx)
+{
+    const auto [u, v, w] = rotation_basis(rotation);
+    position += glm::vec3(u.x * dx, v.x * dx, w.x * dx);
+}
+void transform3D::ylocal_translate(float dy)
+{
+    const auto [u, v, w] = rotation_basis(rotation);
+    position += glm::vec3(u.y * dy, v.y * dy, w.y * dy);
+}
+void transform3D::zlocal_translate(float dz)
+{
+    const auto [u, v, w] = rotation_basis(rotation);
+    position += glm::vec3(u.z * dz, v.z * dz, w.z * dz);
 }
 
 transform3D::trigonometry transform3D::trigonometric_functions(const glm::vec3 &rotation)
