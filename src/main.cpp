@@ -29,13 +29,13 @@ class example_app2D : public lynx::app2D
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_rect.transform.xlocal_translate(-ts);
+            m_rect.transform.xtranslate_local(-ts);
         if (lynx::input::key_pressed(lynx::input::key::D))
-            m_rect.transform.xlocal_translate(ts);
+            m_rect.transform.xtranslate_local(ts);
         if (lynx::input::key_pressed(lynx::input::key::W))
-            m_rect.transform.ylocal_translate(-ts);
+            m_rect.transform.ytranslate_local(-ts);
         if (lynx::input::key_pressed(lynx::input::key::S))
-            m_rect.transform.ylocal_translate(ts);
+            m_rect.transform.ytranslate_local(ts);
         if (lynx::input::key_pressed(lynx::input::key::Q))
             m_rect.transform.rotation -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
@@ -77,13 +77,13 @@ class example_app3D : public lynx::app3D
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_cam->transform.xlocal_translate(-ts);
+            m_cam->transform.xtranslate_local(-ts);
         if (lynx::input::key_pressed(lynx::input::key::D))
-            m_cam->transform.xlocal_translate(ts);
+            m_cam->transform.xtranslate_local(ts);
         if (lynx::input::key_pressed(lynx::input::key::W))
-            m_cam->transform.ylocal_translate(-ts);
+            m_cam->transform.ytranslate_local(-ts);
         if (lynx::input::key_pressed(lynx::input::key::S))
-            m_cam->transform.ylocal_translate(ts);
+            m_cam->transform.ytranslate_local(ts);
         if (lynx::input::key_pressed(lynx::input::key::Q))
             m_cam->transform.rotation.z -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
