@@ -19,34 +19,34 @@ class example_app2D : public lynx::app2D
 
         // m_rect.transform.origin = {0.5f, 0.5f};
 
-        m_cam->transform.origin = {0.5f, 0.5f};
+        // m_cam->transform.origin = {0.5f, 0.5f};
         // m_cam->transform.position({0.5f, 0.5f});
-        m_ellipse.color({1.f, 0.f, 0.f, 1.f});
-        m_ellipse.transform.position = -m_cam->transform.origin;
-        m_ellipse.radius(0.1f);
-        m_rect.transform.position = -m_cam->transform.origin;
+        // m_ellipse.color({1.f, 0.f, 0.f, 1.f});
+        // m_ellipse.transform.position = -m_cam->transform.origin;
+        // m_ellipse.radius(0.1f);
+        // m_rect.transform.position = -m_cam->transform.origin;
     }
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_rect.transform.xtranslate_local(-ts);
+            m_cam->transform.xtranslate_local(-ts);
         if (lynx::input::key_pressed(lynx::input::key::D))
-            m_rect.transform.xtranslate_local(ts);
+            m_cam->transform.xtranslate_local(ts);
         if (lynx::input::key_pressed(lynx::input::key::W))
-            m_rect.transform.ytranslate_local(-ts);
+            m_cam->transform.ytranslate_local(-ts);
         if (lynx::input::key_pressed(lynx::input::key::S))
-            m_rect.transform.ytranslate_local(ts);
+            m_cam->transform.ytranslate_local(ts);
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            m_rect.transform.rotation -= ts;
+            m_cam->transform.rotation -= ts;
         if (lynx::input::key_pressed(lynx::input::key::E))
-            m_rect.transform.rotation += ts;
+            m_cam->transform.rotation += ts;
         if (lynx::input::key_pressed(lynx::input::key::N))
             m_cam->size(m_cam->size() - 5.f * ts);
         if (lynx::input::key_pressed(lynx::input::key::M))
             m_cam->size(m_cam->size() + 5.f * ts);
 
         m_window2D->draw(m_rect);
-        m_window2D->draw(m_ellipse);
+        // m_window2D->draw(m_ellipse);
 
         // auto mat = m_rect.transform.scale_rotate_translate() * m_rect.transform.inverse_scale_rotate_translate();
         // for (auto i = 0; i < 4; i++)
@@ -77,30 +77,29 @@ class example_app3D : public lynx::app3D
     void on_update(const float ts) override
     {
         if (lynx::input::key_pressed(lynx::input::key::A))
-            m_cam->transform.xtranslate_local(-ts);
+            m_cube.transform.xtranslate_local(-ts);
         if (lynx::input::key_pressed(lynx::input::key::D))
-            m_cam->transform.xtranslate_local(ts);
+            m_cube.transform.xtranslate_local(ts);
         if (lynx::input::key_pressed(lynx::input::key::W))
-            m_cam->transform.ytranslate_local(-ts);
+            m_cube.transform.ytranslate_local(-ts);
         if (lynx::input::key_pressed(lynx::input::key::S))
-            m_cam->transform.ytranslate_local(ts);
+            m_cube.transform.ytranslate_local(ts);
         if (lynx::input::key_pressed(lynx::input::key::Q))
-            m_cam->transform.rotation.z -= ts;
+            m_cube.transform.rotate_local(lynx::transform3D::Z(-ts));
         if (lynx::input::key_pressed(lynx::input::key::E))
-            m_cam->transform.rotation.z += ts;
+            m_cube.transform.rotate_local(lynx::transform3D::Z(ts));
         if (lynx::input::key_pressed(lynx::input::key::Z))
-            m_cam->transform.rotation.x -= ts;
+            m_cube.transform.rotate_local(lynx::transform3D::X(-ts));
         if (lynx::input::key_pressed(lynx::input::key::X))
-            m_cam->transform.rotation.x += ts;
+            m_cube.transform.rotate_local(lynx::transform3D::X(ts));
         if (lynx::input::key_pressed(lynx::input::key::N))
-            m_cam->transform.scale.z -= ts;
+            m_cube.transform.rotate_local(lynx::transform3D::Y(-ts));
         if (lynx::input::key_pressed(lynx::input::key::M))
-            m_cam->transform.scale.z += ts;
+            m_cube.transform.rotate_local(lynx::transform3D::Y(ts));
         if (lynx::input::key_pressed(lynx::input::key::ESCAPE))
             shutdown();
 
-        // m_cam->point_to(m_cube.transform.position);
-
+        m_cam->point_to(m_cube.transform.position);
         m_window3D->draw(m_cube);
         // m_window3D->draw(m_ellipse);
     }
@@ -121,16 +120,16 @@ class imgui_demo : public lynx::imgui_layer
     void on_attach() override
     {
         lynx::imgui_layer::on_attach();
-        m_cam = parent()->window<lynx::window2D>()->camera<lynx::orthographic2D>();
+        m_cam = parent()->window<lynx::window3D>()->camera<lynx::perspective3D>();
     }
     void on_imgui_render() override
     {
         const glm::vec2 spos = lynx::input::mouse_position();
-        const glm::vec2 wpos = m_cam->screen_to_world(spos);
+        const glm::vec3 wpos = m_cam->screen_to_world(spos);
 
         ImGui::Begin("Mouse");
         ImGui::Text("Screen mouse pos: %f, %f", spos.x, spos.y);
-        ImGui::Text("World mouse pos: %f, %f", wpos.x, wpos.y);
+        ImGui::Text("World mouse pos: %f, %f, %f", wpos.x, wpos.y, wpos.z);
         if (m_pressed)
             ImGui::Text("PRESSED!");
         m_pressed = false;
@@ -142,7 +141,7 @@ class imgui_demo : public lynx::imgui_layer
         return true;
     }
 
-    lynx::orthographic2D *m_cam;
+    lynx::perspective3D *m_cam;
     bool m_pressed = false;
 };
 

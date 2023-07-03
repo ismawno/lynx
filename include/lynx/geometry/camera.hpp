@@ -66,12 +66,12 @@ class orthographic3D : public camera3D
 {
   public:
     orthographic3D() = default;
-    orthographic3D(float aspect, float xy_size, float depth, const glm::vec3 &rotation = glm::vec3(0.f));
+    orthographic3D(float aspect, float xy_size, float depth, const glm::mat3 &rotation = glm::mat3(1.f));
     orthographic3D(const glm::vec3 &position, float aspect, float xy_size, float depth,
-                   const glm::vec3 &rotation = glm::vec3(0.f));
+                   const glm::mat3 &rotation = glm::mat3(1.f));
 
-    orthographic3D(const glm::vec3 &size, const glm::vec3 &rotation = glm::vec3(0.f));
-    orthographic3D(const glm::vec3 &position, const glm::vec3 &size, const glm::vec3 &rotation = glm::vec3(0.f));
+    orthographic3D(const glm::vec3 &size, const glm::mat3 &rotation = glm::mat3(1.f));
+    orthographic3D(const glm::vec3 &position, const glm::vec3 &size, const glm::mat3 &rotation = glm::mat3(1.f));
 
     float size() const;
     void size(float size);
@@ -83,9 +83,9 @@ class perspective3D : public camera3D
 {
   public:
     perspective3D() = default;
-    perspective3D(float aspect, float fovy, const glm::vec3 &rotation = glm::vec3(0.f), float near = 0.1f,
+    perspective3D(float aspect, float fovy, const glm::mat3 &rotation = glm::mat3(1.f), float near = 0.1f,
                   float far = 10.f);
-    perspective3D(const glm::vec3 &position, float aspect, float fovy, const glm::vec3 &rotation = glm::vec3(0.f),
+    perspective3D(const glm::vec3 &position, float aspect, float fovy, const glm::mat3 &rotation = glm::mat3(1.f),
                   float near = 0.1f, float far = 10.f);
 
     float near() const;

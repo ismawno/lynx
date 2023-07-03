@@ -95,7 +95,7 @@ transform3D thin_line3D::as_transform() const
 
     const glm::vec3 dp = m_p2 - m_p1;
     transform.position = 0.5f * (m_p1 + m_p2);
-    transform.rotation = {0.f, -atan2f(dp.z, dp.x), atan2f(dp.y, dp.x)};
+    transform.rotation = transform3D::YZ(-atan2f(dp.z, dp.x), atan2f(dp.y, dp.x));
     transform.scale.x = 0.5f * glm::length(dp);
     return transform;
 }

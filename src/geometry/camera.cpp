@@ -90,30 +90,30 @@ glm::vec2 camera3D::world_to_screen(const glm::vec3 &world_pos) const
 
 void camera3D::point_towards(const glm::vec3 &direction)
 {
-    const float yrot = atan2f(direction.x, direction.z);
-    transform.rotation.y = yrot;
-    transform.rotation.x = -atan2f(direction.y, direction.z * cosf(yrot) + direction.x * sinf(yrot));
+    const float roty = atan2f(direction.x, direction.z);
+    const float rotx = -atan2f(direction.y, direction.z * cosf(roty) + direction.x * sinf(roty));
+    transform.rotation = transform3D::YX(roty, rotx);
 }
 void camera3D::point_to(const glm::vec3 &position)
 {
     point_towards(position - transform.position);
 }
 
-orthographic3D::orthographic3D(float aspect, float xy_size, float z_size, const glm::vec3 &rotation)
+orthographic3D::orthographic3D(float aspect, float xy_size, float z_size, const glm::mat3 &rotation)
     : orthographic3D(glm::vec3(0.f), aspect, xy_size, z_size, rotation)
 {
 }
 orthographic3D::orthographic3D(const glm::vec3 &position, float aspect, float xy_size, float z_size,
-                               const glm::vec3 &rotation)
+                               const glm::mat3 &rotation)
     : orthographic3D(position, {aspect * xy_size, xy_size, z_size}, rotation)
 {
 }
 
-orthographic3D::orthographic3D(const glm::vec3 &size, const glm::vec3 &rotation)
+orthographic3D::orthographic3D(const glm::vec3 &size, const glm::mat3 &rotation)
     : orthographic3D(glm::vec3(0.f), size, rotation)
 {
 }
-orthographic3D::orthographic3D(const glm::vec3 &position, const glm::vec3 &size, const glm::vec3 &rotation)
+orthographic3D::orthographic3D(const glm::vec3 &position, const glm::vec3 &size, const glm::mat3 &rotation)
 {
     transform.position = position;
     transform.scale = size;
@@ -137,12 +137,12 @@ void orthographic3D::size(const float size)
     transform.scale.x = aspect * size;
 }
 
-perspective3D::perspective3D(const float aspect, const float fovy, const glm::vec3 &rotation, const float near,
+perspective3D::perspective3D(const float aspect, const float fovy, const glm::mat3 &rotation, const float near,
                              const float far)
     : perspective3D(glm::vec3(0.f), aspect, fovy, rotation, near, far)
 {
 }
-perspective3D::perspective3D(const glm::vec3 &position, const float aspect, const float fovy, const glm::vec3 &rotation,
+perspective3D::perspective3D(const glm::vec3 &position, const float aspect, const float fovy, const glm::mat3 &rotation,
                              const float near, const float far)
     : m_near(near), m_far(far), m_fov(fovy), m_half_tan_fovy(tanf(0.5f * fovy)), m_aspect(aspect)
 {
