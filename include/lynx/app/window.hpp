@@ -59,6 +59,9 @@ class window
     void maintain_camera_aspect_ratio(bool maintain);
     void frame_buffer_resize(std::uint32_t width, std::uint32_t height);
 
+    const glm::vec4 &clear_color() const;
+    void clear_color(const glm::vec4 &color);
+
     void push_event(const event &ev);
     event poll_event();
 
@@ -142,7 +145,7 @@ class window
     }
 
   protected:
-    bool m_maintain_camera_aspect_ratio = true;
+    bool m_maintain_camera_aspect_ratio = false;
 
   private:
     std::uint32_t m_width, m_height;
@@ -155,6 +158,7 @@ class window
     std::queue<event> m_event_queue;
 
     bool m_frame_buffer_resized = false;
+    glm::vec4 m_clear_color = {0.01f, 0.01f, 0.01f, 1.f};
 
     void init();
     virtual void render(VkCommandBuffer command_buffer) const = 0;

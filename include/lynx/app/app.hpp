@@ -84,7 +84,7 @@ class app
     virtual void on_shutdown()
     {
     }
-    virtual bool on_event(event ev)
+    virtual bool on_event(const event &ev)
     {
         return false;
     }

@@ -109,7 +109,7 @@ void renderer::end_frame()
     m_frame_index = (m_frame_index + 1) % swap_chain::MAX_FRAMES_IN_FLIGHT;
 }
 
-void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer)
+void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer, const glm::vec4 &clear_color)
 {
     DBG_ASSERT_ERROR(m_frame_started, "Cannot begin render pass if a frame is not in progress")
     DBG_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
@@ -123,7 +123,7 @@ void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer)
     pass_info.renderArea.extent = m_swap_chain->extent();
 
     std::array<VkClearValue, 2> clear_values;
-    clear_values[0].color = {{0.01f, 0.01f, 0.01f, 1.f}};
+    clear_values[0].color = {{clear_color.x, clear_color.y, clear_color.z, clear_color.w}};
     clear_values[1].depthStencil = {1, 0};
 
     pass_info.clearValueCount = 2;

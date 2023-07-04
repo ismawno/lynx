@@ -2,6 +2,9 @@ project "lynx"
 language "C++"
 cppdialect "C++17"
 
+staticruntime "off"
+kind "StaticLib"
+
 function script_path()
    local str = debug.getinfo(2, "S").source:sub(2)
    return str:match("(.*/)")
@@ -19,22 +22,21 @@ filter "system:macosx"
       "-Wno-unused-parameter"
    }
 
-   libdirs "%{wks.location}/vendor/vulkan-sdk/macOS/lib"
-   links {
-      "shapes-2D",
-      "glfw",
-      "Cocoa.framework",
-      "IOKit.framework",
-      "CoreFoundation.framework",
-      "vulkan",
-      "imgui"
-   }
-   rpath = "-Wl,-rpath,".. rootpath .."vendor/vulkan-sdk/macOS/lib"
-   linkoptions {rpath}
+   filter "kind:ConsoleApp"
+      libdirs "%{wks.location}/vendor/vulkan-sdk/macOS/lib"
+      links {
+         "shapes-2D",
+         "glfw",
+         "Cocoa.framework",
+         "IOKit.framework",
+         "CoreFoundation.framework",
+         "vulkan",
+         "imgui"
+      }
+      rpath = "-Wl,-rpath,".. rootpath .."vendor/vulkan-sdk/macOS/lib"
+      linkoptions {rpath}
+   filter {}
 filter {}
-
-staticruntime "off"
-kind "ConsoleApp"
 
 targetdir("bin/" .. outputdir)
 objdir("build/" .. outputdir)
@@ -46,6 +48,10 @@ files {
    "src/**.cpp",
    "include/**.hpp"
 }
+
+filter "kind:not ConsoleApp"
+   removefiles "src/main.cpp"
+filter {}
 
 includedirs {
    "include",

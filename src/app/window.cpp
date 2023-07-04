@@ -49,7 +49,7 @@ bool window::display(const std::function<void(VkCommandBuffer)> &submission) con
             m_camera->keep_aspect_ratio(m_renderer->swap_chain().extent_aspect_ratio());
         m_camera->update_transformation_matrices();
 
-        m_renderer->begin_swap_chain_render_pass(command_buffer);
+        m_renderer->begin_swap_chain_render_pass(command_buffer, m_clear_color);
         render(command_buffer);
         if (submission)
             submission(command_buffer);
@@ -114,6 +114,15 @@ void window::frame_buffer_resize(const std::uint32_t width, const std::uint32_t 
     m_width = width;
     m_height = height;
     m_frame_buffer_resized = true;
+}
+
+const glm::vec4 &window::clear_color() const
+{
+    return m_clear_color;
+}
+void window::clear_color(const glm::vec4 &color)
+{
+    m_clear_color = color;
 }
 
 void window::push_event(const event &ev)
