@@ -71,7 +71,9 @@ bool app::next_frame()
             ly->on_command_submission(cmd);
     };
     m_window->display(submission);
-
+    if (delta_time < m_min_frame_seconds)
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds((long long)((m_min_frame_seconds - delta_time) * 1000.f)));
     m_ongoing_frame = false;
     return !m_window->closed() && !m_to_finish_next_frame;
 }
@@ -91,6 +93,16 @@ void app::shutdown()
     for (const auto &ly : m_layers)
         ly->on_detach();
     m_terminated = true;
+}
+
+std::uint32_t app::framerate_cap() const
+{
+    return (std::uint32_t)(1.f / m_min_frame_seconds);
+}
+void app::limit_framerate(std::uint32_t framerate)
+{
+    DBG_ASSERT_ERROR(framerate > 0, "Framerate must be greater than 0!")
+    m_min_frame_seconds = 1.f / (float)framerate;
 }
 
 bool app::pop_layer(const layer *ly)

@@ -21,6 +21,9 @@ class app
     bool next_frame();
     void shutdown();
 
+    std::uint32_t framerate_cap() const;
+    void limit_framerate(std::uint32_t framerate);
+
     template <typename T, class... Args> ref<T> push_layer(Args &&...args)
     {
         static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
@@ -68,6 +71,7 @@ class app
     bool m_terminated = false;
     bool m_to_finish_next_frame = false;
     bool m_ongoing_frame = false;
+    float m_min_frame_seconds = 0.f;
 
     std::vector<ref<layer>> m_layers;
 
