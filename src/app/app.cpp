@@ -50,7 +50,6 @@ bool app::next_frame()
 
     m_last_timestamp = m_current_timestamp;
     m_current_timestamp = std::chrono::high_resolution_clock::now();
-    m_window->clear();
 
     const float delta_time =
         std::chrono::duration<float, std::chrono::seconds::period>(m_current_timestamp - m_last_timestamp).count();
@@ -58,6 +57,14 @@ bool app::next_frame()
     on_update(delta_time);
     for (const auto &ly : m_layers)
         ly->on_update(delta_time);
+    on_late_update(delta_time);
+
+    m_window->clear();
+
+    on_render(delta_time);
+    for (const auto &ly : m_layers)
+        ly->on_render(delta_time);
+    on_late_render(delta_time);
 
     const auto submission = [this](const VkCommandBuffer cmd) {
         for (const auto &ly : m_layers)

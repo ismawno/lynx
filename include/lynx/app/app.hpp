@@ -81,6 +81,15 @@ class app
     virtual void on_update(float ts)
     {
     }
+    virtual void on_late_update(float ts)
+    {
+    }
+    virtual void on_render(float ts)
+    {
+    }
+    virtual void on_late_render(float ts)
+    {
+    }
     virtual void on_shutdown()
     {
     }

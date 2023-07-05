@@ -76,7 +76,7 @@ void imgui_layer::on_attach()
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
-void imgui_layer::on_update(const float ts)
+void imgui_layer::on_render(const float ts)
 {
     ImGui::SetCurrentContext(m_imgui_context);
     ImGui_ImplVulkan_NewFrame();

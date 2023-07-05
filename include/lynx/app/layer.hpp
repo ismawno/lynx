@@ -35,6 +35,9 @@ class layer
     virtual void on_update(float ts)
     {
     }
+    virtual void on_render(float ts)
+    {
+    }
     virtual bool on_event(event ev)
     {
         return false;
@@ -55,7 +58,7 @@ class imgui_layer : public layer
   protected:
     virtual void on_attach() override;
     virtual void on_detach() override;
-    void on_update(float ts) override;
+    void on_render(float ts) override;
     virtual void on_command_submission(VkCommandBuffer command_buffer) override;
 
     virtual void on_imgui_render() = 0;
