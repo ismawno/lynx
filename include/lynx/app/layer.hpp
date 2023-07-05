@@ -2,6 +2,7 @@
 #define LYNX_LAYER_HPP
 
 #include "lynx/app/input.hpp"
+#include "lynx/internal/non_copyable.hpp"
 #include <functional>
 #include <vulkan/vulkan.hpp>
 #include <imgui.h>
@@ -49,7 +50,7 @@ class layer
     friend class app;
 };
 
-class imgui_layer : public layer
+class imgui_layer : public layer, non_copyable
 {
   public:
     imgui_layer(const char *name = "ImGui Layer");
@@ -66,9 +67,6 @@ class imgui_layer : public layer
   private:
     VkDescriptorPool m_imgui_pool;
     ImGuiContext *m_imgui_context;
-
-    imgui_layer(const imgui_layer &) = delete;
-    imgui_layer &operator=(const imgui_layer &) = delete;
 };
 } // namespace lynx
 

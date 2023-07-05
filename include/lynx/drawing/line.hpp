@@ -23,6 +23,9 @@ class line2D : public drawable2D
     line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1 = glm::vec4(1.f),
            const glm::vec4 &color2 = glm::vec4(1.f));
 
+    line2D(const line2D &);
+    line2D &operator=(const line2D &);
+
     void draw(window2D &win) const override;
 
     const glm::vec2 &p1() const;
@@ -45,9 +48,6 @@ class line2D : public drawable2D
     ref<model2D> m_model;
 
     transform2D as_transform() const;
-
-    line2D(const line2D &) = delete;
-    line2D &operator=(const line2D &) = delete;
 };
 
 class line3D : public drawable3D
@@ -55,6 +55,9 @@ class line3D : public drawable3D
   public:
     line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color1 = glm::vec4(1.f),
            const glm::vec4 &color2 = glm::vec4(1.f));
+
+    line3D(const line3D &);
+    line3D &operator=(const line3D &);
 
     void draw(window3D &win) const override;
 
@@ -78,9 +81,6 @@ class line3D : public drawable3D
     ref<model3D> m_model;
 
     transform3D as_transform() const;
-
-    line3D(const line3D &) = delete;
-    line3D &operator=(const line3D &) = delete;
 };
 
 class line_strip2D : public drawable2D

@@ -18,9 +18,6 @@ class camera
   protected:
     glm::mat4 m_projection{1.f};
     glm::mat4 m_inv_projection{1.f};
-
-  private:
-    camera &operator=(const camera &) = delete;
 };
 
 class camera2D : public camera

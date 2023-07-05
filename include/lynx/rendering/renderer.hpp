@@ -10,7 +10,7 @@ namespace lynx
 {
 class window;
 class device;
-class renderer
+class renderer : non_copyable
 {
   public:
     renderer(const ref<const device> &dev, window &win);
@@ -42,9 +42,6 @@ class renderer
     void create_command_buffers();
     void create_swap_chain();
     void free_command_buffers();
-
-    renderer(const renderer &) = delete;
-    renderer &operator=(const renderer &) = delete;
 };
 } // namespace lynx
 

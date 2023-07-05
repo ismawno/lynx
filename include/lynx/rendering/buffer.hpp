@@ -2,12 +2,13 @@
 #define LYNX_BUFFER_HPP
 
 #include "lynx/internal/core.hpp"
+#include "lynx/internal/non_copyable.hpp"
 #include "lynx/rendering/device.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace lynx
 {
-class buffer
+class buffer : non_copyable
 {
   public:
     buffer(const ref<const device> &dev, VkDeviceSize instance_size, std::size_t instance_count,
@@ -67,9 +68,6 @@ class buffer
     VkMemoryPropertyFlags m_properties;
 
     VkMappedMemoryRange mapped_memory_range(VkDeviceSize size, VkDeviceSize offset);
-
-    buffer(const buffer &) = delete;
-    void operator=(const buffer &) = delete;
 };
 } // namespace lynx
 

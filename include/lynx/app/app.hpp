@@ -9,7 +9,7 @@
 
 namespace lynx
 {
-class app
+class app : non_copyable
 {
   public:
     app() = default;
@@ -101,9 +101,6 @@ class app
     {
         return false;
     }
-
-    app(const app &) = delete;
-    app &operator=(const app &) = delete;
 };
 
 class app2D : public app

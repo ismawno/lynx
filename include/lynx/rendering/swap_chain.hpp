@@ -3,6 +3,7 @@
 
 #include "lynx/internal/core.hpp"
 #include "lynx/rendering/device.hpp"
+#include "lynx/internal/non_copyable.hpp"
 #include <vulkan/vulkan.hpp>
 
 #include <string>
@@ -11,7 +12,7 @@
 namespace lynx
 {
 
-class swap_chain
+class swap_chain : non_copyable
 {
   public:
     static constexpr std::uint32_t MAX_FRAMES_IN_FLIGHT = 2;
@@ -73,9 +74,6 @@ class swap_chain
     std::vector<VkFence> m_in_flight_fences;
     std::vector<VkFence> m_images_in_flight;
     std::size_t m_current_frame = 0;
-
-    swap_chain(const swap_chain &) = delete;
-    swap_chain &operator=(const swap_chain &) = delete;
 };
 
 } // namespace lynx

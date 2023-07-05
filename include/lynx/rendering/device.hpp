@@ -4,11 +4,12 @@
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
+#include "lynx/internal/non_copyable.hpp"
 
 namespace lynx
 {
 class window;
-class device
+class device : non_copyable
 {
   public:
     struct swap_chain_support_details
@@ -105,12 +106,6 @@ class device
 #else
     static inline constexpr std::array<const char *const, 2> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 #endif
-
-    device(const device &) = delete;
-    device &operator=(const device &) = delete;
-
-    device(device &&) = delete;
-    device &operator=(device &&) = delete;
 };
 
 } // namespace lynx

@@ -2,15 +2,16 @@
 #define LYNX_PIPELINE_HPP
 
 #include "lynx/internal/core.hpp"
+#include "lynx/internal/non_copyable.hpp"
 #include "lynx/rendering/device.hpp"
 #include <vector>
 
 namespace lynx
 {
-class pipeline
+class pipeline : non_copyable
 {
   public:
-    struct config_info
+    struct config_info : non_copyable
     {
         config_info() = default;
 
@@ -37,9 +38,6 @@ class pipeline
         std::uint32_t constant_range_size = 0;
 
         static void default_config(config_info &config);
-
-        config_info(const config_info &) = delete;
-        config_info &operator=(const config_info &) = delete;
     };
 
     pipeline(const ref<const device> &dev, const config_info &config);
@@ -55,9 +53,6 @@ class pipeline
 
     void init(const config_info &config);
     void create_shader_module(const std::vector<char> &code, VkShaderModule *shader_module) const;
-
-    pipeline(const pipeline &) = delete;
-    pipeline &operator=(const pipeline &) = delete;
 };
 } // namespace lynx
 

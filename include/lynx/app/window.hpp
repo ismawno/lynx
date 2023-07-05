@@ -27,7 +27,7 @@ class camera3D;
 class orthographic2D;
 class perspective3D;
 
-class window
+class window : non_copyable
 {
   public:
     window(std::uint32_t width, std::uint32_t height, const char *name);
@@ -163,9 +163,6 @@ class window
     void init();
     virtual void render(VkCommandBuffer command_buffer) const = 0;
     virtual void clear_render_data() = 0;
-
-    window(const window &) = delete;
-    window &operator=(const window &) = delete;
 };
 
 class window2D : public window
