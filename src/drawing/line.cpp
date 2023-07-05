@@ -7,20 +7,20 @@
 
 namespace lynx
 {
-thin_line2D::thin_line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1, const glm::vec4 &color2)
+line2D::line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1, const glm::vec4 &color2)
     : m_p1(p1), m_p2(p2), m_transform(as_transform())
 {
     m_model = make_ref<model2D>(context::current()->device(), model2D::line(color1, color2));
 }
 
-void thin_line2D::draw(window2D &win) const
+void line2D::draw(window2D &win) const
 {
     render_system2D &rs = win.render_system(LINE_LIST);
     render_data rdata = {m_model, m_transform.transform()};
     rs.push_render_data(rdata);
 }
 
-transform2D thin_line2D::as_transform() const
+transform2D line2D::as_transform() const
 {
     transform2D transform{};
 
@@ -31,31 +31,31 @@ transform2D thin_line2D::as_transform() const
     return transform;
 }
 
-const glm::vec2 &thin_line2D::p1() const
+const glm::vec2 &line2D::p1() const
 {
     return m_p1;
 }
-const glm::vec2 &thin_line2D::p2() const
+const glm::vec2 &line2D::p2() const
 {
     return m_p2;
 }
 
-void thin_line2D::p1(const glm::vec2 &p1)
+void line2D::p1(const glm::vec2 &p1)
 {
     m_p1 = p1;
     m_transform = as_transform();
 }
-void thin_line2D::p2(const glm::vec2 &p2)
+void line2D::p2(const glm::vec2 &p2)
 {
     m_p2 = p2;
     m_transform = as_transform();
 }
 
-const glm::vec4 &thin_line2D::color1() const
+const glm::vec4 &line2D::color1() const
 {
     return m_model->read_vertex(0).color;
 }
-const glm::vec4 &thin_line2D::color2() const
+const glm::vec4 &line2D::color2() const
 {
     return m_model->read_vertex(1).color;
 }
@@ -67,29 +67,29 @@ template <typename T> void update_vertex_color(const std::size_t index, T &model
     model.write_vertex(index, vertex);
 }
 
-void thin_line2D::color1(const glm::vec4 &color1)
+void line2D::color1(const glm::vec4 &color1)
 {
     update_vertex_color(0, *m_model, color1);
 }
-void thin_line2D::color2(const glm::vec4 &color2)
+void line2D::color2(const glm::vec4 &color2)
 {
     update_vertex_color(1, *m_model, color2);
 }
 
-thin_line3D::thin_line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color1, const glm::vec4 &color2)
+line3D::line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color1, const glm::vec4 &color2)
     : m_p1(p1), m_p2(p2), m_transform(as_transform())
 {
     m_model = make_ref<model3D>(context::current()->device(), model3D::line(color1, color2));
 }
 
-void thin_line3D::draw(window3D &win) const
+void line3D::draw(window3D &win) const
 {
     render_system3D &rs = win.render_system(LINE_LIST);
     render_data rdata = {m_model, m_transform.transform()};
     rs.push_render_data(rdata);
 }
 
-transform3D thin_line3D::as_transform() const
+transform3D line3D::as_transform() const
 {
     transform3D transform{};
 
@@ -100,40 +100,40 @@ transform3D thin_line3D::as_transform() const
     return transform;
 }
 
-const glm::vec3 &thin_line3D::p1() const
+const glm::vec3 &line3D::p1() const
 {
     return m_p1;
 }
-const glm::vec3 &thin_line3D::p2() const
+const glm::vec3 &line3D::p2() const
 {
     return m_p2;
 }
 
-void thin_line3D::p1(const glm::vec3 &p1)
+void line3D::p1(const glm::vec3 &p1)
 {
     m_p1 = p1;
     m_transform = as_transform();
 }
-void thin_line3D::p2(const glm::vec3 &p2)
+void line3D::p2(const glm::vec3 &p2)
 {
     m_p2 = p2;
     m_transform = as_transform();
 }
 
-const glm::vec4 &thin_line3D::color1() const
+const glm::vec4 &line3D::color1() const
 {
     return m_model->read_vertex(0).color;
 }
-const glm::vec4 &thin_line3D::color2() const
+const glm::vec4 &line3D::color2() const
 {
     return m_model->read_vertex(1).color;
 }
 
-void thin_line3D::color1(const glm::vec4 &color1)
+void line3D::color1(const glm::vec4 &color1)
 {
     update_vertex_color(0, *m_model, color1);
 }
-void thin_line3D::color2(const glm::vec4 &color2)
+void line3D::color2(const glm::vec4 &color2)
 {
     update_vertex_color(1, *m_model, color2);
 }
