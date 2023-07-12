@@ -60,27 +60,44 @@ void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::co
 void render_system::render(VkCommandBuffer command_buffer, const camera &cam) const
 {
     const glm::mat4 &proj = cam.projection();
-    for (const auto &[mdl, mdl_transform] : m_render_data)
+    for (const render_data &rdata : m_render_data)
     {
         DBG_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")
         m_pipeline->bind(command_buffer);
 
-        const push_constant_data push_with_camera = {mdl_transform, proj};
+        const push_constant_data push_with_camera = {rdata.mdl_transform, proj};
         vkCmdPushConstants(command_buffer, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                            0, sizeof(push_constant_data), &push_with_camera);
 
-        mdl->bind(command_buffer);
-        mdl->draw(command_buffer);
+        rdata.mdl->bind(command_buffer);
+        rdata.mdl->draw(command_buffer);
     }
 }
 
-void render_system::push_render_data(render_data &rdata)
+render_data render_system::create_render_data(const model *mdl, glm::mat4 &mdl_transform, const bool unowned) const
+{
+    DBG_ASSERT_CRITICAL(mdl, "Model cannot be a null pointer")
+#ifdef DEBUG
+    mdl->to_be_rendered = true;
+#endif
+    return {mdl, mdl_transform, unowned};
+}
+
+void render_system::push_render_data(const render_data &rdata)
 {
     m_render_data.push_back(rdata);
 }
 
 void render_system::clear_render_data()
 {
+    for (const render_data &rdata : m_render_data)
+    {
+#ifdef DEBUG
+        rdata.mdl->to_be_rendered = false;
+#endif
+        if (rdata.unowned)
+            delete rdata.mdl;
+    }
     m_render_data.clear();
 }
 
@@ -92,14 +109,16 @@ void render_system::pipeline_config(pipeline::config_info &config) const
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const transform2D &transform)
 {
-    render_data rdata = {make_ref<model2D>(m_device, vertices), transform.transform()};
+    glm::mat4 mdl_mat = transform.transform();
+    const render_data rdata = create_render_data(new model2D(m_device, vertices), mdl_mat, true);
     push_render_data(rdata);
 }
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
                            const transform2D &transform)
 {
-    render_data rdata = {make_ref<model2D>(m_device, vertices, indices), transform.transform()};
+    glm::mat4 mdl_mat = transform.transform();
+    const render_data rdata = create_render_data(new model2D(m_device, vertices, indices), mdl_mat, true);
     push_render_data(rdata);
 }
 
@@ -108,11 +127,11 @@ void render_system2D::draw(const drawable2D &drawable)
     drawable.draw(*this);
 }
 
-void render_system2D::push_render_data(render_data &data)
+render_data render_system2D::create_render_data(const model *mdl, glm::mat4 &mdl_transform, const bool unowned) const
 {
     const float z_offset = 1.f - ++s_z_offset_counter * std::numeric_limits<float>::epsilon();
-    data.mdl_transform[3][2] = z_offset;
-    render_system::push_render_data(data);
+    mdl_transform[3][2] = z_offset;
+    return render_system::create_render_data(mdl, mdl_transform, unowned);
 }
 
 void render_system2D::reset_z_offset_counter()
@@ -131,14 +150,16 @@ void render_system2D::pipeline_config(pipeline::config_info &config) const
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const transform3D &transform)
 {
-    render_data rdata = {make_ref<model3D>(m_device, vertices), transform.transform()};
+    glm::mat4 mdl_mat = transform.transform();
+    const render_data rdata = create_render_data(new model3D(m_device, vertices), mdl_mat, true);
     push_render_data(rdata);
 }
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
                            const transform3D &transform)
 {
-    render_data rdata = {make_ref<model3D>(m_device, vertices, indices), transform.transform()};
+    glm::mat4 mdl_mat = transform.transform();
+    const render_data rdata = create_render_data(new model3D(m_device, vertices, indices), mdl_mat, true);
     push_render_data(rdata);
 }
 

@@ -8,15 +8,16 @@
 namespace lynx
 {
 line2D::line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1, const glm::vec4 &color2)
-    : m_p1(p1), m_p2(p2), m_transform(as_transform())
+    : m_p1(p1), m_p2(p2), m_transform(as_transform()),
+      m_model(context::current()->device(), model2D::line(color1, color2))
 {
-    m_model = make_ref<model2D>(context::current()->device(), model2D::line(color1, color2));
 }
 
 void line2D::draw(window2D &win) const
 {
     render_system2D &rs = win.render_system(LINE_LIST);
-    render_data rdata = {m_model, m_transform.transform()};
+    glm::mat4 tmat = m_transform.transform();
+    const render_data rdata = rs.create_render_data(&m_model, tmat);
     rs.push_render_data(rdata);
 }
 
@@ -53,11 +54,11 @@ void line2D::p2(const glm::vec2 &p2)
 
 const glm::vec4 &line2D::color1() const
 {
-    return m_model->read_vertex(0).color;
+    return m_model.read_vertex(0).color;
 }
 const glm::vec4 &line2D::color2() const
 {
-    return m_model->read_vertex(1).color;
+    return m_model.read_vertex(1).color;
 }
 
 template <typename T> void update_vertex_color(const std::size_t index, T &model, const glm::vec4 &color)
@@ -69,23 +70,24 @@ template <typename T> void update_vertex_color(const std::size_t index, T &model
 
 void line2D::color1(const glm::vec4 &color1)
 {
-    update_vertex_color(0, *m_model, color1);
+    update_vertex_color(0, m_model, color1);
 }
 void line2D::color2(const glm::vec4 &color2)
 {
-    update_vertex_color(1, *m_model, color2);
+    update_vertex_color(1, m_model, color2);
 }
 
 line3D::line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color1, const glm::vec4 &color2)
-    : m_p1(p1), m_p2(p2), m_transform(as_transform())
+    : m_p1(p1), m_p2(p2), m_transform(as_transform()),
+      m_model(context::current()->device(), model3D::line(color1, color2))
 {
-    m_model = make_ref<model3D>(context::current()->device(), model3D::line(color1, color2));
 }
 
 void line3D::draw(window3D &win) const
 {
     render_system3D &rs = win.render_system(LINE_LIST);
-    render_data rdata = {m_model, m_transform.transform()};
+    glm::mat4 tmat = m_transform.transform();
+    const render_data rdata = rs.create_render_data(&m_model, tmat);
     rs.push_render_data(rdata);
 }
 
@@ -122,19 +124,19 @@ void line3D::p2(const glm::vec3 &p2)
 
 const glm::vec4 &line3D::color1() const
 {
-    return m_model->read_vertex(0).color;
+    return m_model.read_vertex(0).color;
 }
 const glm::vec4 &line3D::color2() const
 {
-    return m_model->read_vertex(1).color;
+    return m_model.read_vertex(1).color;
 }
 
 void line3D::color1(const glm::vec4 &color1)
 {
-    update_vertex_color(0, *m_model, color1);
+    update_vertex_color(0, m_model, color1);
 }
 void line3D::color2(const glm::vec4 &color2)
 {
-    update_vertex_color(1, *m_model, color2);
+    update_vertex_color(1, m_model, color2);
 }
 } // namespace lynx

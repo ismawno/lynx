@@ -2,6 +2,7 @@
 #define LYNX_LINES_HPP
 
 #include "lynx/drawing/drawable.hpp"
+#include "lynx/drawing/model.hpp"
 #include "lynx/geometry/vertex.hpp"
 #include "lynx/geometry/transform.hpp"
 #include "lynx/internal/core.hpp"
@@ -14,17 +15,11 @@
 
 namespace lynx
 {
-class model2D;
-class model3D;
-
 class line2D : public drawable2D
 {
   public:
     line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1 = glm::vec4(1.f),
            const glm::vec4 &color2 = glm::vec4(1.f));
-
-    line2D(const line2D &);
-    line2D &operator=(const line2D &);
 
     void draw(window2D &win) const override;
 
@@ -45,7 +40,7 @@ class line2D : public drawable2D
     glm::vec2 m_p2;
 
     transform2D m_transform;
-    ref<model2D> m_model;
+    model2D m_model;
 
     transform2D as_transform() const;
 };
@@ -55,9 +50,6 @@ class line3D : public drawable3D
   public:
     line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color1 = glm::vec4(1.f),
            const glm::vec4 &color2 = glm::vec4(1.f));
-
-    line3D(const line3D &);
-    line3D &operator=(const line3D &);
 
     void draw(window3D &win) const override;
 
@@ -78,7 +70,7 @@ class line3D : public drawable3D
     glm::vec3 m_p2;
 
     transform3D m_transform;
-    ref<model3D> m_model;
+    model3D m_model;
 
     transform3D as_transform() const;
 };

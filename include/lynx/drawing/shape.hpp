@@ -4,6 +4,7 @@
 #include "lynx/drawing/drawable.hpp"
 #include "lynx/internal/core.hpp"
 #include "lynx/geometry/transform.hpp"
+#include "lynx/drawing/model.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -13,9 +14,6 @@
 
 namespace lynx
 {
-class model2D;
-class model3D;
-
 struct vertex2D;
 struct vertex3D;
 
@@ -30,7 +28,7 @@ class shape2D : public drawable2D
     transform2D transform{};
 
   protected:
-    ref<model2D> m_model;
+    model2D m_model;
 
   private:
     topology m_topology;
@@ -48,7 +46,7 @@ class shape3D : public drawable3D
     transform3D transform{};
 
   protected:
-    ref<model3D> m_model;
+    model3D m_model;
 
   private:
     topology m_topology;

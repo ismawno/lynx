@@ -49,7 +49,7 @@ class window : non_copyable
 
     bool should_close() const;
     bool closed();
-    void close();
+    virtual void close();
 
     bool was_resized() const;
     void complete_resize();
@@ -169,6 +169,7 @@ class window2D : public window
 {
   public:
     window2D(std::uint32_t width, std::uint32_t height, const char *name);
+    virtual ~window2D() override;
 
     template <typename T, class... Args> T *add_render_system(Args &&...args)
     {
@@ -192,6 +193,8 @@ class window2D : public window
     void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
               const transform2D &transform = {});
     void draw(const drawable2D &drawable);
+
+    void close() override;
 
     template <typename T = camera2D> const T *camera() const
     {
@@ -222,6 +225,7 @@ class window3D : public window
 {
   public:
     window3D(std::uint32_t width, std::uint32_t height, const char *name);
+    virtual ~window3D() override;
 
     template <typename T, class... Args> T *add_render_system(Args &&...args)
     {
@@ -245,6 +249,8 @@ class window3D : public window
     void draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
               const transform3D &transform = {});
     void draw(const drawable3D &drawable);
+
+    void close() override;
 
     template <typename T = camera3D> const T *camera() const
     {

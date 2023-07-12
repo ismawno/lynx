@@ -24,8 +24,13 @@ struct push_constant_data
 
 struct render_data
 {
-    ref<const model> mdl;
+    const model *mdl;
     glm::mat4 mdl_transform;
+    bool unowned;
+
+  private:
+    render_data() = default;
+    friend class render_system;
 };
 class render_system
 {
@@ -35,7 +40,8 @@ class render_system
     void init(const ref<const device> &dev, VkRenderPass render_pass);
     void render(VkCommandBuffer command_buffer, const camera &cam) const;
 
-    virtual void push_render_data(render_data &rdata);
+    virtual render_data create_render_data(const model *mdl, glm::mat4 &transform, bool unowned = false) const;
+    void push_render_data(const render_data &rdata);
     void clear_render_data();
 
   protected:
@@ -65,7 +71,7 @@ class render_system2D : public render_system
         return make_ref<model2D>(m_device, std::forward<Args>(args)...);
     }
 
-    void push_render_data(render_data &data) override;
+    render_data create_render_data(const model *mdl, glm::mat4 &transform, bool unowned = false) const override;
     static void reset_z_offset_counter();
 
   protected:

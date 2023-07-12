@@ -35,7 +35,11 @@ class model
     model(const ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices);
     template <typename T> model(const ref<const device> &dev, const vertex_index_pair<T> &build);
 
+#ifdef DEBUG
+    virtual ~model();
+#else
     virtual ~model() = default;
+#endif
 
     void bind(VkCommandBuffer command_buffer) const;
     void draw(VkCommandBuffer command_buffer) const;
@@ -50,6 +54,10 @@ class model
 
     template <typename T> void update_vertex_buffer(std::function<void(T &)> for_each_fn = nullptr);
     void update_index_buffer(std::function<void(std::uint32_t &)> for_each_fn = nullptr);
+
+#ifdef DEBUG
+    mutable bool to_be_rendered = false;
+#endif
 
   private:
     scope<buffer> m_device_vertex_buffer;

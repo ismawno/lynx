@@ -29,6 +29,15 @@ model::model(const ref<const device> &dev, const vertex_index_pair<T> &build)
 {
 }
 
+#ifdef DEBUG
+model::~model()
+{
+    DBG_ASSERT_CRITICAL(!to_be_rendered,
+                        "Model has been destroyed before being rendered! Any drawable entity must remain alive until "
+                        "the end of the frame once it has been submitted for drawing")
+}
+#endif
+
 template <typename T>
 static void create_buffer(const ref<const device> &dev, const std::vector<T> &data, VkBufferUsageFlags usage,
                           scope<buffer> &device_buffer, scope<buffer> &host_buffer)

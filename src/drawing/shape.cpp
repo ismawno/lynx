@@ -1,62 +1,61 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/internal/context.hpp"
-
 #include "lynx/drawing/shape.hpp"
-#include "lynx/drawing/model.hpp"
-
 #include "lynx/app/window.hpp"
-
 #include "lynx/rendering/buffer.hpp"
-
 #include "lynx/geometry/vertex.hpp"
 
 namespace lynx
 {
 // Color should already be encoded in arguments when constructing the model
-template <class... ModelArgs> shape2D::shape2D(topology tplg, ModelArgs &&...args) : m_topology(tplg)
+template <class... ModelArgs>
+shape2D::shape2D(topology tplg, ModelArgs &&...args)
+    : m_model(context::current()->device(), std::forward<ModelArgs>(args)...), m_topology(tplg)
 {
-    m_model = make_ref<model2D>(context::current()->device(), std::forward<ModelArgs>(args)...);
 }
 
 const glm::vec4 &shape2D::color() const
 {
-    return m_model->read_vertex(0).color;
+    return m_model.read_vertex(0).color;
 }
 
 void shape2D::color(const glm::vec4 &color)
 {
     const auto feach = [&color](vertex2D &vtx) { vtx.color = color; };
-    m_model->update_vertex_buffer(feach);
+    m_model.update_vertex_buffer(feach);
 }
 
 void shape2D::draw(window2D &win) const
 {
     render_system2D &rs = win.render_system(m_topology);
-    render_data rdata = {m_model, transform.transform()};
+    glm::mat4 tmat = transform.transform();
+    const render_data rdata = rs.create_render_data(&m_model, tmat);
     rs.push_render_data(rdata);
 }
 
 // Color should already be encoded in arguments when constructing the model
-template <class... ModelArgs> shape3D::shape3D(topology tplg, ModelArgs &&...args) : m_topology(tplg)
+template <class... ModelArgs>
+shape3D::shape3D(topology tplg, ModelArgs &&...args)
+    : m_model(context::current()->device(), std::forward<ModelArgs>(args)...), m_topology(tplg)
 {
-    m_model = make_ref<model3D>(context::current()->device(), std::forward<ModelArgs>(args)...);
 }
 
 const glm::vec4 &shape3D::color() const
 {
-    return m_model->read_vertex(0).color;
+    return m_model.read_vertex(0).color;
 }
 
 void shape3D::color(const glm::vec4 &color)
 {
     const auto feach = [&color](vertex3D &vtx) { vtx.color = color; };
-    m_model->update_vertex_buffer(feach);
+    m_model.update_vertex_buffer(feach);
 }
 
 void shape3D::draw(window3D &win) const
 {
     render_system3D &rs = win.render_system(m_topology);
-    render_data rdata = {m_model, transform.transform()};
+    glm::mat4 tmat = transform.transform();
+    const render_data rdata = rs.create_render_data(&m_model, tmat);
     rs.push_render_data(rdata);
 }
 
@@ -103,19 +102,19 @@ polygon2D::polygon2D(const std::vector<glm::vec2> &local_vertices, const glm::ve
 
 const glm::vec2 &polygon2D::vertex(const std::size_t index) const
 {
-    return m_model->read_vertex(index + 1).position; // +1 to account for center vertex
+    return m_model.read_vertex(index + 1).position; // +1 to account for center vertex
 }
 
 void polygon2D::vertex(const std::size_t index, const glm::vec2 &vertex)
 {
-    vertex2D v = m_model->read_vertex(index + 1);
+    vertex2D v = m_model.read_vertex(index + 1);
     v.position = vertex;
-    m_model->write_vertex(index + 1, v); //+1 to account for center vertex
+    m_model.write_vertex(index + 1, v); //+1 to account for center vertex
 }
 
 const glm::vec2 &polygon2D::operator[](const std::size_t index) const
 {
-    return m_model->read_vertex(index + 1).position;
+    return m_model.read_vertex(index + 1).position;
 }
 
 std::size_t polygon2D::size() const
@@ -166,19 +165,19 @@ polygon3D::polygon3D(const std::vector<glm::vec3> &local_vertices, const glm::ve
 
 const glm::vec3 &polygon3D::vertex(const std::size_t index) const
 {
-    return m_model->read_vertex(index + 1).position; // +1 to account for center vertex
+    return m_model.read_vertex(index + 1).position; // +1 to account for center vertex
 }
 
 void polygon3D::vertex(const std::size_t index, const glm::vec3 &vertex)
 {
-    vertex3D v = m_model->read_vertex(index + 1);
+    vertex3D v = m_model.read_vertex(index + 1);
     v.position = vertex;
-    m_model->write_vertex(index + 1, v); //+1 to account for center vertex
+    m_model.write_vertex(index + 1, v); //+1 to account for center vertex
 }
 
 const glm::vec3 &polygon3D::operator[](const std::size_t index) const
 {
-    return m_model->read_vertex(index + 1).position;
+    return m_model.read_vertex(index + 1).position;
 }
 
 std::size_t polygon3D::size() const

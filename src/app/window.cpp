@@ -201,6 +201,11 @@ window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) 
     add_render_system<triangle_strip_render_system2D>();
 }
 
+window2D::~window2D()
+{
+    clear_render_data();
+}
+
 const render_system2D &window2D::render_system(const topology tplg) const
 {
     return *m_render_systems[(std::size_t)tplg];
@@ -224,6 +229,12 @@ void window2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std
 void window2D::draw(const drawable2D &drawable)
 {
     drawable.draw(*this);
+}
+
+void window2D::close()
+{
+    clear_render_data();
+    window::close();
 }
 
 void window2D::render(const VkCommandBuffer command_buffer) const
@@ -250,6 +261,11 @@ window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) 
     add_render_system<triangle_strip_render_system3D>();
 }
 
+window3D::~window3D()
+{
+    clear_render_data();
+}
+
 const render_system3D &window3D::render_system(const topology tplg) const
 {
     return *m_render_systems[(std::size_t)tplg];
@@ -273,6 +289,12 @@ void window3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std
 void window3D::draw(const drawable3D &drawable)
 {
     drawable.draw(*this);
+}
+
+void window3D::close()
+{
+    clear_render_data();
+    window::close();
 }
 
 void window3D::render(const VkCommandBuffer command_buffer) const
