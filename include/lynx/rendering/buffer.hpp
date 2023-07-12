@@ -2,17 +2,19 @@
 #define LYNX_BUFFER_HPP
 
 #include "lynx/internal/core.hpp"
-#include "lynx/internal/non_copyable.hpp"
+#include "lynx/internal/utils.hpp"
 #include "lynx/rendering/device.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace lynx
 {
-class buffer : non_copyable
+class buffer : custom_copyable
 {
   public:
     buffer(const ref<const device> &dev, VkDeviceSize instance_size, std::size_t instance_count,
            VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize min_offset_alignment = 1);
+
+    buffer(const buffer &other);
     ~buffer();
 
     void map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0, VkMemoryMapFlags flags = 0);

@@ -186,7 +186,7 @@ class window2D : public window
         return window::render_system<T>(m_render_systems);
     }
 
-    const render_system2D &render_system(topology tplg) const;
+    const render_system2D &render_system(topology tplg) const; // BRING ALL OF THIS TO BASE
     render_system2D &render_system(topology tplg);
 
     void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {});

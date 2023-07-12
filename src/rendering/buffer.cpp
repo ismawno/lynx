@@ -19,6 +19,13 @@ buffer::buffer(const ref<const device> &dev, VkDeviceSize instance_size, std::si
     m_device->create_buffer(m_buffer_size, usage, properties, m_buffer, m_memory);
 }
 
+buffer::buffer(const buffer &other)
+    : buffer(other.m_device, other.m_instance_size, other.m_instance_count, other.m_usage, other.m_properties,
+             other.m_min_offset_alignment)
+{
+    write(other);
+}
+
 buffer::~buffer()
 {
     unmap();

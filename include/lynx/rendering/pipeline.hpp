@@ -2,7 +2,7 @@
 #define LYNX_PIPELINE_HPP
 
 #include "lynx/internal/core.hpp"
-#include "lynx/internal/non_copyable.hpp"
+#include "lynx/internal/utils.hpp"
 #include "lynx/rendering/device.hpp"
 #include <vector>
 

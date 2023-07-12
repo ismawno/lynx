@@ -11,6 +11,15 @@ class non_copyable
   protected:
     non_copyable() = default;
 };
+
+class custom_copyable
+{
+    custom_copyable(const custom_copyable &) = default;
+    custom_copyable &operator=(const custom_copyable &) = default;
+
+  protected:
+    custom_copyable() = default;
+};
 } // namespace lynx
 
 #endif

@@ -2,7 +2,7 @@
 #define LYNX_LAYER_HPP
 
 #include "lynx/app/input.hpp"
-#include "lynx/internal/non_copyable.hpp"
+#include "lynx/internal/utils.hpp"
 #include <functional>
 #include <vulkan/vulkan.hpp>
 #include <imgui.h>

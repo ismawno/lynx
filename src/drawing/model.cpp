@@ -29,6 +29,21 @@ model::model(const ref<const device> &dev, const vertex_index_pair<T> &build)
 {
 }
 
+model::model(const model &other)
+{
+    *this = other;
+}
+
+model &model::operator=(const model &other)
+{
+    m_device_vertex_buffer = make_scope<buffer>(*other.m_device_vertex_buffer);
+    m_device_index_buffer = make_scope<buffer>(*other.m_device_index_buffer);
+
+    m_host_vertex_buffer = make_scope<buffer>(*other.m_host_vertex_buffer);
+    m_host_index_buffer = make_scope<buffer>(*other.m_host_index_buffer);
+    return *this;
+}
+
 #ifdef DEBUG
 model::~model()
 {

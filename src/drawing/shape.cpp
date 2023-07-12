@@ -27,7 +27,7 @@ void shape2D::color(const glm::vec4 &color)
 
 void shape2D::draw(window2D &win) const
 {
-    render_system2D &rs = win.render_system(m_topology);
+    render_system2D &rs = win.render_system(m_topology); // DONT NEED TO BE RS2D
     glm::mat4 tmat = transform.transform();
     const render_data rdata = rs.create_render_data(&m_model, tmat);
     rs.push_render_data(rdata);

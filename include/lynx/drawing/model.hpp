@@ -35,6 +35,9 @@ class model
     model(const ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices);
     template <typename T> model(const ref<const device> &dev, const vertex_index_pair<T> &build);
 
+    model(const model &other);
+    model &operator=(const model &other);
+
 #ifdef DEBUG
     virtual ~model();
 #else
