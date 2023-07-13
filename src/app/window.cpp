@@ -69,6 +69,7 @@ void window::clear()
 
 void window::close()
 {
+    clear_render_data();
     vkDeviceWaitIdle(m_device->vulkan_device());
     glfwDestroyWindow(m_window);
     m_window = nullptr;
@@ -84,6 +85,36 @@ bool window::closed()
         return true;
     }
     return false;
+}
+
+void window::render(const VkCommandBuffer command_buffer) const
+{
+    for (const auto &sys : m_render_systems)
+        sys->render(command_buffer, *m_camera);
+}
+
+void window::clear_render_data()
+{
+    for (const auto &sys : m_render_systems)
+        sys->clear_render_data();
+}
+
+const render_system *window::render_system(const topology tplg) const
+{
+    return m_render_systems[(std::size_t)tplg].get();
+}
+render_system *window::render_system(const topology tplg)
+{
+    return m_render_systems[(std::size_t)tplg].get();
+}
+
+const render_system2D *window2D::render_system(const topology tplg) const
+{
+    return dynamic_cast<const render_system2D *>(window::render_system(tplg));
+}
+render_system2D *window2D::render_system(const topology tplg)
+{
+    return dynamic_cast<render_system2D *>(window::render_system(tplg));
 }
 
 bool window::was_resized() const
@@ -201,29 +232,15 @@ window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) 
     add_render_system<triangle_strip_render_system2D>();
 }
 
-window2D::~window2D()
-{
-    clear_render_data();
-}
-
-const render_system2D &window2D::render_system(const topology tplg) const
-{
-    return *m_render_systems[(std::size_t)tplg];
-}
-render_system2D &window2D::render_system(const topology tplg)
-{
-    return *m_render_systems[(std::size_t)tplg];
-}
-
 void window2D::draw(const std::vector<vertex2D> &vertices, const topology tplg, const transform2D &transform)
 {
-    m_render_systems[(std::size_t)tplg]->draw(vertices, transform);
+    render_system(tplg)->draw(vertices, transform);
 }
 
 void window2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
                     const topology tplg, const transform2D &transform)
 {
-    m_render_systems[(std::size_t)tplg]->draw(vertices, indices, transform);
+    render_system(tplg)->draw(vertices, indices, transform);
 }
 
 void window2D::draw(const drawable2D &drawable)
@@ -231,22 +248,9 @@ void window2D::draw(const drawable2D &drawable)
     drawable.draw(*this);
 }
 
-void window2D::close()
-{
-    clear_render_data();
-    window::close();
-}
-
-void window2D::render(const VkCommandBuffer command_buffer) const
-{
-    for (const auto &sys : m_render_systems)
-        sys->render(command_buffer, *camera());
-}
-
 void window2D::clear_render_data()
 {
-    for (const auto &sys : m_render_systems)
-        sys->clear_render_data();
+    window::clear_render_data();
     render_system2D::reset_z_offset_counter();
 }
 
@@ -261,52 +265,29 @@ window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) 
     add_render_system<triangle_strip_render_system3D>();
 }
 
-window3D::~window3D()
+const render_system3D *window3D::render_system(const topology tplg) const
 {
-    clear_render_data();
+    return dynamic_cast<const render_system3D *>(window::render_system(tplg));
 }
-
-const render_system3D &window3D::render_system(const topology tplg) const
+render_system3D *window3D::render_system(const topology tplg)
 {
-    return *m_render_systems[(std::size_t)tplg];
-}
-render_system3D &window3D::render_system(const topology tplg)
-{
-    return *m_render_systems[(std::size_t)tplg];
+    return dynamic_cast<render_system3D *>(window::render_system(tplg));
 }
 
 void window3D::draw(const std::vector<vertex3D> &vertices, const topology tplg, const transform3D &transform)
 {
-    m_render_systems[(std::size_t)tplg]->draw(vertices, transform);
+    render_system(tplg)->draw(vertices, transform);
 }
 
 void window3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
                     const topology tplg, const transform3D &transform)
 {
-    m_render_systems[(std::size_t)tplg]->draw(vertices, indices, transform);
+    render_system(tplg)->draw(vertices, indices, transform);
 }
 
 void window3D::draw(const drawable3D &drawable)
 {
     drawable.draw(*this);
-}
-
-void window3D::close()
-{
-    clear_render_data();
-    window::close();
-}
-
-void window3D::render(const VkCommandBuffer command_buffer) const
-{
-    for (const auto &sys : m_render_systems)
-        sys->render(command_buffer, *camera());
-}
-
-void window3D::clear_render_data()
-{
-    for (const auto &sys : m_render_systems)
-        sys->clear_render_data();
 }
 
 } // namespace lynx

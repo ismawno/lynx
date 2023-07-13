@@ -15,10 +15,10 @@ line2D::line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1
 
 void line2D::draw(window2D &win) const
 {
-    render_system2D &rs = win.render_system(LINE_LIST);
+    render_system2D *rs = win.render_system(LINE_LIST);
     glm::mat4 tmat = m_transform.transform();
-    const render_data rdata = rs.create_render_data(&m_model, tmat);
-    rs.push_render_data(rdata);
+    const render_data rdata = rs->create_render_data(&m_model, tmat);
+    rs->push_render_data(rdata);
 }
 
 transform2D line2D::as_transform() const
@@ -85,10 +85,10 @@ line3D::line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color1
 
 void line3D::draw(window3D &win) const
 {
-    render_system3D &rs = win.render_system(LINE_LIST);
+    render_system3D *rs = win.render_system(LINE_LIST);
     glm::mat4 tmat = m_transform.transform();
-    const render_data rdata = rs.create_render_data(&m_model, tmat);
-    rs.push_render_data(rdata);
+    const render_data rdata = rs->create_render_data(&m_model, tmat);
+    rs->push_render_data(rdata);
 }
 
 transform3D line3D::as_transform() const
