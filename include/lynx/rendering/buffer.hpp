@@ -2,19 +2,17 @@
 #define LYNX_BUFFER_HPP
 
 #include "lynx/internal/core.hpp"
-#include "lynx/internal/utils.hpp"
+#include "lynx/internal/utility.hpp"
 #include "lynx/rendering/device.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace lynx
 {
-class buffer : custom_copyable
+class buffer : non_copyable
 {
   public:
     buffer(const ref<const device> &dev, VkDeviceSize instance_size, std::size_t instance_count,
            VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize min_offset_alignment = 1);
-
-    buffer(const buffer &other);
     ~buffer();
 
     void map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0, VkMemoryMapFlags flags = 0);
@@ -32,14 +30,14 @@ class buffer : custom_copyable
     VkDescriptorBufferInfo descriptor_info_at_index(std::size_t index) const;
     void invalidate_at_index(std::size_t index);
 
-    template <typename T = void> const T &read_at_index(const std::size_t index) const
+    template <typename T> const T &read_at_index(const std::size_t index) const
     {
         DBG_ASSERT_ERROR(m_mapped_data, "Cannot read from unmapped buffer")
         const char *offsetted = (const char *)m_mapped_data + index * m_alignment_size;
         return *((const T *)offsetted);
     }
 
-    template <typename T = void> T &read_at_index(const std::size_t index)
+    template <typename T> T &read_at_index(const std::size_t index)
     {
         DBG_ASSERT_ERROR(m_mapped_data, "Cannot read from unmapped buffer")
         char *offsetted = (char *)m_mapped_data + index * m_alignment_size;

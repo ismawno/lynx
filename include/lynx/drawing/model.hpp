@@ -35,9 +35,6 @@ class model
     model(const ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices);
     template <typename T> model(const ref<const device> &dev, const vertex_index_pair<T> &build);
 
-    model(const model &other);
-    model &operator=(const model &other);
-
 #ifdef DEBUG
     virtual ~model();
 #else
@@ -62,15 +59,21 @@ class model
     mutable bool to_be_rendered = false;
 #endif
 
+  protected:
+    model() = default;
+    template <typename T> void copy(const model &other);
+
   private:
+    ref<const device> m_device;
+
     scope<buffer> m_device_vertex_buffer;
     scope<buffer> m_host_vertex_buffer;
 
     scope<buffer> m_device_index_buffer;
     scope<buffer> m_host_index_buffer;
 
-    template <typename T> void create_vertex_buffer(const ref<const device> &dev, const std::vector<T> &vertices);
-    void create_index_buffer(const ref<const device> &dev, const std::vector<std::uint32_t> &indices);
+    template <typename T> void create_vertex_buffer(const std::vector<T> &vertices);
+    void create_index_buffer(const std::vector<std::uint32_t> &indices);
 };
 
 class model2D : public model
@@ -82,6 +85,9 @@ class model2D : public model
     model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices,
             const std::vector<std::uint32_t> &indices);
     model2D(const ref<const device> &dev, const vertex_index_pair &build);
+
+    model2D(const model2D &other);
+    model2D &operator=(const model2D &other);
 
     void write_vertex(std::size_t buffer_index, const vertex2D &vertex);
     const vertex2D &read_vertex(std::size_t buffer_index) const;
@@ -105,6 +111,9 @@ class model3D : public model
     model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices,
             const std::vector<std::uint32_t> &indices);
     model3D(const ref<const device> &dev, const vertex_index_pair &build);
+
+    model3D(const model3D &other);
+    model3D &operator=(const model3D &other);
 
     void write_vertex(std::size_t buffer_index, const vertex3D &vertex);
     const vertex3D &read_vertex(std::size_t buffer_index) const;

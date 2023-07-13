@@ -5,7 +5,7 @@ namespace lynx
 {
 static VkDeviceSize compute_alignment_size(VkDeviceSize instance_size, VkDeviceSize min_offset_alignment)
 {
-    return min_offset_alignment > 0 ? ((instance_size + min_offset_alignment - 1) & ~(min_offset_alignment - 1))
+    return min_offset_alignment > 1 ? ((instance_size + min_offset_alignment - 1) & ~(min_offset_alignment - 1))
                                     : instance_size;
 }
 
@@ -17,13 +17,6 @@ buffer::buffer(const ref<const device> &dev, VkDeviceSize instance_size, std::si
       m_buffer_size(m_instance_count * m_alignment_size), m_usage(usage), m_properties(properties)
 {
     m_device->create_buffer(m_buffer_size, usage, properties, m_buffer, m_memory);
-}
-
-buffer::buffer(const buffer &other)
-    : buffer(other.m_device, other.m_instance_size, other.m_instance_count, other.m_usage, other.m_properties,
-             other.m_min_offset_alignment)
-{
-    write(other);
 }
 
 buffer::~buffer()
@@ -69,6 +62,10 @@ void buffer::write(const buffer &src_buffer)
 {
     DBG_ASSERT_ERROR(m_buffer_size >= src_buffer.buffer_size(),
                      "Destination buffer size must be at least equal to the src buffer size")
+    DBG_ASSERT_ERROR(m_usage & VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                     "Destintaion buffer must have the VK_BUFFER_USAGE_TRANSFER_DST_BIT flag enabled")
+    DBG_ASSERT_ERROR(src_buffer.m_usage & VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                     "Source buffer must have the VK_BUFFER_USAGE_TRANSFER_SRC_BIT flag enabled")
     m_device->copy_buffer(m_buffer, src_buffer.m_buffer, m_buffer_size);
 }
 

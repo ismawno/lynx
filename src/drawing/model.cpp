@@ -6,21 +6,22 @@
 
 namespace lynx
 {
-template <typename T> model::model(const ref<const device> &dev, const std::vector<T> &vertices)
+template <typename T> model::model(const ref<const device> &dev, const std::vector<T> &vertices) : m_device(dev)
 {
     DBG_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
-    create_vertex_buffer(dev, vertices);
+    create_vertex_buffer(vertices);
     m_device_index_buffer = nullptr;
     m_host_index_buffer = nullptr;
 }
 
 template <typename T>
 model::model(const ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices)
+    : m_device(dev)
 {
     DBG_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
     DBG_ASSERT_ERROR(!indices.empty(), "If specified, indices must not be empty")
-    create_vertex_buffer(dev, vertices);
-    create_index_buffer(dev, indices);
+    create_vertex_buffer(vertices);
+    create_index_buffer(indices);
 }
 
 template <typename T>
@@ -29,19 +30,29 @@ model::model(const ref<const device> &dev, const vertex_index_pair<T> &build)
 {
 }
 
-model::model(const model &other)
+template <typename T> void model::copy(const model &other)
 {
-    *this = other;
-}
+    m_device = other.m_device;
+    std::vector<T> vertices;
+    vertices.reserve(other.m_host_vertex_buffer->instance_count());
 
-model &model::operator=(const model &other)
-{
-    m_device_vertex_buffer = make_scope<buffer>(*other.m_device_vertex_buffer);
-    m_device_index_buffer = make_scope<buffer>(*other.m_device_index_buffer);
+    for (std::size_t i = 0; i < other.m_host_vertex_buffer->instance_count(); i++)
+        vertices.push_back(other.read_vertex<T>(i));
+    create_vertex_buffer(vertices);
 
-    m_host_vertex_buffer = make_scope<buffer>(*other.m_host_vertex_buffer);
-    m_host_index_buffer = make_scope<buffer>(*other.m_host_index_buffer);
-    return *this;
+    if (!other.has_index_buffers())
+    {
+        m_device_index_buffer = nullptr;
+        m_host_index_buffer = nullptr;
+        return;
+    }
+
+    std::vector<std::uint32_t> indices;
+    indices.reserve(other.m_host_index_buffer->instance_count());
+
+    for (std::size_t i = 0; i < other.m_host_index_buffer->instance_count(); i++)
+        indices.push_back(other.read_index(i));
+    create_index_buffer(indices);
 }
 
 #ifdef DEBUG
@@ -68,14 +79,14 @@ static void create_buffer(const ref<const device> &dev, const std::vector<T> &da
     device_buffer->write(*host_buffer);
 }
 
-template <typename T> void model::create_vertex_buffer(const ref<const device> &dev, const std::vector<T> &vertices)
+template <typename T> void model::create_vertex_buffer(const std::vector<T> &vertices)
 {
-    create_buffer(dev, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, m_device_vertex_buffer, m_host_vertex_buffer);
+    create_buffer(m_device, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, m_device_vertex_buffer, m_host_vertex_buffer);
 }
 
-void model::create_index_buffer(const ref<const device> &dev, const std::vector<std::uint32_t> &indices)
+void model::create_index_buffer(const std::vector<std::uint32_t> &indices)
 {
-    create_buffer(dev, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, m_device_index_buffer, m_host_index_buffer);
+    create_buffer(m_device, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, m_device_index_buffer, m_host_index_buffer);
 }
 
 void model::bind(VkCommandBuffer command_buffer) const
@@ -160,6 +171,11 @@ model2D::model2D(const ref<const device> &dev, const std::vector<vertex2D> &vert
 
 model2D::model2D(const ref<const device> &dev, const vertex_index_pair &build) : model(dev, build)
 {
+}
+
+model2D::model2D(const model2D &other)
+{
+    copy<vertex2D>(other);
 }
 
 void model2D::write_vertex(std::size_t buffer_index, const vertex2D &vertex)
@@ -265,6 +281,11 @@ model3D::model3D(const ref<const device> &dev, const std::vector<vertex3D> &vert
 
 model3D::model3D(const ref<const device> &dev, const vertex_index_pair &build) : model(dev, build)
 {
+}
+
+model3D::model3D(const model3D &other)
+{
+    copy<vertex3D>(other);
 }
 
 void model3D::write_vertex(std::size_t buffer_index, const vertex3D &vertex)
