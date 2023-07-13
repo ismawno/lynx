@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
-#include "lynx/internal/utils.hpp"
+#include "lynx/internal/utility.hpp"
 
 namespace lynx
 {

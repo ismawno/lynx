@@ -1,5 +1,5 @@
-#ifndef LYNX_NON_COPYABLE_HPP
-#define LYNX_NON_COPYABLE_HPP
+#ifndef LYNX_UTILITY_HPP
+#define LYNX_UTILITY_HPP
 
 namespace lynx
 {

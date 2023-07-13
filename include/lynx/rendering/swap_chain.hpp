@@ -3,7 +3,7 @@
 
 #include "lynx/internal/core.hpp"
 #include "lynx/rendering/device.hpp"
-#include "lynx/internal/utils.hpp"
+#include "lynx/internal/utility.hpp"
 #include <vulkan/vulkan.hpp>
 
 #include <string>
