@@ -27,10 +27,7 @@ void shape2D::color(const glm::vec4 &color)
 
 void shape2D::draw(window2D &win) const
 {
-    render_system2D *rs = win.render_system(m_topology); // DONT NEED TO BE RS2D
-    glm::mat4 tmat = transform.transform();
-    const render_data rdata = rs->create_render_data(&m_model, tmat);
-    rs->push_render_data(rdata);
+    drawable::default_draw(win, &m_model, transform.transform(), m_topology);
 }
 
 // Color should already be encoded in arguments when constructing the model
@@ -53,10 +50,7 @@ void shape3D::color(const glm::vec4 &color)
 
 void shape3D::draw(window3D &win) const
 {
-    render_system3D *rs = win.render_system(m_topology);
-    glm::mat4 tmat = transform.transform();
-    const render_data rdata = rs->create_render_data(&m_model, tmat);
-    rs->push_render_data(rdata);
+    drawable::default_draw(win, &m_model, transform.transform(), m_topology);
 }
 
 rect2D::rect2D(const glm::vec2 &position, const glm::vec2 &dimensions, const glm::vec4 &color)

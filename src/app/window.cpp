@@ -99,24 +99,6 @@ void window::clear_render_data()
         sys->clear_render_data();
 }
 
-const render_system *window::render_system(const topology tplg) const
-{
-    return m_render_systems[(std::size_t)tplg].get();
-}
-render_system *window::render_system(const topology tplg)
-{
-    return m_render_systems[(std::size_t)tplg].get();
-}
-
-const render_system2D *window2D::render_system(const topology tplg) const
-{
-    return dynamic_cast<const render_system2D *>(window::render_system(tplg));
-}
-render_system2D *window2D::render_system(const topology tplg)
-{
-    return dynamic_cast<render_system2D *>(window::render_system(tplg));
-}
-
 bool window::was_resized() const
 {
     return m_frame_buffer_resized;
@@ -234,13 +216,13 @@ window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) 
 
 void window2D::draw(const std::vector<vertex2D> &vertices, const topology tplg, const transform2D &transform)
 {
-    render_system(tplg)->draw(vertices, transform);
+    render_system_as_topology<render_system2D>(tplg)->draw(vertices, transform);
 }
 
 void window2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
                     const topology tplg, const transform2D &transform)
 {
-    render_system(tplg)->draw(vertices, indices, transform);
+    render_system_as_topology<render_system2D>(tplg)->draw(vertices, indices, transform);
 }
 
 void window2D::draw(const drawable2D &drawable)
@@ -265,24 +247,15 @@ window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) 
     add_render_system<triangle_strip_render_system3D>();
 }
 
-const render_system3D *window3D::render_system(const topology tplg) const
-{
-    return dynamic_cast<const render_system3D *>(window::render_system(tplg));
-}
-render_system3D *window3D::render_system(const topology tplg)
-{
-    return dynamic_cast<render_system3D *>(window::render_system(tplg));
-}
-
 void window3D::draw(const std::vector<vertex3D> &vertices, const topology tplg, const transform3D &transform)
 {
-    render_system(tplg)->draw(vertices, transform);
+    render_system_as_topology<render_system3D>(tplg)->draw(vertices, transform);
 }
 
 void window3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
                     const topology tplg, const transform3D &transform)
 {
-    render_system(tplg)->draw(vertices, indices, transform);
+    render_system_as_topology<render_system3D>(tplg)->draw(vertices, indices, transform);
 }
 
 void window3D::draw(const drawable3D &drawable)

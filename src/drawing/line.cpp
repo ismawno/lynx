@@ -15,10 +15,7 @@ line2D::line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1
 
 void line2D::draw(window2D &win) const
 {
-    render_system2D *rs = win.render_system(LINE_LIST);
-    glm::mat4 tmat = m_transform.transform();
-    const render_data rdata = rs->create_render_data(&m_model, tmat);
-    rs->push_render_data(rdata);
+    drawable::default_draw(win, &m_model, m_transform.transform(), LINE_LIST);
 }
 
 transform2D line2D::as_transform() const
@@ -85,10 +82,7 @@ line3D::line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color1
 
 void line3D::draw(window3D &win) const
 {
-    render_system3D *rs = win.render_system(LINE_LIST);
-    glm::mat4 tmat = m_transform.transform();
-    const render_data rdata = rs->create_render_data(&m_model, tmat);
-    rs->push_render_data(rdata);
+    drawable::default_draw(win, &m_model, m_transform.transform(), LINE_LIST);
 }
 
 transform3D line3D::as_transform() const
@@ -138,5 +132,73 @@ void line3D::color1(const glm::vec4 &color1)
 void line3D::color2(const glm::vec4 &color2)
 {
     update_vertex_color(1, m_model, color2);
+}
+
+template <typename T1, typename T2>
+static std::vector<T2> to_vertex_array(const std::vector<T1> &points, const glm::vec4 &color)
+{
+    std::vector<T2> result;
+    result.reserve(points.size());
+    for (const T1 &point : points)
+        result.emplace_back(point, color);
+    return result;
+}
+
+line_strip2D::line_strip2D(const std::vector<glm::vec2> &points, const glm::vec4 &color)
+    : m_model(context::current()->device(), to_vertex_array<glm::vec2, vertex2D>(points, color))
+{
+}
+
+line_strip2D::line_strip2D(const std::vector<vertex2D> &points) : m_model(context::current()->device(), points)
+{
+}
+
+void line_strip2D::draw(window2D &win) const
+{
+    drawable::default_draw_no_transform(win, &m_model, LINE_STRIP);
+}
+
+const vertex2D &line_strip2D::point(std::size_t index) const
+{
+    return m_model.read_vertex(index);
+}
+void line_strip2D::point(std::size_t index, const vertex2D &vertex)
+{
+    m_model.write_vertex(index, vertex);
+}
+
+void line_strip2D::color(const glm::vec4 &color)
+{
+    const auto feach = [&color](vertex2D &vtx) { vtx.color = color; };
+    m_model.update_vertex_buffer(feach);
+}
+
+line_strip3D::line_strip3D(const std::vector<glm::vec3> &points, const glm::vec4 &color)
+    : m_model(context::current()->device(), to_vertex_array<glm::vec3, vertex3D>(points, color))
+{
+}
+
+line_strip3D::line_strip3D(const std::vector<vertex3D> &points) : m_model(context::current()->device(), points)
+{
+}
+
+void line_strip3D::draw(window3D &win) const
+{
+    drawable::default_draw_no_transform(win, &m_model, LINE_STRIP);
+}
+
+const vertex3D &line_strip3D::point(std::size_t index) const
+{
+    return m_model.read_vertex(index);
+}
+void line_strip3D::point(std::size_t index, const vertex3D &vertex)
+{
+    m_model.write_vertex(index, vertex);
+}
+
+void line_strip3D::color(const glm::vec4 &color)
+{
+    const auto feach = [&color](vertex3D &vtx) { vtx.color = color; };
+    m_model.update_vertex_buffer(feach);
 }
 } // namespace lynx

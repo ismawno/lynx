@@ -178,6 +178,11 @@ model2D::model2D(const model2D &other)
     copy<vertex2D>(other);
 }
 
+model2D &model2D::operator=(const model2D &other)
+{
+    copy<vertex2D>(other);
+}
+
 void model2D::write_vertex(std::size_t buffer_index, const vertex2D &vertex)
 {
     model::write_vertex(buffer_index, vertex);
@@ -284,6 +289,11 @@ model3D::model3D(const ref<const device> &dev, const vertex_index_pair &build) :
 }
 
 model3D::model3D(const model3D &other)
+{
+    copy<vertex3D>(other);
+}
+
+model3D &model3D::operator=(const model3D &other)
 {
     copy<vertex3D>(other);
 }

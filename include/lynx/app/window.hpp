@@ -51,8 +51,30 @@ class window : non_copyable
     bool closed();
     void close();
 
-    const lynx::render_system *render_system(topology tplg) const; // BRING ALL OF THIS TO BASE
-    lynx::render_system *render_system(topology tplg);
+    template <typename T = lynx::render_system> const T *render_system_as_topology(topology tplg) const
+    {
+        static_assert(std::is_same<T, lynx::render_system>::value || std::is_same<T, render_system2D>::value ||
+                          std::is_same<T, render_system3D>::value,
+                      "When retrieving render system from topology, the type must be either render_system, "
+                      "render_system2D or render_system3D");
+
+        if constexpr (std::is_same<T, lynx::render_system>::value)
+            return m_render_systems[(std::size_t)tplg].get();
+        else
+            return dynamic_cast<const T *>(m_render_systems[(std::size_t)tplg].get());
+    }
+    template <typename T = lynx::render_system> T *render_system_as_topology(topology tplg)
+    {
+        static_assert(std::is_same<T, lynx::render_system>::value || std::is_same<T, render_system2D>::value ||
+                          std::is_same<T, render_system3D>::value,
+                      "When retrieving render system from topology, the type must be either render_system, "
+                      "render_system2D or render_system3D");
+
+        if constexpr (std::is_same<T, lynx::render_system>::value)
+            return m_render_systems[(std::size_t)tplg].get();
+        else
+            return dynamic_cast<T *>(m_render_systems[(std::size_t)tplg].get());
+    }
 
     bool was_resized() const;
     void complete_resize();
@@ -182,9 +204,6 @@ class window2D : public window
         return window::render_system<T>();
     }
 
-    const render_system2D *render_system(topology tplg) const;
-    render_system2D *render_system(topology tplg);
-
     void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {});
     void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
               const transform2D &transform = {});
@@ -234,9 +253,6 @@ class window3D : public window
         static_assert(std::is_base_of<render_system3D, T>::value, "Type must inherit from render_system3D");
         return window::render_system<T>();
     }
-
-    const render_system3D *render_system(topology tplg) const;
-    render_system3D *render_system(topology tplg);
 
     void draw(const std::vector<vertex3D> &vertices, topology tplg, const transform3D &transform = {});
     void draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
