@@ -2,7 +2,7 @@
 #include "lynx/app/input.hpp"
 #include "lynx/app/window.hpp"
 #include "lynx/geometry/camera.hpp"
-#include "lynx/internal/context.hpp"
+#include "lynx/utility/context.hpp"
 
 namespace lynx::input
 {

@@ -2,7 +2,7 @@
 #define LYNX_BUFFER_HPP
 
 #include "lynx/internal/core.hpp"
-#include "lynx/internal/utility.hpp"
+#include "lynx/utility/non_copyable.hpp"
 #include "lynx/rendering/device.hpp"
 #include <vulkan/vulkan.hpp>
 

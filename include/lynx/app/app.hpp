@@ -3,7 +3,7 @@
 
 #include "lynx/app/window.hpp"
 #include "lynx/app/layer.hpp"
-#include "lynx/internal/context.hpp"
+#include "lynx/utility/context.hpp"
 
 #include <chrono>
 

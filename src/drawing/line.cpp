@@ -2,7 +2,7 @@
 #include "lynx/drawing/line.hpp"
 #include "lynx/rendering/render_system.hpp"
 #include "lynx/app/window.hpp"
-#include "lynx/internal/context.hpp"
+#include "lynx/utility/context.hpp"
 #include "lynx/rendering/buffer.hpp"
 
 namespace lynx

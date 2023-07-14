@@ -1,5 +1,5 @@
 #include "lynx/internal/pch.hpp"
-#include "lynx/internal/context.hpp"
+#include "lynx/utility/context.hpp"
 #include "lynx/drawing/shape.hpp"
 #include "lynx/app/window.hpp"
 #include "lynx/rendering/buffer.hpp"

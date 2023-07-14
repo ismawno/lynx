@@ -5,7 +5,7 @@
 #include "lynx/drawing/model.hpp"
 #include "lynx/geometry/camera.hpp"
 #include "lynx/rendering/buffer.hpp"
-#include "lynx/internal/context.hpp"
+#include "lynx/utility/context.hpp"
 
 namespace lynx
 {
