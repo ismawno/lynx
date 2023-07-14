@@ -112,7 +112,7 @@ bool model::has_index_buffers() const
 }
 
 template <typename T>
-static void update_buffer(std::function<void(T &)> for_each_fn, buffer &host_buffer, buffer &device_buffer)
+static void update_buffer(const std::function<void(T &)> &for_each_fn, buffer &host_buffer, buffer &device_buffer)
 {
     if (for_each_fn)
     {
@@ -123,11 +123,11 @@ static void update_buffer(std::function<void(T &)> for_each_fn, buffer &host_buf
     device_buffer.write(host_buffer);
 }
 
-template <typename T> void model::update_vertex_buffer(std::function<void(T &)> for_each_fn)
+template <typename T> void model::update_vertex_buffer(const std::function<void(T &)> &for_each_fn)
 {
     update_buffer(for_each_fn, *m_host_vertex_buffer, *m_device_vertex_buffer);
 }
-void model::update_index_buffer(std::function<void(std::uint32_t &)> for_each_fn)
+void model::update_index_buffer(const std::function<void(std::uint32_t &)> &for_each_fn)
 {
     DBG_ASSERT_ERROR(has_index_buffers(), "Cannot update index buffer in a model that does not have index buffers")
     update_buffer(for_each_fn, *m_host_index_buffer, *m_device_index_buffer);
@@ -194,7 +194,7 @@ const vertex2D &model2D::read_vertex(std::size_t buffer_index) const
     return model::read_vertex<vertex2D>(buffer_index);
 }
 
-void model2D::update_vertex_buffer(std::function<void(vertex2D &)> for_each_fn)
+void model2D::update_vertex_buffer(const std::function<void(vertex2D &)> &for_each_fn)
 {
     model::update_vertex_buffer(for_each_fn);
 }
@@ -309,7 +309,7 @@ const vertex3D &model3D::read_vertex(std::size_t buffer_index) const
     return model::read_vertex<vertex3D>(buffer_index);
 }
 
-void model3D::update_vertex_buffer(std::function<void(vertex3D &)> for_each_fn)
+void model3D::update_vertex_buffer(const std::function<void(vertex3D &)> &for_each_fn)
 {
     model::update_vertex_buffer(for_each_fn);
 }

@@ -158,13 +158,22 @@ void line_strip2D::draw(window2D &win) const
     drawable::default_draw_no_transform(win, &m_model, LINE_STRIP);
 }
 
-const vertex2D &line_strip2D::point(std::size_t index) const
+const vertex2D &line_strip2D::operator[](const std::size_t index) const
 {
     return m_model.read_vertex(index);
 }
-void line_strip2D::point(std::size_t index, const vertex2D &vertex)
+const vertex2D &line_strip2D::point(const std::size_t index) const
+{
+    return m_model.read_vertex(index);
+}
+void line_strip2D::point(const std::size_t index, const vertex2D &vertex)
 {
     m_model.write_vertex(index, vertex);
+}
+
+void line_strip2D::update_points(const std::function<void(vertex2D &)> &for_each_fn)
+{
+    m_model.update_vertex_buffer(for_each_fn);
 }
 
 void line_strip2D::color(const glm::vec4 &color)
@@ -187,6 +196,10 @@ void line_strip3D::draw(window3D &win) const
     drawable::default_draw_no_transform(win, &m_model, LINE_STRIP);
 }
 
+const vertex3D &line_strip3D::operator[](const std::size_t index) const
+{
+    return m_model.read_vertex(index);
+}
 const vertex3D &line_strip3D::point(std::size_t index) const
 {
     return m_model.read_vertex(index);
@@ -194,6 +207,11 @@ const vertex3D &line_strip3D::point(std::size_t index) const
 void line_strip3D::point(std::size_t index, const vertex3D &vertex)
 {
     m_model.write_vertex(index, vertex);
+}
+
+void line_strip3D::update_points(const std::function<void(vertex3D &)> &for_each_fn)
+{
+    m_model.update_vertex_buffer(for_each_fn);
 }
 
 void line_strip3D::color(const glm::vec4 &color)

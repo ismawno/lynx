@@ -87,6 +87,8 @@ class line_strip2D : public drawable2D
     const vertex2D &point(std::size_t index) const;
     void point(std::size_t index, const vertex2D &vertex);
 
+    void update_points(const std::function<void(vertex2D &)> &for_each_fn);
+
     void color(const glm::vec4 &color);
 
   private:
@@ -104,6 +106,8 @@ class line_strip3D : public drawable3D
     const vertex3D &operator[](std::size_t index) const;
     const vertex3D &point(std::size_t index) const;
     void point(std::size_t index, const vertex3D &vertex);
+
+    void update_points(const std::function<void(vertex3D &)> &for_each_fn);
 
     void color(const glm::vec4 &color);
 
