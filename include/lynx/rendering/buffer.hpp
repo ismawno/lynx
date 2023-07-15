@@ -1,7 +1,8 @@
 #ifndef LYNX_BUFFER_HPP
 #define LYNX_BUFFER_HPP
 
-#include "lynx/internal/core.hpp"
+#include "kit/memory/ref.hpp"
+
 #include "lynx/utility/non_copyable.hpp"
 #include "lynx/rendering/device.hpp"
 #include <vulkan/vulkan.hpp>
@@ -11,7 +12,7 @@ namespace lynx
 class buffer : non_copyable
 {
   public:
-    buffer(const ref<const device> &dev, VkDeviceSize instance_size, std::size_t instance_count,
+    buffer(const kit::ref<const device> &dev, VkDeviceSize instance_size, std::size_t instance_count,
            VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize min_offset_alignment = 1);
     ~buffer();
 
@@ -52,7 +53,7 @@ class buffer : non_copyable
     VkMemoryPropertyFlags properties() const;
 
   private:
-    ref<const device> m_device;
+    kit::ref<const device> m_device;
     void *m_mapped_data = nullptr;
 
     VkBuffer m_buffer = VK_NULL_HANDLE;

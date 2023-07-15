@@ -1,7 +1,7 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/app/window.hpp"
 #include "lynx/rendering/device.hpp"
-#include "lynx/internal/core.hpp"
+#include "kit/memory/stack_vector.hpp"
 
 namespace lynx
 {
@@ -114,7 +114,7 @@ void device::pick_physical_device()
     DBG_ASSERT_CRITICAL(device_count != 0, "Failed to find GPUs with Vulkan support")
 
     DBG_INFO("Device count: {0}", device_count)
-    stk_vector<VkPhysicalDevice> devices(device_count);
+    kit::stack_vector<VkPhysicalDevice> devices(device_count);
     vkEnumeratePhysicalDevices(m_instance, &device_count, devices.data());
 
     for (const auto &device : devices)
@@ -240,7 +240,7 @@ bool device::check_validation_layer_support() const
     std::uint32_t layer_count;
     vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
 
-    stk_vector<VkLayerProperties> available_layers(layer_count);
+    kit::stack_vector<VkLayerProperties> available_layers(layer_count);
     vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
 
     for (const char *layer_name : s_validation_layers)
@@ -286,7 +286,7 @@ void device::has_gflw_required_instance_extensions() const
 {
     std::uint32_t extension_count = 0;
     vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, nullptr);
-    stk_vector<VkExtensionProperties> extensions(extension_count);
+    kit::stack_vector<VkExtensionProperties> extensions(extension_count);
     vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, extensions.data());
 
     DBG_INFO("Available extensions:")
@@ -312,7 +312,7 @@ bool device::check_device_extension_support(VkPhysicalDevice device) const
     std::uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, nullptr);
 
-    stk_vector<VkExtensionProperties> availableExtensions(extension_count);
+    kit::stack_vector<VkExtensionProperties> availableExtensions(extension_count);
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, availableExtensions.data());
 
     std::unordered_set<std::string> req_extensions(s_device_extensions.begin(), s_device_extensions.end());
@@ -330,7 +330,7 @@ device::queue_family_indices device::find_queue_families(VkPhysicalDevice device
     std::uint32_t queue_family_count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, nullptr);
 
-    stk_vector<VkQueueFamilyProperties> queue_families(queue_family_count);
+    kit::stack_vector<VkQueueFamilyProperties> queue_families(queue_family_count);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, queue_families.data());
 
     for (std::uint32_t i = 0; i < queue_families.size(); i++)

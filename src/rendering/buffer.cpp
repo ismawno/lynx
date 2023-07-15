@@ -9,7 +9,7 @@ static VkDeviceSize compute_alignment_size(VkDeviceSize instance_size, VkDeviceS
                                     : instance_size;
 }
 
-buffer::buffer(const ref<const device> &dev, VkDeviceSize instance_size, std::size_t instance_count,
+buffer::buffer(const kit::ref<const device> &dev, VkDeviceSize instance_size, std::size_t instance_count,
                VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize min_offset_alignment)
     : m_device(dev), m_instance_count(instance_count), m_instance_size(instance_size),
       m_min_offset_alignment(min_offset_alignment),

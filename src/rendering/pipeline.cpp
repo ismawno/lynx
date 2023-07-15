@@ -6,7 +6,7 @@
 
 namespace lynx
 {
-pipeline::pipeline(const ref<const device> &dev, const config_info &config) : m_device(dev)
+pipeline::pipeline(const kit::ref<const device> &dev, const config_info &config) : m_device(dev)
 {
     DBG_ASSERT_CRITICAL(config.vertex_shader_path && config.fragment_shader_path,
                         "Vertex and fragment shader paths must not be null pointers!")

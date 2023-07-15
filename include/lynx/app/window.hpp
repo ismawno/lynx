@@ -2,11 +2,12 @@
 #define LYNX_WINDOW_HPP
 
 #include "lynx/rendering/render_system.hpp"
-#include "lynx/internal/core.hpp"
 #include "lynx/rendering/renderer.hpp"
 #include "lynx/rendering/swap_chain.hpp"
 #include "lynx/app/input.hpp"
 #include "lynx/drawing/drawable.hpp"
+#include "kit/memory/ref.hpp"
+#include "kit/memory/scope.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -91,7 +92,7 @@ class window : non_copyable
     event poll_event();
 
     const lynx::renderer &renderer() const;
-    const ref<const lynx::device> &device() const;
+    const kit::ref<const lynx::device> &device() const;
 
     template <typename T = lynx::camera> const T *camera() const
     {
@@ -114,7 +115,7 @@ class window : non_copyable
     template <typename T, class... Args> T *set_camera(Args &&...args)
     {
         static_assert(std::is_base_of<lynx::camera, T>::value, "Type must inherit from camera");
-        auto cam = make_scope<T>(std::forward<Args>(args)...);
+        auto cam = kit::make_scope<T>(std::forward<Args>(args)...);
         T *ptr = cam.get();
         m_camera = std::move(cam);
         return ptr;
@@ -127,7 +128,7 @@ class window : non_copyable
         static_assert(std::is_base_of<lynx::render_system, T>::value, "Type must inherit from render_system");
         DBG_ASSERT_ERROR(!render_system<T>(), "A system with the provided type already exists")
 
-        auto system = make_scope<T>(std::forward<Args>(args)...);
+        auto system = kit::make_scope<T>(std::forward<Args>(args)...);
         T *ptr = system.get();
 
         system->init(m_device, m_renderer->swap_chain().render_pass());
@@ -168,11 +169,11 @@ class window : non_copyable
     const char *m_name;
     GLFWwindow *m_window;
 
-    ref<const lynx::device> m_device;
-    scope<lynx::renderer> m_renderer;
-    scope<lynx::camera> m_camera;
+    kit::ref<const lynx::device> m_device;
+    kit::scope<lynx::renderer> m_renderer;
+    kit::scope<lynx::camera> m_camera;
     std::queue<event> m_event_queue;
-    std::vector<scope<lynx::render_system>> m_render_systems;
+    std::vector<kit::scope<lynx::render_system>> m_render_systems;
 
     bool m_frame_buffer_resized = false;
     glm::vec4 m_clear_color = {0.01f, 0.01f, 0.01f, 1.f};

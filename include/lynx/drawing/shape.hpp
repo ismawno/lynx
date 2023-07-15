@@ -2,7 +2,6 @@
 #define LYNX_SHAPE_HPP
 
 #include "lynx/drawing/drawable.hpp"
-#include "lynx/internal/core.hpp"
 #include "lynx/geometry/transform.hpp"
 #include "lynx/drawing/model.hpp"
 

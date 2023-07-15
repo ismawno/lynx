@@ -20,9 +20,8 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
-#ifdef HAS_DEBUG_LOG_TOOLS
-#include "dbg/log.hpp"
-#endif
+#include <thread>
+#include "kit/debug/log.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

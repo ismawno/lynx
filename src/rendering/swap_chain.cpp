@@ -4,7 +4,7 @@
 namespace lynx
 {
 
-swap_chain::swap_chain(const ref<const device> &dev, VkExtent2D extent, scope<swap_chain> old_swap_chain)
+swap_chain::swap_chain(const kit::ref<const device> &dev, VkExtent2D extent, kit::scope<swap_chain> old_swap_chain)
     : m_device(dev), m_old_swap_chain(std::move(old_swap_chain)), m_window_extent(extent)
 {
     DBG_ASSERT_ERROR(!old_swap_chain || compare_swap_formats(*old_swap_chain),

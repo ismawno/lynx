@@ -5,7 +5,7 @@
 
 namespace lynx
 {
-renderer::renderer(const ref<const device> &dev, window &win) : m_window(win), m_device(dev)
+renderer::renderer(const kit::ref<const device> &dev, window &win) : m_window(win), m_device(dev)
 {
     create_swap_chain();
     create_command_buffers();
@@ -47,7 +47,7 @@ void renderer::create_swap_chain()
     }
 
     vkDeviceWaitIdle(m_device->vulkan_device());
-    m_swap_chain = make_scope<lynx::swap_chain>(m_device, ext, std::move(m_swap_chain));
+    m_swap_chain = kit::make_scope<lynx::swap_chain>(m_device, ext, std::move(m_swap_chain));
     // create_pipeline(); // If render passes are not compatible
 }
 

@@ -1,7 +1,9 @@
 #ifndef LYNX_MODEL_HPP
 #define LYNX_MODEL_HPP
 
-#include "lynx/internal/core.hpp"
+#include "kit/memory/ref.hpp"
+#include "kit/memory/scope.hpp"
+
 #include <functional>
 #include <vulkan/vulkan.hpp>
 
@@ -30,10 +32,10 @@ class model
         std::vector<std::uint32_t> indices;
     };
 
-    template <typename T> model(const ref<const device> &dev, const std::vector<T> &vertices);
+    template <typename T> model(const kit::ref<const device> &dev, const std::vector<T> &vertices);
     template <typename T>
-    model(const ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices);
-    template <typename T> model(const ref<const device> &dev, const vertex_index_pair<T> &build);
+    model(const kit::ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices);
+    template <typename T> model(const kit::ref<const device> &dev, const vertex_index_pair<T> &build);
 
 #ifdef DEBUG
     virtual ~model();
@@ -64,13 +66,13 @@ class model
     template <typename T> void copy(const model &other);
 
   private:
-    ref<const device> m_device;
+    kit::ref<const device> m_device;
 
-    scope<buffer> m_device_vertex_buffer;
-    scope<buffer> m_host_vertex_buffer;
+    kit::scope<buffer> m_device_vertex_buffer;
+    kit::scope<buffer> m_host_vertex_buffer;
 
-    scope<buffer> m_device_index_buffer;
-    scope<buffer> m_host_index_buffer;
+    kit::scope<buffer> m_device_index_buffer;
+    kit::scope<buffer> m_host_index_buffer;
 
     template <typename T> void create_vertex_buffer(const std::vector<T> &vertices);
     void create_index_buffer(const std::vector<std::uint32_t> &indices);
@@ -81,10 +83,10 @@ class model2D : public model
   public:
     using vertex_index_pair = model::vertex_index_pair<vertex2D>;
 
-    model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices);
-    model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices,
+    model2D(const kit::ref<const device> &dev, const std::vector<vertex2D> &vertices);
+    model2D(const kit::ref<const device> &dev, const std::vector<vertex2D> &vertices,
             const std::vector<std::uint32_t> &indices);
-    model2D(const ref<const device> &dev, const vertex_index_pair &build);
+    model2D(const kit::ref<const device> &dev, const vertex_index_pair &build);
 
     model2D(const model2D &other);
     model2D &operator=(const model2D &other);
@@ -107,10 +109,10 @@ class model3D : public model
 {
   public:
     using vertex_index_pair = model::vertex_index_pair<vertex3D>;
-    model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices);
-    model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices,
+    model3D(const kit::ref<const device> &dev, const std::vector<vertex3D> &vertices);
+    model3D(const kit::ref<const device> &dev, const std::vector<vertex3D> &vertices,
             const std::vector<std::uint32_t> &indices);
-    model3D(const ref<const device> &dev, const vertex_index_pair &build);
+    model3D(const kit::ref<const device> &dev, const vertex_index_pair &build);
 
     model3D(const model3D &other);
     model3D &operator=(const model3D &other);

@@ -24,13 +24,13 @@ class app : non_copyable
     std::uint32_t framerate_cap() const;
     void limit_framerate(std::uint32_t framerate);
 
-    template <typename T, class... Args> ref<T> push_layer(Args &&...args)
+    template <typename T, class... Args> kit::ref<T> push_layer(Args &&...args)
     {
         static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
         DBG_ASSERT_ERROR(!m_terminated, "Cannot push layers to a terminated app")
 
         context::set(m_window.get());
-        auto ly = make_ref<T>(std::forward<Args>(args)...);
+        auto ly = kit::make_ref<T>(std::forward<Args>(args)...);
 
         ly->m_parent = this;
         m_layers.emplace_back(ly)->on_attach();
@@ -60,7 +60,7 @@ class app : non_copyable
     template <typename T, class... Args> T *set_window(Args &&...args)
     {
         static_assert(std::is_base_of<lynx::window, T>::value, "Window type must inherit from window");
-        auto win = make_scope<T>(std::forward<Args>(args)...);
+        auto win = kit::make_scope<T>(std::forward<Args>(args)...);
         T *ptr = win.get();
         m_window = std::move(win);
         return ptr;
@@ -73,11 +73,11 @@ class app : non_copyable
     bool m_ongoing_frame = false;
     float m_min_frame_seconds = 0.f;
 
-    std::vector<ref<layer>> m_layers;
+    std::vector<kit::ref<layer>> m_layers;
 
     std::chrono::steady_clock::time_point m_last_timestamp;
     std::chrono::steady_clock::time_point m_current_timestamp;
-    scope<lynx::window> m_window;
+    kit::scope<lynx::window> m_window;
 
     virtual void on_start()
     {

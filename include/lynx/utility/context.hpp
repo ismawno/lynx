@@ -1,7 +1,7 @@
 #ifndef LYNX_CONTEXT_HPP
 #define LYNX_CONTEXT_HPP
 
-#include "lynx/internal/core.hpp"
+#include "kit/memory/ref.hpp"
 #include <array>
 
 namespace lynx
@@ -24,7 +24,7 @@ class context
     static std::size_t count();
     static bool empty();
 
-    const ref<const device> &device() const;
+    const kit::ref<const device> &device() const;
     lynx::window *window() const;
     bool valid() const;
 

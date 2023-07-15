@@ -1,8 +1,10 @@
 #ifndef LYNX_RENDERER_HPP
 #define LYNX_RENDERER_HPP
 
-#include "lynx/internal/core.hpp"
 #include "lynx/rendering/swap_chain.hpp"
+#include "kit/memory/ref.hpp"
+#include "kit/memory/scope.hpp"
+
 #include <vulkan/vulkan.hpp>
 #include <functional>
 
@@ -13,7 +15,7 @@ class device;
 class renderer : non_copyable
 {
   public:
-    renderer(const ref<const device> &dev, window &win);
+    renderer(const kit::ref<const device> &dev, window &win);
     ~renderer();
 
     VkCommandBuffer begin_frame();
@@ -31,8 +33,8 @@ class renderer : non_copyable
 
   private:
     window &m_window;
-    ref<const device> m_device;
-    scope<lynx::swap_chain> m_swap_chain;
+    kit::ref<const device> m_device;
+    kit::scope<lynx::swap_chain> m_swap_chain;
     std::array<VkCommandBuffer, swap_chain::MAX_FRAMES_IN_FLIGHT> m_command_buffers;
 
     std::uint32_t m_image_index;

@@ -5,7 +5,6 @@
 #include "lynx/drawing/model.hpp"
 #include "lynx/geometry/vertex.hpp"
 #include "lynx/geometry/transform.hpp"
-#include "lynx/internal/core.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

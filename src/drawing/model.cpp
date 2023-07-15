@@ -6,7 +6,7 @@
 
 namespace lynx
 {
-template <typename T> model::model(const ref<const device> &dev, const std::vector<T> &vertices) : m_device(dev)
+template <typename T> model::model(const kit::ref<const device> &dev, const std::vector<T> &vertices) : m_device(dev)
 {
     DBG_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
     create_vertex_buffer(vertices);
@@ -15,7 +15,8 @@ template <typename T> model::model(const ref<const device> &dev, const std::vect
 }
 
 template <typename T>
-model::model(const ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices)
+model::model(const kit::ref<const device> &dev, const std::vector<T> &vertices,
+             const std::vector<std::uint32_t> &indices)
     : m_device(dev)
 {
     DBG_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
@@ -25,7 +26,7 @@ model::model(const ref<const device> &dev, const std::vector<T> &vertices, const
 }
 
 template <typename T>
-model::model(const ref<const device> &dev, const vertex_index_pair<T> &build)
+model::model(const kit::ref<const device> &dev, const vertex_index_pair<T> &build)
     : model(dev, build.vertices, build.indices)
 {
 }
@@ -65,17 +66,18 @@ model::~model()
 #endif
 
 template <typename T>
-static void create_buffer(const ref<const device> &dev, const std::vector<T> &data, VkBufferUsageFlags usage,
-                          scope<buffer> &device_buffer, scope<buffer> &host_buffer)
+static void create_buffer(const kit::ref<const device> &dev, const std::vector<T> &data, VkBufferUsageFlags usage,
+                          kit::scope<buffer> &device_buffer, kit::scope<buffer> &host_buffer)
 {
-    host_buffer = make_scope<buffer>(dev, sizeof(T), data.size(), (VkBufferUsageFlags)VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                     (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+    host_buffer =
+        kit::make_scope<buffer>(dev, sizeof(T), data.size(), (VkBufferUsageFlags)VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
     host_buffer->map();
     host_buffer->write((void *)data.data());
     host_buffer->flush();
 
-    device_buffer = make_scope<buffer>(dev, sizeof(T), data.size(), usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-                                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    device_buffer = kit::make_scope<buffer>(dev, sizeof(T), data.size(), usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     device_buffer->write(*host_buffer);
 }
 
@@ -159,17 +161,17 @@ std::uint32_t model::read_index(const std::size_t buffer_index) const
     return m_host_index_buffer->read_at_index<std::uint32_t>(buffer_index);
 }
 
-model2D::model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices) : model(dev, vertices)
+model2D::model2D(const kit::ref<const device> &dev, const std::vector<vertex2D> &vertices) : model(dev, vertices)
 {
 }
 
-model2D::model2D(const ref<const device> &dev, const std::vector<vertex2D> &vertices,
+model2D::model2D(const kit::ref<const device> &dev, const std::vector<vertex2D> &vertices,
                  const std::vector<std::uint32_t> &indices)
     : model(dev, vertices, indices)
 {
 }
 
-model2D::model2D(const ref<const device> &dev, const vertex_index_pair &build) : model(dev, build)
+model2D::model2D(const kit::ref<const device> &dev, const vertex_index_pair &build) : model(dev, build)
 {
 }
 
@@ -275,17 +277,17 @@ model2D::vertex_index_pair model2D::polygon(const std::vector<glm::vec2> &local_
     return polygon_model<glm::vec2, vertex_index_pair>(local_vertices, color);
 }
 
-model3D::model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices) : model(dev, vertices)
+model3D::model3D(const kit::ref<const device> &dev, const std::vector<vertex3D> &vertices) : model(dev, vertices)
 {
 }
 
-model3D::model3D(const ref<const device> &dev, const std::vector<vertex3D> &vertices,
+model3D::model3D(const kit::ref<const device> &dev, const std::vector<vertex3D> &vertices,
                  const std::vector<std::uint32_t> &indices)
     : model(dev, vertices, indices)
 {
 }
 
-model3D::model3D(const ref<const device> &dev, const vertex_index_pair &build) : model(dev, build)
+model3D::model3D(const kit::ref<const device> &dev, const vertex_index_pair &build) : model(dev, build)
 {
 }
 

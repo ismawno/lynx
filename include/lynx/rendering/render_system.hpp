@@ -1,7 +1,6 @@
 #ifndef LYNX_RENDER_SYSTEM_HPP
 #define LYNX_RENDER_SYSTEM_HPP
 
-#include "lynx/internal/core.hpp"
 #include "lynx/rendering/pipeline.hpp"
 #include "lynx/drawing/model.hpp"
 #include "lynx/geometry/transform.hpp"
@@ -37,7 +36,7 @@ class render_system
   public:
     virtual ~render_system();
 
-    void init(const ref<const device> &dev, VkRenderPass render_pass);
+    void init(const kit::ref<const device> &dev, VkRenderPass render_pass);
     void render(VkCommandBuffer command_buffer, const camera &cam) const;
 
     virtual render_data create_render_data(const model *mdl, glm::mat4 &transform, bool unowned = false) const;
@@ -45,7 +44,7 @@ class render_system
     void clear_render_data();
 
   protected:
-    ref<const device> m_device;
+    kit::ref<const device> m_device;
 
     void create_pipeline_layout(const pipeline::config_info &config);
     void create_pipeline(VkRenderPass render_pass, pipeline::config_info &config);
@@ -53,7 +52,7 @@ class render_system
     virtual void pipeline_config(pipeline::config_info &config) const;
 
   private:
-    scope<pipeline> m_pipeline;
+    kit::scope<pipeline> m_pipeline;
     VkPipelineLayout m_pipeline_layout;
     std::vector<render_data> m_render_data;
 };
@@ -66,9 +65,9 @@ class render_system2D : public render_system
               const transform2D &transform = {});
     void draw(const drawable2D &drawable);
 
-    template <class... Args> ref<model2D> model_from_vertices(Args &&...args) const
+    template <class... Args> kit::ref<model2D> model_from_vertices(Args &&...args) const
     {
-        return make_ref<model2D>(m_device, std::forward<Args>(args)...);
+        return kit::make_ref<model2D>(m_device, std::forward<Args>(args)...);
     }
 
     render_data create_render_data(const model *mdl, glm::mat4 &transform, bool unowned = false) const override;
@@ -89,9 +88,9 @@ class render_system3D : public render_system
               const transform3D &transform = {});
     void draw(const drawable3D &drawable);
 
-    template <class... Args> ref<model3D> model_from_vertices(Args &&...args) const
+    template <class... Args> kit::ref<model3D> model_from_vertices(Args &&...args) const
     {
-        return make_ref<model3D>(m_device, std::forward<Args>(args)...);
+        return kit::make_ref<model3D>(m_device, std::forward<Args>(args)...);
     }
 
   protected:

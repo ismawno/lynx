@@ -20,7 +20,7 @@ render_system::~render_system()
         vkDestroyPipelineLayout(m_device->vulkan_device(), m_pipeline_layout, nullptr);
 }
 
-void render_system::init(const ref<const device> &dev, VkRenderPass render_pass)
+void render_system::init(const kit::ref<const device> &dev, VkRenderPass render_pass)
 {
     m_device = dev;
 
@@ -54,7 +54,7 @@ void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::co
 
     config.render_pass = render_pass;
     config.pipeline_layout = m_pipeline_layout;
-    m_pipeline = make_scope<pipeline>(m_device, config);
+    m_pipeline = kit::make_scope<pipeline>(m_device, config);
 }
 
 void render_system::render(VkCommandBuffer command_buffer, const camera &cam) const

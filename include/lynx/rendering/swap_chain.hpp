@@ -1,7 +1,9 @@
 #ifndef LYNX_SWAP_CHAIN_HPP
 #define LYNX_SWAP_CHAIN_HPP
 
-#include "lynx/internal/core.hpp"
+#include "kit/memory/ref.hpp"
+#include "kit/memory/scope.hpp"
+
 #include "lynx/rendering/device.hpp"
 #include "lynx/utility/non_copyable.hpp"
 #include <vulkan/vulkan.hpp>
@@ -17,7 +19,7 @@ class swap_chain : non_copyable
   public:
     static constexpr std::uint32_t MAX_FRAMES_IN_FLIGHT = 2;
 
-    swap_chain(const ref<const device> &dev, VkExtent2D window_extentm, scope<swap_chain> old_swap_chain);
+    swap_chain(const kit::ref<const device> &dev, VkExtent2D window_extentm, kit::scope<swap_chain> old_swap_chain);
     ~swap_chain();
 
     VkFramebuffer frame_buffer(std::size_t index) const;
@@ -62,8 +64,8 @@ class swap_chain : non_copyable
     std::vector<VkImage> m_swap_chain_images;
     std::vector<VkImageView> m_swap_chain_image_views;
 
-    ref<const device> m_device;
-    scope<swap_chain> m_old_swap_chain;
+    kit::ref<const device> m_device;
+    kit::scope<swap_chain> m_old_swap_chain;
 
     VkExtent2D m_window_extent;
 

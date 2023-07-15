@@ -31,8 +31,8 @@ void window::init()
     glfwSetWindowUserPointer(m_window, this);
 
     context::create(this);
-    m_device = make_ref<lynx::device>(*this);
-    m_renderer = make_scope<lynx::renderer>(m_device, *this);
+    m_device = kit::make_ref<lynx::device>(*this);
+    m_renderer = kit::make_scope<lynx::renderer>(m_device, *this);
 }
 
 void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
@@ -161,7 +161,7 @@ const renderer &window::renderer() const
     return *m_renderer;
 }
 
-const ref<const lynx::device> &window::device() const
+const kit::ref<const lynx::device> &window::device() const
 {
     return m_device;
 }

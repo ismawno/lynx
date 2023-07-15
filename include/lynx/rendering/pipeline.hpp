@@ -1,9 +1,9 @@
 #ifndef LYNX_PIPELINE_HPP
 #define LYNX_PIPELINE_HPP
 
-#include "lynx/internal/core.hpp"
 #include "lynx/utility/non_copyable.hpp"
 #include "lynx/rendering/device.hpp"
+#include "kit/memory/ref.hpp"
 #include <vector>
 
 namespace lynx
@@ -40,13 +40,13 @@ class pipeline : non_copyable
         static void default_config(config_info &config);
     };
 
-    pipeline(const ref<const device> &dev, const config_info &config);
+    pipeline(const kit::ref<const device> &dev, const config_info &config);
     ~pipeline();
 
     void bind(VkCommandBuffer command_buffer) const;
 
   private:
-    ref<const device> m_device;
+    kit::ref<const device> m_device;
     VkPipeline m_graphics_pipeline;
     VkShaderModule m_vert_shader_module;
     VkShaderModule m_frag_shader_module;

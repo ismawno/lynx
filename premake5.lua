@@ -25,7 +25,7 @@ filter "system:macosx"
    filter "kind:ConsoleApp"
       libdirs "%{wks.location}/vendor/vulkan-sdk/macOS/lib"
       links {
-         "shapes-2D",
+         "cpp-kit",
          "glfw",
          "Cocoa.framework",
          "IOKit.framework",
@@ -55,8 +55,7 @@ filter {}
 
 includedirs {
    "include",
-   "%{wks.location}/debug-log-tools/include",
-   "%{wks.location}/allocators/include",
+   "%{wks.location}/cpp-kit/include",
    "%{wks.location}/vendor/spdlog/include",
    "%{wks.location}/vendor/glfw/include",
    "%{wks.location}/vendor/glm",

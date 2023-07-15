@@ -69,7 +69,7 @@ bool context::empty()
     return s_active_contexts <= 0;
 }
 
-const ref<const device> &context::device() const
+const kit::ref<const device> &context::device() const
 {
     return m_window->device();
 }
