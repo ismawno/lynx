@@ -8,7 +8,7 @@ namespace lynx
 {
 pipeline::pipeline(const kit::ref<const device> &dev, const config_info &config) : m_device(dev)
 {
-    DBG_ASSERT_CRITICAL(config.vertex_shader_path && config.fragment_shader_path,
+    KIT_ASSERT_CRITICAL(config.vertex_shader_path && config.fragment_shader_path,
                         "Vertex and fragment shader paths must not be null pointers!")
     init(config);
 }
@@ -28,7 +28,7 @@ void pipeline::bind(VkCommandBuffer command_buffer) const
 static std::vector<char> read_file(const char *path)
 {
     std::ifstream file{path, std::ios::ate | std::ios::binary};
-    DBG_ASSERT_ERROR(file.is_open(), "File at path {0} not found", path)
+    KIT_ASSERT_ERROR(file.is_open(), "File at path {0} not found", path)
 
     const long file_size = file.tellg();
     std::vector<char> buffer((std::size_t)file_size);
@@ -40,8 +40,8 @@ static std::vector<char> read_file(const char *path)
 
 void pipeline::init(const config_info &config)
 {
-    DBG_ASSERT_ERROR(config.pipeline_layout, "Pipeline layout must be provided to create graphics pipeline!")
-    DBG_ASSERT_ERROR(config.render_pass, "Render pass must be provided to create graphics pipeline!")
+    KIT_ASSERT_ERROR(config.pipeline_layout, "Pipeline layout must be provided to create graphics pipeline!")
+    KIT_ASSERT_ERROR(config.render_pass, "Render pass must be provided to create graphics pipeline!")
 
     const std::vector<char> vert_code = read_file(config.vertex_shader_path);
     const std::vector<char> frag_code = read_file(config.fragment_shader_path);
@@ -89,7 +89,7 @@ void pipeline::init(const config_info &config)
 
     pipeline_info.basePipelineIndex = -1;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
-    DBG_CHECK_RETURN_VALUE(vkCreateGraphicsPipelines(m_device->vulkan_device(), VK_NULL_HANDLE, 1, &pipeline_info,
+    KIT_CHECK_RETURN_VALUE(vkCreateGraphicsPipelines(m_device->vulkan_device(), VK_NULL_HANDLE, 1, &pipeline_info,
                                                      nullptr, &m_graphics_pipeline),
                            VK_SUCCESS, CRITICAL, "Failed to create graphics pipeline")
 }
@@ -100,7 +100,7 @@ void pipeline::create_shader_module(const std::vector<char> &code, VkShaderModul
     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     create_info.codeSize = code.size();
     create_info.pCode = (const std::uint32_t *)code.data();
-    DBG_CHECK_RETURN_VALUE(vkCreateShaderModule(m_device->vulkan_device(), &create_info, nullptr, shader_module),
+    KIT_CHECK_RETURN_VALUE(vkCreateShaderModule(m_device->vulkan_device(), &create_info, nullptr, shader_module),
                            VK_SUCCESS, CRITICAL, "Failed to create shader module")
 }
 

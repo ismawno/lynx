@@ -44,13 +44,13 @@ void render_system::create_pipeline_layout(const pipeline::config_info &config)
     layout_info.pSetLayouts = nullptr;
     layout_info.pushConstantRangeCount = 1;
     layout_info.pPushConstantRanges = &push_constant_range;
-    DBG_CHECK_RETURN_VALUE(vkCreatePipelineLayout(m_device->vulkan_device(), &layout_info, nullptr, &m_pipeline_layout),
+    KIT_CHECK_RETURN_VALUE(vkCreatePipelineLayout(m_device->vulkan_device(), &layout_info, nullptr, &m_pipeline_layout),
                            VK_SUCCESS, CRITICAL, "Failed to create pipeline layout")
 }
 
 void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::config_info &config)
 {
-    DBG_ASSERT_ERROR(m_pipeline_layout, "Cannot create pipeline before pipeline layout!");
+    KIT_ASSERT_ERROR(m_pipeline_layout, "Cannot create pipeline before pipeline layout!");
 
     config.render_pass = render_pass;
     config.pipeline_layout = m_pipeline_layout;
@@ -62,7 +62,7 @@ void render_system::render(VkCommandBuffer command_buffer, const camera &cam) co
     const glm::mat4 &proj = cam.projection();
     for (const render_data &rdata : m_render_data)
     {
-        DBG_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")
+        KIT_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")
         m_pipeline->bind(command_buffer);
 
         const push_constant_data push_with_camera = {rdata.mdl_transform, proj};
@@ -76,7 +76,7 @@ void render_system::render(VkCommandBuffer command_buffer, const camera &cam) co
 
 render_data render_system::create_render_data(const model *mdl, glm::mat4 &mdl_transform, const bool unowned) const
 {
-    DBG_ASSERT_CRITICAL(mdl, "Model cannot be a null pointer")
+    KIT_ASSERT_CRITICAL(mdl, "Model cannot be a null pointer")
 #ifdef DEBUG
     mdl->to_be_rendered = true;
 #endif

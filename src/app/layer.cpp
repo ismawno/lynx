@@ -42,7 +42,7 @@ void imgui_layer::on_attach()
     pool_info.poolSizeCount = std::size(pool_sizes);
     pool_info.pPoolSizes = pool_sizes;
 
-    DBG_CHECK_RETURN_VALUE(
+    KIT_CHECK_RETURN_VALUE(
         vkCreateDescriptorPool(parent_app->window()->device()->vulkan_device(), &pool_info, nullptr, &m_imgui_pool),
         VK_SUCCESS, CRITICAL, "Failed to create descriptor pool")
 

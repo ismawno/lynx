@@ -8,7 +8,7 @@ namespace lynx
 {
 template <typename T> model::model(const kit::ref<const device> &dev, const std::vector<T> &vertices) : m_device(dev)
 {
-    DBG_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
+    KIT_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
     create_vertex_buffer(vertices);
     m_device_index_buffer = nullptr;
     m_host_index_buffer = nullptr;
@@ -19,8 +19,8 @@ model::model(const kit::ref<const device> &dev, const std::vector<T> &vertices,
              const std::vector<std::uint32_t> &indices)
     : m_device(dev)
 {
-    DBG_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
-    DBG_ASSERT_ERROR(!indices.empty(), "If specified, indices must not be empty")
+    KIT_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
+    KIT_ASSERT_ERROR(!indices.empty(), "If specified, indices must not be empty")
     create_vertex_buffer(vertices);
     create_index_buffer(indices);
 }
@@ -59,7 +59,7 @@ template <typename T> void model::copy(const model &other)
 #ifdef DEBUG
 model::~model()
 {
-    DBG_ASSERT_CRITICAL(!to_be_rendered,
+    KIT_ASSERT_CRITICAL(!to_be_rendered,
                         "Model has been destroyed before being rendered! Any drawable entity must remain alive until "
                         "the end of the frame once it has been submitted for drawing")
 }
@@ -131,7 +131,7 @@ template <typename T> void model::update_vertex_buffer(const std::function<void(
 }
 void model::update_index_buffer(const std::function<void(std::uint32_t &)> &for_each_fn)
 {
-    DBG_ASSERT_ERROR(has_index_buffers(), "Cannot update index buffer in a model that does not have index buffers")
+    KIT_ASSERT_ERROR(has_index_buffers(), "Cannot update index buffer in a model that does not have index buffers")
     update_buffer(for_each_fn, *m_host_index_buffer, *m_device_index_buffer);
 }
 
@@ -144,7 +144,7 @@ template <typename T> void model::write_vertex(const std::size_t buffer_index, c
 
 void model::write_index(const std::size_t buffer_index, const std::uint32_t index)
 {
-    DBG_ASSERT_ERROR(has_index_buffers(), "Cannot write to index buffer in a model that does not have index buffers")
+    KIT_ASSERT_ERROR(has_index_buffers(), "Cannot write to index buffer in a model that does not have index buffers")
     m_host_index_buffer->write_at_index(&index, buffer_index);
     m_host_index_buffer->flush_at_index(buffer_index);
     update_index_buffer();
@@ -157,7 +157,7 @@ template <typename T> const T &model::read_vertex(const std::size_t buffer_index
 
 std::uint32_t model::read_index(const std::size_t buffer_index) const
 {
-    DBG_ASSERT_ERROR(has_index_buffers(), "Cannot write to index buffer in a model that does not have index buffers")
+    KIT_ASSERT_ERROR(has_index_buffers(), "Cannot write to index buffer in a model that does not have index buffers")
     return m_host_index_buffer->read_at_index<std::uint32_t>(buffer_index);
 }
 
@@ -225,7 +225,7 @@ const std::vector<vertex2D> &model2D::line(const glm::vec4 &color1, const glm::v
 template <typename VecType, typename ReturnType>
 static ReturnType circle_model(const std::uint32_t partitions, const glm::vec4 &color)
 {
-    DBG_ASSERT_ERROR(partitions > 2, "Must at least have 3 partitions. Current: {0}", partitions)
+    KIT_ASSERT_ERROR(partitions > 2, "Must at least have 3 partitions. Current: {0}", partitions)
 
     ReturnType build;
     build.vertices.emplace_back(VecType(0.f), color);
@@ -250,7 +250,7 @@ static ReturnType circle_model(const std::uint32_t partitions, const glm::vec4 &
 template <typename VecType, typename ReturnType>
 static ReturnType polygon_model(const std::vector<VecType> &local_vertices, const glm::vec4 &color)
 {
-    DBG_ASSERT_ERROR(local_vertices.size() > 2, "Must at least have 3 vertices. Current: {0}", local_vertices.size())
+    KIT_ASSERT_ERROR(local_vertices.size() > 2, "Must at least have 3 vertices. Current: {0}", local_vertices.size())
     ReturnType build;
     build.vertices.reserve(local_vertices.size() + 1);
     build.vertices.emplace_back(VecType(0.f), color);
@@ -344,7 +344,7 @@ model3D::vertex_index_pair model3D::polygon(const std::vector<glm::vec3> &local_
 model3D::vertex_index_pair model3D::sphere(const std::uint32_t lat_partitions, const std::uint32_t lon_partitions,
                                            const glm::vec4 &color)
 {
-    DBG_ASSERT_ERROR(lat_partitions > 2 && lon_partitions > 2,
+    KIT_ASSERT_ERROR(lat_partitions > 2 && lon_partitions > 2,
                      "Must at least have 3 partitions for each angle. lat partitions: {0}, lon_partitions",
                      lat_partitions, lon_partitions)
 

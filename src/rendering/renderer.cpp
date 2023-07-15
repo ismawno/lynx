@@ -22,13 +22,13 @@ bool renderer::frame_in_progress() const
 }
 VkCommandBuffer renderer::current_command_buffer() const
 {
-    DBG_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve command buffer")
+    KIT_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve command buffer")
     return m_command_buffers[m_frame_index];
 }
 
 std::uint32_t renderer::frame_index() const
 {
-    DBG_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve frame index")
+    KIT_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve frame index")
     return m_frame_index;
 }
 
@@ -59,7 +59,7 @@ void renderer::create_command_buffers()
     alloc_info.commandPool = m_device->command_pool();
     alloc_info.commandBufferCount = (std::uint32_t)m_command_buffers.size();
 
-    DBG_CHECK_RETURN_VALUE(vkAllocateCommandBuffers(m_device->vulkan_device(), &alloc_info, m_command_buffers.data()),
+    KIT_CHECK_RETURN_VALUE(vkAllocateCommandBuffers(m_device->vulkan_device(), &alloc_info, m_command_buffers.data()),
                            VK_SUCCESS, CRITICAL, "Failed to create command buffers")
 }
 
@@ -71,7 +71,7 @@ void renderer::free_command_buffers()
 
 VkCommandBuffer renderer::begin_frame()
 {
-    DBG_ASSERT_ERROR(!m_frame_started, "Cannot begin a new frame when there is already one in progress")
+    KIT_ASSERT_ERROR(!m_frame_started, "Cannot begin a new frame when there is already one in progress")
     const VkResult result = m_swap_chain->acquire_next_image(&m_image_index);
     if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
@@ -79,19 +79,19 @@ VkCommandBuffer renderer::begin_frame()
         return nullptr;
     }
 
-    DBG_ASSERT_CRITICAL(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR, "Failed to acquire swap chain image")
+    KIT_ASSERT_CRITICAL(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR, "Failed to acquire swap chain image")
     m_frame_started = true;
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    DBG_CHECK_RETURN_VALUE(vkBeginCommandBuffer(m_command_buffers[m_frame_index], &begin_info), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkBeginCommandBuffer(m_command_buffers[m_frame_index], &begin_info), VK_SUCCESS, CRITICAL,
                            "Failed to begin command buffer")
     return m_command_buffers[m_frame_index];
 }
 void renderer::end_frame()
 {
-    DBG_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
-    DBG_CHECK_RETURN_VALUE(vkEndCommandBuffer(m_command_buffers[m_frame_index]), VK_SUCCESS, CRITICAL,
+    KIT_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
+    KIT_CHECK_RETURN_VALUE(vkEndCommandBuffer(m_command_buffers[m_frame_index]), VK_SUCCESS, CRITICAL,
                            "Failed to end command buffer")
 
     const VkResult result = m_swap_chain->submit_command_buffers(&m_command_buffers[m_frame_index], &m_image_index);
@@ -104,15 +104,15 @@ void renderer::end_frame()
         m_window.complete_resize();
     }
 
-    DBG_ASSERT_CRITICAL(recreate_fixes_issue || result == VK_SUCCESS, "Failed to submit command buffers")
+    KIT_ASSERT_CRITICAL(recreate_fixes_issue || result == VK_SUCCESS, "Failed to submit command buffers")
     m_frame_started = false;
     m_frame_index = (m_frame_index + 1) % swap_chain::MAX_FRAMES_IN_FLIGHT;
 }
 
 void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer, const glm::vec4 &clear_color)
 {
-    DBG_ASSERT_ERROR(m_frame_started, "Cannot begin render pass if a frame is not in progress")
-    DBG_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
+    KIT_ASSERT_ERROR(m_frame_started, "Cannot begin render pass if a frame is not in progress")
+    KIT_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
                      "Cannot begin render pass with a command buffer from another frame")
 
     VkRenderPassBeginInfo pass_info{};
@@ -148,8 +148,8 @@ void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer, cons
 }
 void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
 {
-    DBG_ASSERT_ERROR(m_frame_started, "Cannot end render pass if a frame is not in progress")
-    DBG_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
+    KIT_ASSERT_ERROR(m_frame_started, "Cannot end render pass if a frame is not in progress")
+    KIT_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
                      "Cannot end render pass with a command buffer from another frame")
 
     vkCmdEndRenderPass(m_command_buffers[m_frame_index]);

@@ -126,7 +126,7 @@ class window : kit::non_copyable
     template <typename T, class... Args> T *add_render_system(Args &&...args)
     {
         static_assert(std::is_base_of<lynx::render_system, T>::value, "Type must inherit from render_system");
-        DBG_ASSERT_ERROR(!render_system<T>(), "A system with the provided type already exists")
+        KIT_ASSERT_ERROR(!render_system<T>(), "A system with the provided type already exists")
 
         auto system = kit::make_scope<T>(std::forward<Args>(args)...);
         T *ptr = system.get();

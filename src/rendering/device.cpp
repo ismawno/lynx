@@ -10,7 +10,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverity
                                                      VkDebugUtilsMessageTypeFlagsEXT,
                                                      const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *)
 {
-    DBG_ERROR("{0}", pCallbackData->pMessage)
+    KIT_ERROR("{0}", pCallbackData->pMessage)
     return VK_FALSE;
 }
 
@@ -67,7 +67,7 @@ bool device::queue_family_indices::is_complete() const
 
 void device::create_instance()
 {
-    DBG_ASSERT_ERROR(check_validation_layer_support(), "Validation layers requested, but not available!")
+    KIT_ASSERT_ERROR(check_validation_layer_support(), "Validation layers requested, but not available!")
 
     VkApplicationInfo app_info{};
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -100,7 +100,7 @@ void device::create_instance()
     create_info.pNext = nullptr;
 #endif
 
-    DBG_CHECK_RETURN_VALUE(vkCreateInstance(&create_info, nullptr, &m_instance), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkCreateInstance(&create_info, nullptr, &m_instance), VK_SUCCESS, CRITICAL,
                            "Failed to create vulkan instance")
 #ifdef DEBUG
     has_gflw_required_instance_extensions();
@@ -111,9 +111,9 @@ void device::pick_physical_device()
 {
     std::uint32_t device_count = 0;
     vkEnumeratePhysicalDevices(m_instance, &device_count, nullptr);
-    DBG_ASSERT_CRITICAL(device_count != 0, "Failed to find GPUs with Vulkan support")
+    KIT_ASSERT_CRITICAL(device_count != 0, "Failed to find GPUs with Vulkan support")
 
-    DBG_INFO("Device count: {0}", device_count)
+    KIT_INFO("Device count: {0}", device_count)
     kit::stack_vector<VkPhysicalDevice> devices(device_count);
     vkEnumeratePhysicalDevices(m_instance, &device_count, devices.data());
 
@@ -124,10 +124,10 @@ void device::pick_physical_device()
             break;
         }
 
-    DBG_ASSERT_CRITICAL(m_physical_device != VK_NULL_HANDLE, "Failed to find a suitable GPU")
+    KIT_ASSERT_CRITICAL(m_physical_device != VK_NULL_HANDLE, "Failed to find a suitable GPU")
 
     vkGetPhysicalDeviceProperties(m_physical_device, &m_properties);
-    DBG_INFO("Physical device: {0}", m_properties.deviceName)
+    KIT_INFO("Physical device: {0}", m_properties.deviceName)
 }
 
 void device::create_logical_device()
@@ -170,7 +170,7 @@ void device::create_logical_device()
     create_info.enabledLayerCount = 0;
 #endif
 
-    DBG_CHECK_RETURN_VALUE(vkCreateDevice(m_physical_device, &create_info, nullptr, &m_device), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkCreateDevice(m_physical_device, &create_info, nullptr, &m_device), VK_SUCCESS, CRITICAL,
                            "Failed to create logical device")
 
     vkGetDeviceQueue(m_device, indices.graphics_family, 0, &m_graphics_queue);
@@ -186,7 +186,7 @@ void device::create_command_pool()
     pool_info.queueFamilyIndex = indices.graphics_family;
     pool_info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
-    DBG_CHECK_RETURN_VALUE(vkCreateCommandPool(m_device, &pool_info, nullptr, &m_command_pool), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkCreateCommandPool(m_device, &pool_info, nullptr, &m_command_pool), VK_SUCCESS, CRITICAL,
                            "Failed to create command pool")
 }
 
@@ -229,7 +229,7 @@ void device::setup_debug_messenger()
 {
     VkDebugUtilsMessengerCreateInfoEXT create_info;
     populate_debug_messenger_create_info(create_info);
-    DBG_CHECK_RETURN_VALUE(create_debug_utils_messenger_EXT(m_instance, &create_info, nullptr, &m_debug_messenger),
+    KIT_CHECK_RETURN_VALUE(create_debug_utils_messenger_EXT(m_instance, &create_info, nullptr, &m_debug_messenger),
                            VK_SUCCESS, CRITICAL, "Failed to set up debug messenger")
 }
 #endif
@@ -289,20 +289,20 @@ void device::has_gflw_required_instance_extensions() const
     kit::stack_vector<VkExtensionProperties> extensions(extension_count);
     vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, extensions.data());
 
-    DBG_INFO("Available extensions:")
+    KIT_INFO("Available extensions:")
     std::unordered_set<std::string> available;
     for (const auto &extension : extensions)
     {
-        DBG_INFO("\t{0}", extension.extensionName)
+        KIT_INFO("\t{0}", extension.extensionName)
         available.insert(extension.extensionName);
     }
 
-    DBG_INFO("Required extensions:")
+    KIT_INFO("Required extensions:")
     const std::vector<const char *> req_extensions = required_extensions();
     for (const auto &required : req_extensions)
     {
-        DBG_INFO("\t{0}", required)
-        DBG_ASSERT_CRITICAL(available.find(required) != available.end(), "Missing required glfw extension")
+        KIT_INFO("\t{0}", required)
+        KIT_ASSERT_CRITICAL(available.find(required) != available.end(), "Missing required glfw extension")
     }
 }
 #endif
@@ -391,7 +391,7 @@ VkFormat device::find_supported_format(const std::vector<VkFormat> &candidates, 
             (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features))
             return format;
     }
-    DBG_CRITICAL("Failed to find supported format")
+    KIT_CRITICAL("Failed to find supported format")
     return VK_FORMAT_MAX_ENUM;
 }
 
@@ -403,7 +403,7 @@ std::uint32_t device::find_memory_type(std::uint32_t typeFilter, VkMemoryPropert
         if ((typeFilter & (1 << i)) && (mem_properties.memoryTypes[i].propertyFlags & properties) == properties)
             return i;
 
-    DBG_CRITICAL("Failed to find suitable memory type");
+    KIT_CRITICAL("Failed to find suitable memory type");
     return (std::uint32_t)-1;
 }
 
@@ -416,7 +416,7 @@ void device::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemory
     buffer_info.usage = usage;
     buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    DBG_CHECK_RETURN_VALUE(vkCreateBuffer(m_device, &buffer_info, nullptr, &buffer), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkCreateBuffer(m_device, &buffer_info, nullptr, &buffer), VK_SUCCESS, CRITICAL,
                            "Failed to create buffer")
 
     VkMemoryRequirements mem_reqs;
@@ -427,7 +427,7 @@ void device::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemory
     alloc_info.allocationSize = mem_reqs.size;
     alloc_info.memoryTypeIndex = find_memory_type(mem_reqs.memoryTypeBits, properties);
 
-    DBG_CHECK_RETURN_VALUE(vkAllocateMemory(m_device, &alloc_info, nullptr, &buffer_memory), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkAllocateMemory(m_device, &alloc_info, nullptr, &buffer_memory), VK_SUCCESS, CRITICAL,
                            "Failed to allocate buffer memory")
     vkBindBufferMemory(m_device, buffer, buffer_memory, 0);
 }
@@ -441,14 +441,14 @@ VkCommandBuffer device::begin_single_time_commands() const
     alloc_info.commandBufferCount = 1;
 
     VkCommandBuffer command_buffer;
-    DBG_CHECK_RETURN_VALUE(vkAllocateCommandBuffers(m_device, &alloc_info, &command_buffer), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkAllocateCommandBuffers(m_device, &alloc_info, &command_buffer), VK_SUCCESS, CRITICAL,
                            "Failed to allocate command buffer")
 
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-    DBG_CHECK_RETURN_VALUE(vkBeginCommandBuffer(command_buffer, &begin_info), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkBeginCommandBuffer(command_buffer, &begin_info), VK_SUCCESS, CRITICAL,
                            "Failed to begin command buffer")
     return command_buffer;
 }
@@ -506,7 +506,7 @@ void device::copy_buffer_to_image(VkBuffer buffer, VkImage image, std::uint32_t 
 void device::create_image_with_info(const VkImageCreateInfo &image_info, VkMemoryPropertyFlags properties,
                                     VkImage &image, VkDeviceMemory &image_memory) const
 {
-    DBG_CHECK_RETURN_VALUE(vkCreateImage(m_device, &image_info, nullptr, &image), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkCreateImage(m_device, &image_info, nullptr, &image), VK_SUCCESS, CRITICAL,
                            "Failed to create image!")
 
     VkMemoryRequirements mem_reqs;
@@ -517,9 +517,9 @@ void device::create_image_with_info(const VkImageCreateInfo &image_info, VkMemor
     alloc_info.allocationSize = mem_reqs.size;
     alloc_info.memoryTypeIndex = find_memory_type(mem_reqs.memoryTypeBits, properties);
 
-    DBG_CHECK_RETURN_VALUE(vkAllocateMemory(m_device, &alloc_info, nullptr, &image_memory), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkAllocateMemory(m_device, &alloc_info, nullptr, &image_memory), VK_SUCCESS, CRITICAL,
                            "Failed to allocate image memory")
-    DBG_CHECK_RETURN_VALUE(vkBindImageMemory(m_device, image, image_memory, 0), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkBindImageMemory(m_device, image, image_memory, 0), VK_SUCCESS, CRITICAL,
                            "Failed to bind image memory")
 }
 

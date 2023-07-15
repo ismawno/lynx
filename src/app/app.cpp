@@ -20,8 +20,8 @@ void app::run()
 
 void app::start()
 {
-    DBG_ASSERT_ERROR(!m_terminated, "Cannot call start on a terminated app")
-    DBG_ASSERT_ERROR(!m_started, "Cannot call start on a started app")
+    KIT_ASSERT_ERROR(!m_terminated, "Cannot call start on a terminated app")
+    KIT_ASSERT_ERROR(!m_started, "Cannot call start on a started app")
     m_current_timestamp = std::chrono::high_resolution_clock::now();
     m_started = true;
     context::set(m_window.get());
@@ -30,8 +30,8 @@ void app::start()
 
 bool app::next_frame()
 {
-    DBG_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
-    DBG_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
+    KIT_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
+    KIT_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
     m_ongoing_frame = true;
 
     context::set(m_window.get());
@@ -86,7 +86,7 @@ void app::shutdown()
         m_to_finish_next_frame = true;
         return;
     }
-    DBG_ASSERT_ERROR(!m_terminated, "Cannot terminate an already terminated app")
+    KIT_ASSERT_ERROR(!m_terminated, "Cannot terminate an already terminated app")
     vkDeviceWaitIdle(m_window->device()->vulkan_device());
 
     on_shutdown();
@@ -101,7 +101,7 @@ std::uint32_t app::framerate_cap() const
 }
 void app::limit_framerate(std::uint32_t framerate)
 {
-    DBG_ASSERT_ERROR(framerate > 0, "Framerate must be greater than 0!")
+    KIT_ASSERT_ERROR(framerate > 0, "Framerate must be greater than 0!")
     m_min_frame_seconds = 1.f / (float)framerate;
 }
 

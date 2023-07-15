@@ -30,7 +30,7 @@ void buffer::map(VkDeviceSize size, VkDeviceSize offset, VkMemoryMapFlags flags)
 {
     if (m_mapped_data)
         unmap();
-    DBG_CHECK_RETURN_VALUE(vkMapMemory(m_device->vulkan_device(), m_memory, offset, size, flags, &m_mapped_data),
+    KIT_CHECK_RETURN_VALUE(vkMapMemory(m_device->vulkan_device(), m_memory, offset, size, flags, &m_mapped_data),
                            VK_SUCCESS, CRITICAL, "Failed to map memory");
 }
 
@@ -45,8 +45,8 @@ bool buffer::unmap()
 
 void buffer::write(const void *data, const VkDeviceSize size, const VkDeviceSize offset)
 {
-    DBG_ASSERT_ERROR(m_mapped_data, "Cannot copy to unmapped buffer")
-    DBG_ASSERT_ERROR((size == VK_WHOLE_SIZE && offset == 0) ||
+    KIT_ASSERT_ERROR(m_mapped_data, "Cannot copy to unmapped buffer")
+    KIT_ASSERT_ERROR((size == VK_WHOLE_SIZE && offset == 0) ||
                          (size != VK_WHOLE_SIZE && (offset + size) <= m_buffer_size),
                      "Size + offset must be lower than the buffer size")
     if (size == VK_WHOLE_SIZE)
@@ -60,11 +60,11 @@ void buffer::write(const void *data, const VkDeviceSize size, const VkDeviceSize
 
 void buffer::write(const buffer &src_buffer)
 {
-    DBG_ASSERT_ERROR(m_buffer_size >= src_buffer.buffer_size(),
+    KIT_ASSERT_ERROR(m_buffer_size >= src_buffer.buffer_size(),
                      "Destination buffer size must be at least equal to the src buffer size")
-    DBG_ASSERT_ERROR(m_usage & VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+    KIT_ASSERT_ERROR(m_usage & VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                      "Destintaion buffer must have the VK_BUFFER_USAGE_TRANSFER_DST_BIT flag enabled")
-    DBG_ASSERT_ERROR(src_buffer.m_usage & VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+    KIT_ASSERT_ERROR(src_buffer.m_usage & VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                      "Source buffer must have the VK_BUFFER_USAGE_TRANSFER_SRC_BIT flag enabled")
     m_device->copy_buffer(m_buffer, src_buffer.m_buffer, m_buffer_size);
 }
@@ -82,7 +82,7 @@ VkMappedMemoryRange buffer::mapped_memory_range(const VkDeviceSize size, const V
 void buffer::flush(const VkDeviceSize size, const VkDeviceSize offset)
 {
     const VkMappedMemoryRange mapped_range = mapped_memory_range(size, offset);
-    DBG_CHECK_RETURN_VALUE(vkFlushMappedMemoryRanges(m_device->vulkan_device(), 1, &mapped_range), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(vkFlushMappedMemoryRanges(m_device->vulkan_device(), 1, &mapped_range), VK_SUCCESS, CRITICAL,
                            "Failed to flush memory. size: {0}, offset: {1}", size, offset)
 }
 
@@ -98,20 +98,20 @@ VkDescriptorBufferInfo buffer::descriptor_info(const VkDeviceSize size, const Vk
 void buffer::invalidate(const VkDeviceSize size, const VkDeviceSize offset)
 {
     const VkMappedMemoryRange mapped_range = mapped_memory_range(size, offset);
-    DBG_CHECK_RETURN_VALUE(vkInvalidateMappedMemoryRanges(m_device->vulkan_device(), 1, &mapped_range), VK_SUCCESS,
+    KIT_CHECK_RETURN_VALUE(vkInvalidateMappedMemoryRanges(m_device->vulkan_device(), 1, &mapped_range), VK_SUCCESS,
                            CRITICAL, "Failed to invalidate memory. size: {0}, offset: {1}", size, offset)
 }
 
 void buffer::write_at_index(const void *data, std::size_t index)
 {
-    DBG_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
+    KIT_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
                      m_instance_count)
     write(data, m_instance_size, index * m_alignment_size);
 }
 
 void buffer::flush_at_index(std::size_t index)
 {
-    DBG_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
+    KIT_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
                      m_instance_count)
 
     const VkDeviceSize atom_size = m_device->properties().limits.nonCoherentAtomSize;
@@ -149,14 +149,14 @@ void buffer::flush_at_index(std::size_t index)
 
 VkDescriptorBufferInfo buffer::descriptor_info_at_index(std::size_t index) const
 {
-    DBG_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
+    KIT_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
                      m_instance_count)
     return descriptor_info(m_alignment_size, index * m_alignment_size);
 }
 
 void buffer::invalidate_at_index(std::size_t index)
 {
-    DBG_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
+    KIT_ASSERT_ERROR(index < m_instance_count, "Index exceeds instance count. index: {0}, instance count: {1}", index,
                      m_instance_count)
     invalidate(m_alignment_size, index * m_alignment_size);
 }

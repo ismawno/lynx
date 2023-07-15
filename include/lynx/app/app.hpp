@@ -27,7 +27,7 @@ class app : kit::non_copyable
     template <typename T, class... Args> kit::ref<T> push_layer(Args &&...args)
     {
         static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
-        DBG_ASSERT_ERROR(!m_terminated, "Cannot push layers to a terminated app")
+        KIT_ASSERT_ERROR(!m_terminated, "Cannot push layers to a terminated app")
 
         context::set(m_window.get());
         auto ly = kit::make_ref<T>(std::forward<Args>(args)...);

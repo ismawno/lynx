@@ -39,7 +39,7 @@ class drawable2D
     virtual void draw(window2D &win) const = 0;
     virtual void draw(render_system2D &rs) const
     {
-        DBG_ERROR("To draw to an arbitrary render system, the draw render system method must be overriden")
+        KIT_ERROR("To draw to an arbitrary render system, the draw render system method must be overriden")
     }
 };
 
@@ -51,7 +51,7 @@ class drawable3D
     virtual void draw(window3D &win) const = 0;
     virtual void draw(render_system3D &rs) const
     {
-        DBG_ERROR("To draw to an arbitrary render system, the draw render system method must be overriden")
+        KIT_ERROR("To draw to an arbitrary render system, the draw render system method must be overriden")
     }
 };
 } // namespace lynx

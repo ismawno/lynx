@@ -14,7 +14,7 @@ void poll_events()
 bool key_pressed(const key::key_code kc)
 {
     const window *win = context::current()->window();
-    DBG_ASSERT_ERROR(context::current()->valid(), "Trying to get input feedback with a non valid current context")
+    KIT_ASSERT_ERROR(context::current()->valid(), "Trying to get input feedback with a non valid current context")
     if (!win)
         return false;
     return key_pressed(*win, kc);
@@ -27,7 +27,7 @@ bool key_pressed(const window &win, const key::key_code kc)
 bool mouse_button_pressed(const mouse::button btn)
 {
     const window *win = context::current()->window();
-    DBG_ASSERT_ERROR(context::current()->valid(), "Trying to get input feedback with a non valid current context")
+    KIT_ASSERT_ERROR(context::current()->valid(), "Trying to get input feedback with a non valid current context")
     if (!win)
         return false;
     return mouse_button_pressed(*win, btn);
@@ -41,7 +41,7 @@ glm::vec2 mouse_position()
 {
     static glm::vec2 pixel_mouse{0.f};
     const window *win = context::current()->window();
-    DBG_ASSERT_ERROR(context::current()->valid(), "Trying to get input feedback with a non valid current context")
+    KIT_ASSERT_ERROR(context::current()->valid(), "Trying to get input feedback with a non valid current context")
     if (!win)
         return pixel_mouse;
 

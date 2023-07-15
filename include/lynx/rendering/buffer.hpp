@@ -33,14 +33,14 @@ class buffer : kit::non_copyable
 
     template <typename T> const T &read_at_index(const std::size_t index) const
     {
-        DBG_ASSERT_ERROR(m_mapped_data, "Cannot read from unmapped buffer")
+        KIT_ASSERT_ERROR(m_mapped_data, "Cannot read from unmapped buffer")
         const char *offsetted = (const char *)m_mapped_data + index * m_alignment_size;
         return *((const T *)offsetted);
     }
 
     template <typename T> T &read_at_index(const std::size_t index)
     {
-        DBG_ASSERT_ERROR(m_mapped_data, "Cannot read from unmapped buffer")
+        KIT_ASSERT_ERROR(m_mapped_data, "Cannot read from unmapped buffer")
         char *offsetted = (char *)m_mapped_data + index * m_alignment_size;
         return *((T *)offsetted);
     }

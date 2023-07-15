@@ -51,7 +51,7 @@ class example_app2D : public lynx::app2D
         // auto mat = m_rect.transform.scale_rotate_translate() * m_rect.transform.inverse_scale_rotate_translate();
         // for (auto i = 0; i < 4; i++)
         //     for (auto j = 0; j < 4; j++)
-        //         DBG_INFO("{0}, {1}: {2}", i, j, mat[i][j])
+        //         KIT_INFO("{0}, {1}: {2}", i, j, mat[i][j])
         // m_rect.transform.rotate(ts);
     }
     lynx::window2D *m_window2D;
@@ -147,7 +147,7 @@ class imgui_demo : public lynx::imgui_layer
 
 int main()
 {
-    DBG_SET_LEVEL(info)
+    KIT_SET_LEVEL(info)
     example_app3D app;
 
     // app.push_layer<imgui_demo>();

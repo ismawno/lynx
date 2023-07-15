@@ -23,7 +23,7 @@ window::~window()
 
 void window::init()
 {
-    DBG_CHECK_RETURN_VALUE(glfwInit(), GLFW_TRUE, CRITICAL, "GLFW failed to initialize")
+    KIT_CHECK_RETURN_VALUE(glfwInit(), GLFW_TRUE, CRITICAL, "GLFW failed to initialize")
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
@@ -37,7 +37,7 @@ void window::init()
 
 void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
 {
-    DBG_CHECK_RETURN_VALUE(glfwCreateWindowSurface(instance, m_window, nullptr, surface), VK_SUCCESS, CRITICAL,
+    KIT_CHECK_RETURN_VALUE(glfwCreateWindowSurface(instance, m_window, nullptr, surface), VK_SUCCESS, CRITICAL,
                            "Failed to create GLFW window surface")
 }
 

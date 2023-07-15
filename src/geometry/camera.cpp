@@ -75,7 +75,7 @@ void camera3D::keep_aspect_ratio(const float aspect)
 
 glm::vec3 camera3D::screen_to_world(const glm::vec2 &screen_pos, const float z_screen) const
 {
-    DBG_ASSERT_ERROR(z_screen >= 0.f && z_screen <= 1.f,
+    KIT_ASSERT_ERROR(z_screen >= 0.f && z_screen <= 1.f,
                      "Value of z-screen must be normalized ([0, 1]) to fit into vulkan's canonical volume. z: {0}",
                      z_screen)
     const glm::vec4 pos4 = m_inv_projection * glm::vec4(screen_pos, z_screen, 1.f);
@@ -148,8 +148,8 @@ perspective3D::perspective3D(const glm::vec3 &position, const float aspect, cons
 {
     transform.position = position;
     transform.rotation = rotation;
-    DBG_ASSERT_ERROR(aspect > 0.0f, "Aspect ratio must be greater than 0");
-    DBG_ASSERT_ERROR(m_fov > 0.0f, "The tangent of the field of view must be greater than 0");
+    KIT_ASSERT_ERROR(aspect > 0.0f, "Aspect ratio must be greater than 0");
+    KIT_ASSERT_ERROR(m_fov > 0.0f, "The tangent of the field of view must be greater than 0");
 }
 
 float perspective3D::near() const
