@@ -1,17 +1,17 @@
 #ifndef LYNX_PIPELINE_HPP
 #define LYNX_PIPELINE_HPP
 
-#include "lynx/utility/non_copyable.hpp"
+#include "kit/interface/non_copyable.hpp"
 #include "lynx/rendering/device.hpp"
 #include "kit/memory/ref.hpp"
 #include <vector>
 
 namespace lynx
 {
-class pipeline : non_copyable
+class pipeline : kit::non_copyable
 {
   public:
-    struct config_info : non_copyable
+    struct config_info : kit::non_copyable
     {
         config_info() = default;
 

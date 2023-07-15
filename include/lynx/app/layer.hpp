@@ -2,7 +2,7 @@
 #define LYNX_LAYER_HPP
 
 #include "lynx/app/input.hpp"
-#include "lynx/utility/non_copyable.hpp"
+#include "kit/interface/non_copyable.hpp"
 #include <functional>
 #include <vulkan/vulkan.hpp>
 #include <imgui.h>
@@ -50,7 +50,7 @@ class layer
     friend class app;
 };
 
-class imgui_layer : public layer, non_copyable
+class imgui_layer : public layer, kit::non_copyable
 {
   public:
     imgui_layer(const char *name = "ImGui Layer");

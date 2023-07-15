@@ -4,12 +4,12 @@
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.hpp>
-#include "lynx/utility/non_copyable.hpp"
+#include "kit/interface/non_copyable.hpp"
 
 namespace lynx
 {
 class window;
-class device : non_copyable
+class device : kit::non_copyable
 {
   public:
     struct swap_chain_support_details

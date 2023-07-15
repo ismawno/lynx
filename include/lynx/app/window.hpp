@@ -28,7 +28,7 @@ class camera3D;
 class orthographic2D;
 class perspective3D;
 
-class window : non_copyable
+class window : kit::non_copyable
 {
   public:
     window(std::uint32_t width, std::uint32_t height, const char *name);

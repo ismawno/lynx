@@ -3,13 +3,13 @@
 
 #include "kit/memory/ref.hpp"
 
-#include "lynx/utility/non_copyable.hpp"
+#include "kit/interface/non_copyable.hpp"
 #include "lynx/rendering/device.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace lynx
 {
-class buffer : non_copyable
+class buffer : kit::non_copyable
 {
   public:
     buffer(const kit::ref<const device> &dev, VkDeviceSize instance_size, std::size_t instance_count,

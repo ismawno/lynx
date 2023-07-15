@@ -12,7 +12,7 @@ namespace lynx
 {
 class window;
 class device;
-class renderer : non_copyable
+class renderer : kit::non_copyable
 {
   public:
     renderer(const kit::ref<const device> &dev, window &win);

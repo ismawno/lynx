@@ -5,7 +5,7 @@
 #include "kit/memory/scope.hpp"
 
 #include "lynx/rendering/device.hpp"
-#include "lynx/utility/non_copyable.hpp"
+#include "kit/interface/non_copyable.hpp"
 #include <vulkan/vulkan.hpp>
 
 #include <string>
@@ -14,7 +14,7 @@
 namespace lynx
 {
 
-class swap_chain : non_copyable
+class swap_chain : kit::non_copyable
 {
   public:
     static constexpr std::uint32_t MAX_FRAMES_IN_FLIGHT = 2;

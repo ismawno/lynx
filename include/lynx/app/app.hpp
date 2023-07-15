@@ -9,7 +9,7 @@
 
 namespace lynx
 {
-class app : non_copyable
+class app : kit::non_copyable
 {
   public:
     app() = default;
