@@ -1,7 +1,7 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/app/window.hpp"
 #include "lynx/rendering/device.hpp"
-#include "kit/memory/stack_vector.hpp"
+#include "kit/container/stack_vector.hpp"
 
 namespace lynx
 {
