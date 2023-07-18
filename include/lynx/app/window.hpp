@@ -45,12 +45,12 @@ class window : kit::non_copyable
 
     void create_surface(VkInstance instance, VkSurfaceKHR *surface) const;
 
-    bool display(const std::function<void(VkCommandBuffer)> &submission = nullptr) const;
-    void clear();
+    bool display(const std::function<void(VkCommandBuffer)> &submission = nullptr);
 
     bool should_close() const;
     bool closed();
     void close();
+    void wait_for_device() const;
 
     template <typename T = lynx::render_system> const T *render_system_as_topology(topology tplg) const
     {

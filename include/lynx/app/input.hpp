@@ -15,9 +15,8 @@ class window;
 
 namespace lynx::input
 {
-namespace key
-{
-enum key_code
+
+enum class key
 {
     SPACE = GLFW_KEY_SPACE,
     APOSTROPHE = GLFW_KEY_APOSTROPHE,
@@ -141,11 +140,8 @@ enum key_code
     MENU = GLFW_KEY_MENU,
     LAST = GLFW_KEY_MENU
 };
-} // namespace key
 
-namespace mouse
-{
-enum button
+enum class mouse
 {
     BUTTON_1 = GLFW_MOUSE_BUTTON_1,
     BUTTON_2 = GLFW_MOUSE_BUTTON_2,
@@ -160,19 +156,18 @@ enum button
     BUTTON_RIGHT = GLFW_MOUSE_BUTTON_RIGHT,
     BUTTON_MIDDLE = GLFW_MOUSE_BUTTON_MIDDLE
 };
-} // namespace mouse
 
 void poll_events();
 
-bool key_pressed(key::key_code kc);
-bool key_pressed(const window &win, key::key_code kc);
+bool key_pressed(key kc);
+bool key_pressed(const window &win, key kc);
 
-bool mouse_button_pressed(mouse::button btn);
-bool mouse_button_pressed(const window &win, mouse::button btn);
+bool mouse_button_pressed(mouse btn);
+bool mouse_button_pressed(const window &win, mouse btn);
 
 glm::vec2 mouse_position();
 
-const char *key_name(key::key_code kc);
+const char *key_name(key kc);
 
 void install_callbacks(window *win);
 
@@ -205,12 +200,12 @@ struct event
     struct mouse_state
     {
         glm::vec2 position{0.f};
-        input::mouse::button button;
+        input::mouse button;
     };
 
     bool empty = false;
     action_type type;
-    input::key::key_code key;
+    input::key key;
 
     window_resize window;
     mouse_state mouse;

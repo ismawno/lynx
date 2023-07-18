@@ -72,7 +72,7 @@ void imgui_layer::on_attach()
     parent_app->window()->renderer().immediate_submission(
         [](const VkCommandBuffer cmd) { ImGui_ImplVulkan_CreateFontsTexture(cmd); });
 
-    vkDeviceWaitIdle(parent_app->window()->device()->vulkan_device());
+    parent_app->window()->wait_for_device();
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
@@ -93,7 +93,7 @@ void imgui_layer::on_detach()
 {
     const app *parent_app = parent();
     ImGui::SetCurrentContext(m_imgui_context);
-    vkDeviceWaitIdle(parent_app->window()->device()->vulkan_device());
+    parent_app->window()->wait_for_device();
     vkDestroyDescriptorPool(parent_app->window()->device()->vulkan_device(), m_imgui_pool, nullptr);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();

@@ -11,7 +11,7 @@ void poll_events()
     glfwPollEvents();
 }
 
-bool key_pressed(const key::key_code kc)
+bool key_pressed(const key kc)
 {
     const window *win = context::current()->window();
     KIT_ASSERT_ERROR(context::current()->valid(), "Trying to get input feedback with a non valid current context")
@@ -19,12 +19,12 @@ bool key_pressed(const key::key_code kc)
         return false;
     return key_pressed(*win, kc);
 }
-bool key_pressed(const window &win, const key::key_code kc)
+bool key_pressed(const window &win, const key kc)
 {
     return glfwGetKey(win.glfw_window(), (int)kc) == GLFW_PRESS;
 }
 
-bool mouse_button_pressed(const mouse::button btn)
+bool mouse_button_pressed(const mouse btn)
 {
     const window *win = context::current()->window();
     KIT_ASSERT_ERROR(context::current()->valid(), "Trying to get input feedback with a non valid current context")
@@ -32,7 +32,7 @@ bool mouse_button_pressed(const mouse::button btn)
         return false;
     return mouse_button_pressed(*win, btn);
 }
-bool mouse_button_pressed(const window &win, const mouse::button btn)
+bool mouse_button_pressed(const window &win, const mouse btn)
 {
     return glfwGetMouseButton(win.glfw_window(), (int)btn);
 }
@@ -51,7 +51,7 @@ glm::vec2 mouse_position()
     return pixel_mouse;
 }
 
-const char *key_name(const key::key_code kc)
+const char *key_name(const key kc)
 {
     return glfwGetKeyName((int)kc, 0);
 }
@@ -95,7 +95,7 @@ static void key_callback(GLFWwindow *window, const int key, const int scancode, 
     default:
         break;
     }
-    ev.key = (key::key_code)key;
+    ev.key = (input::key)key;
     from_glfw(window)->push_event(ev);
 }
 
@@ -111,7 +111,7 @@ static void mouse_button_callback(GLFWwindow *window, const int button, const in
 {
     event ev;
     ev.type = action == GLFW_PRESS ? event::MOUSE_PRESSED : event::MOUSE_RELEASED;
-    ev.mouse.button = (mouse::button)button;
+    ev.mouse.button = (mouse)button;
     from_glfw(window)->push_event(ev);
 }
 

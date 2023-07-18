@@ -41,7 +41,7 @@ void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
                            "Failed to create GLFW window surface")
 }
 
-bool window::display(const std::function<void(VkCommandBuffer)> &submission) const
+bool window::display(const std::function<void(VkCommandBuffer)> &submission)
 {
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
@@ -56,23 +56,24 @@ bool window::display(const std::function<void(VkCommandBuffer)> &submission) con
 
         m_renderer->end_swap_chain_render_pass(command_buffer);
         m_renderer->end_frame();
+
+        clear_render_data();
         return true;
     }
     return false;
 }
 
-void window::clear()
-{
-    vkDeviceWaitIdle(m_device->vulkan_device());
-    clear_render_data();
-}
-
 void window::close()
 {
     clear_render_data();
-    vkDeviceWaitIdle(m_device->vulkan_device());
+    wait_for_device();
     glfwDestroyWindow(m_window);
     m_window = nullptr;
+}
+
+void window::wait_for_device() const
+{
+    vkDeviceWaitIdle(m_device->vulkan_device());
 }
 
 bool window::closed()

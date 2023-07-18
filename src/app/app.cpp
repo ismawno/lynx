@@ -42,6 +42,8 @@ bool app::next_frame()
         return false;
     }
 
+    m_window->wait_for_device();
+
     while (const event ev = m_window->poll_event())
         if (!on_event(ev))
             for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
@@ -59,8 +61,6 @@ bool app::next_frame()
         ly->on_update(delta_time);
     on_late_update(delta_time);
 
-    m_window->clear();
-
     on_render(delta_time);
     for (const auto &ly : m_layers)
         ly->on_render(delta_time);
@@ -70,7 +70,9 @@ bool app::next_frame()
         for (const auto &ly : m_layers)
             ly->on_command_submission(cmd);
     };
-    m_window->display(submission);
+    KIT_CHECK_RETURN_VALUE(m_window->display(submission), true, CRITICAL,
+                           "Display failed to get command buffer for new frame")
+
     if (delta_time < m_min_frame_seconds)
         std::this_thread::sleep_for(
             std::chrono::milliseconds((long long)((m_min_frame_seconds - delta_time) * 1000.f)));
@@ -87,7 +89,7 @@ void app::shutdown()
         return;
     }
     KIT_ASSERT_ERROR(!m_terminated, "Cannot terminate an already terminated app")
-    vkDeviceWaitIdle(m_window->device()->vulkan_device());
+    m_window->wait_for_device();
 
     on_shutdown();
     for (const auto &ly : m_layers)
