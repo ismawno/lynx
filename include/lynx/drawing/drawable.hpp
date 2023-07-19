@@ -16,7 +16,7 @@ class render_system3D;
 
 class model;
 
-enum topology
+enum class topology
 {
     POINT_LIST = 0,
     LINE_LIST = 1,
