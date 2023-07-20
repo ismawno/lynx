@@ -54,28 +54,28 @@ void shape3D::draw(window3D &win) const
 }
 
 rect2D::rect2D(const glm::vec2 &position, const glm::vec2 &dimensions, const glm::vec4 &color)
-    : shape2D(TRIANGLE_LIST, model2D::rect(color))
+    : shape2D(topology::TRIANGLE_LIST, model2D::rect(color))
 {
     transform.position = position;
     transform.scale = dimensions;
 }
 
-rect2D::rect2D(const glm::vec4 &color) : shape2D(TRIANGLE_LIST, model2D::rect(color))
+rect2D::rect2D(const glm::vec4 &color) : shape2D(topology::TRIANGLE_LIST, model2D::rect(color))
 {
 }
 
 ellipse2D::ellipse2D(const float ra, const float rb, const glm::vec4 &color, const std::uint32_t partitions)
-    : shape2D(TRIANGLE_LIST, model2D::circle(partitions, color))
+    : shape2D(topology::TRIANGLE_LIST, model2D::circle(partitions, color))
 {
     transform.scale = {ra, rb};
 }
 ellipse2D::ellipse2D(const float radius, const glm::vec4 &color, const std::uint32_t partitions)
-    : shape2D(TRIANGLE_LIST, model2D::circle(partitions, color))
+    : shape2D(topology::TRIANGLE_LIST, model2D::circle(partitions, color))
 {
     transform.scale = {radius, radius};
 }
 ellipse2D::ellipse2D(const glm::vec4 &color, const std::uint32_t partitions)
-    : shape2D(TRIANGLE_LIST, model2D::circle(partitions, color))
+    : shape2D(topology::TRIANGLE_LIST, model2D::circle(partitions, color))
 {
 }
 
@@ -90,7 +90,7 @@ void ellipse2D::radius(const float radius)
 }
 
 polygon2D::polygon2D(const std::vector<glm::vec2> &local_vertices, const glm::vec4 &color)
-    : shape2D(TRIANGLE_LIST, model2D::polygon(local_vertices, color)), m_size(local_vertices.size())
+    : shape2D(topology::TRIANGLE_LIST, model2D::polygon(local_vertices, color)), m_size(local_vertices.size())
 {
 }
 
@@ -117,28 +117,28 @@ std::size_t polygon2D::size() const
 }
 
 rect3D::rect3D(const glm::vec3 &position, const glm::vec2 &dimensions, const glm::vec4 &color)
-    : shape3D(TRIANGLE_LIST, model3D::rect(color))
+    : shape3D(topology::TRIANGLE_LIST, model3D::rect(color))
 {
     transform.position = position;
     transform.scale = glm::vec3(dimensions, 1.f);
 }
 
-rect3D::rect3D(const glm::vec4 &color) : shape3D(TRIANGLE_LIST, model3D::rect(color))
+rect3D::rect3D(const glm::vec4 &color) : shape3D(topology::TRIANGLE_LIST, model3D::rect(color))
 {
 }
 
 ellipse3D::ellipse3D(const float ra, const float rb, const glm::vec4 &color, const std::uint32_t partitions)
-    : shape3D(TRIANGLE_LIST, model3D::circle(partitions, color))
+    : shape3D(topology::TRIANGLE_LIST, model3D::circle(partitions, color))
 {
     transform.scale = {ra, rb, 1.f};
 }
 ellipse3D::ellipse3D(const float radius, const glm::vec4 &color, const std::uint32_t partitions)
-    : shape3D(TRIANGLE_LIST, model3D::circle(partitions, color))
+    : shape3D(topology::TRIANGLE_LIST, model3D::circle(partitions, color))
 {
     transform.scale = {radius, radius, radius};
 }
 ellipse3D::ellipse3D(const glm::vec4 &color, const std::uint32_t partitions)
-    : shape3D(TRIANGLE_LIST, model3D::circle(partitions, color))
+    : shape3D(topology::TRIANGLE_LIST, model3D::circle(partitions, color))
 {
 }
 
@@ -153,7 +153,7 @@ void ellipse3D::radius(const float radius)
 }
 
 polygon3D::polygon3D(const std::vector<glm::vec3> &local_vertices, const glm::vec4 &color)
-    : shape3D(TRIANGLE_LIST, model3D::polygon(local_vertices, color)), m_size(local_vertices.size())
+    : shape3D(topology::TRIANGLE_LIST, model3D::polygon(local_vertices, color)), m_size(local_vertices.size())
 {
 }
 
@@ -181,18 +181,18 @@ std::size_t polygon3D::size() const
 
 ellipsoid3D::ellipsoid3D(const float ra, const float rb, float rc, const glm::vec4 &color,
                          const std::uint32_t lat_partitions, const std::uint32_t lon_partitions)
-    : shape3D(TRIANGLE_LIST, model3D::sphere(lat_partitions, lon_partitions, color))
+    : shape3D(topology::TRIANGLE_LIST, model3D::sphere(lat_partitions, lon_partitions, color))
 {
     transform.scale = {ra, rb, rc};
 }
 ellipsoid3D::ellipsoid3D(const float radius, const glm::vec4 &color, const std::uint32_t lat_partitions,
                          const std::uint32_t lon_partitions)
-    : shape3D(TRIANGLE_LIST, model3D::sphere(lat_partitions, lon_partitions, color))
+    : shape3D(topology::TRIANGLE_LIST, model3D::sphere(lat_partitions, lon_partitions, color))
 {
     transform.scale = {radius, radius, radius};
 }
 ellipsoid3D::ellipsoid3D(const glm::vec4 &color, const std::uint32_t lat_partitions, const std::uint32_t lon_partitions)
-    : shape3D(TRIANGLE_LIST, model3D::sphere(lat_partitions, lon_partitions, color))
+    : shape3D(topology::TRIANGLE_LIST, model3D::sphere(lat_partitions, lon_partitions, color))
 {
 }
 
@@ -207,13 +207,13 @@ void ellipsoid3D::radius(const float radius)
 }
 
 cube3D::cube3D(const glm::vec3 &position, const glm::vec3 &dimensions, const glm::vec4 &color)
-    : shape3D(TRIANGLE_LIST, model3D::cube(color))
+    : shape3D(topology::TRIANGLE_LIST, model3D::cube(color))
 {
     transform.position = position;
     transform.scale = dimensions;
 }
 
-cube3D::cube3D(const glm::vec4 &color) : shape3D(TRIANGLE_LIST, model3D::cube(color))
+cube3D::cube3D(const glm::vec4 &color) : shape3D(topology::TRIANGLE_LIST, model3D::cube(color))
 {
 }
 } // namespace lynx

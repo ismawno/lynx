@@ -22,10 +22,10 @@ void app::start()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot call start on a terminated app")
     KIT_ASSERT_ERROR(!m_started, "Cannot call start on a started app")
-    m_current_timestamp = std::chrono::high_resolution_clock::now();
     m_started = true;
     context::set(m_window.get());
     on_start();
+    m_frame_clock.restart();
 }
 
 bool app::next_frame()
@@ -50,12 +50,7 @@ bool app::next_frame()
                 if ((*it)->on_event(ev))
                     break;
 
-    m_last_timestamp = m_current_timestamp;
-    m_current_timestamp = std::chrono::high_resolution_clock::now();
-
-    const float delta_time =
-        std::chrono::duration<float, std::chrono::seconds::period>(m_current_timestamp - m_last_timestamp).count();
-
+    const float delta_time = m_frame_clock.restart().as<float, kit::time::seconds>();
     on_update(delta_time);
     for (const auto &ly : m_layers)
         ly->on_update(delta_time);

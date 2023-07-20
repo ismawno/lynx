@@ -4,8 +4,7 @@
 #include "lynx/app/window.hpp"
 #include "lynx/app/layer.hpp"
 #include "lynx/utility/context.hpp"
-
-#include <chrono>
+#include "kit/profile/clock.hpp"
 
 namespace lynx
 {
@@ -74,10 +73,8 @@ class app : kit::non_copyable
     float m_min_frame_seconds = 0.f;
 
     std::vector<kit::ref<layer>> m_layers;
-
-    std::chrono::steady_clock::time_point m_last_timestamp;
-    std::chrono::steady_clock::time_point m_current_timestamp;
     kit::scope<lynx::window> m_window;
+    kit::clock m_frame_clock;
 
     virtual void on_start()
     {

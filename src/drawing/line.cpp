@@ -15,7 +15,7 @@ line2D::line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1
 
 void line2D::draw(window2D &win) const
 {
-    drawable::default_draw(win, &m_model, m_transform.transform(), LINE_LIST);
+    drawable::default_draw(win, &m_model, m_transform.transform(), topology::LINE_LIST);
 }
 
 transform2D line2D::as_transform() const
@@ -82,7 +82,7 @@ line3D::line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color1
 
 void line3D::draw(window3D &win) const
 {
-    drawable::default_draw(win, &m_model, m_transform.transform(), LINE_LIST);
+    drawable::default_draw(win, &m_model, m_transform.transform(), topology::LINE_LIST);
 }
 
 transform3D line3D::as_transform() const
@@ -155,7 +155,7 @@ line_strip2D::line_strip2D(const std::vector<vertex2D> &points) : m_model(contex
 
 void line_strip2D::draw(window2D &win) const
 {
-    drawable::default_draw_no_transform(win, &m_model, LINE_STRIP);
+    drawable::default_draw_no_transform(win, &m_model, topology::LINE_STRIP);
 }
 
 const vertex2D &line_strip2D::operator[](const std::size_t index) const
@@ -193,7 +193,7 @@ line_strip3D::line_strip3D(const std::vector<vertex3D> &points) : m_model(contex
 
 void line_strip3D::draw(window3D &win) const
 {
-    drawable::default_draw_no_transform(win, &m_model, LINE_STRIP);
+    drawable::default_draw_no_transform(win, &m_model, topology::LINE_STRIP);
 }
 
 const vertex3D &line_strip3D::operator[](const std::size_t index) const
