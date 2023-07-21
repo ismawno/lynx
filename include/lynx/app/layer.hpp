@@ -4,13 +4,14 @@
 #include "lynx/app/input.hpp"
 #include "kit/interface/nameable.hpp"
 #include "kit/interface/toggleable.hpp"
+#include "kit/interface/serializable.hpp"
 #include <functional>
 #include <vulkan/vulkan.hpp>
 
 namespace lynx
 {
 class app;
-class layer : public kit::nameable, public kit::toggleable
+class layer : public kit::nameable, public kit::toggleable, public kit::serializable
 {
   public:
     using kit::nameable::nameable;
@@ -27,6 +28,12 @@ class layer : public kit::nameable, public kit::toggleable
 
   private:
     app *m_parent = nullptr;
+
+#ifdef KIT_USE_YAML_CPP
+    virtual YAML::Node encode() const;
+    virtual bool decode(const YAML::Node &node);
+#endif
+
     virtual void on_attach()
     {
     }
