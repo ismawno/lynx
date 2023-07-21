@@ -50,7 +50,9 @@ bool app::next_frame()
                 if ((*it)->on_event(ev))
                     break;
 
-    const float delta_time = m_frame_clock.restart().as<float, kit::time::seconds>();
+    m_frame_time = m_frame_clock.restart();
+    const float delta_time = m_frame_time.as<kit::time::seconds, float>();
+
     on_update(delta_time);
     for (const auto &ly : m_layers)
         ly->on_update(delta_time);
@@ -68,9 +70,8 @@ bool app::next_frame()
     KIT_CHECK_RETURN_VALUE(m_window->display(submission), true, CRITICAL,
                            "Display failed to get command buffer for new frame")
 
-    if (delta_time < m_min_frame_seconds)
-        std::this_thread::sleep_for(
-            std::chrono::milliseconds((long long)((m_min_frame_seconds - delta_time) * 1000.f)));
+    if (m_frame_time < m_min_frame_time)
+        kit::time::sleep(m_min_frame_time - m_frame_time);
     m_ongoing_frame = false;
     return !m_window->closed() && !m_to_finish_next_frame;
 }
@@ -92,14 +93,18 @@ void app::shutdown()
     m_terminated = true;
 }
 
+kit::time app::frame_time() const
+{
+    return m_frame_time;
+}
 std::uint32_t app::framerate_cap() const
 {
-    return (std::uint32_t)(1.f / m_min_frame_seconds);
+    return (std::uint32_t)(1.f / m_min_frame_time.as<kit::time::seconds, float>());
 }
 void app::limit_framerate(std::uint32_t framerate)
 {
     KIT_ASSERT_ERROR(framerate > 0, "Framerate must be greater than 0!")
-    m_min_frame_seconds = 1.f / (float)framerate;
+    m_min_frame_time = kit::time::from<kit::time::duration::seconds>(1.f / framerate);
 }
 
 bool app::pop_layer(const layer *ly)

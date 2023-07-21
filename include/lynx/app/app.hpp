@@ -20,6 +20,8 @@ class app : kit::non_copyable
     bool next_frame();
     void shutdown();
 
+    kit::time frame_time() const;
+
     std::uint32_t framerate_cap() const;
     void limit_framerate(std::uint32_t framerate);
 
@@ -70,11 +72,12 @@ class app : kit::non_copyable
     bool m_terminated = false;
     bool m_to_finish_next_frame = false;
     bool m_ongoing_frame = false;
-    float m_min_frame_seconds = 0.f;
 
     std::vector<kit::ref<layer>> m_layers;
     kit::scope<lynx::window> m_window;
     kit::clock m_frame_clock;
+    kit::time m_frame_time;
+    kit::time m_min_frame_time;
 
     virtual void on_start()
     {
