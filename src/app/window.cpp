@@ -10,7 +10,7 @@
 namespace lynx
 {
 window::window(const std::uint32_t width, const std::uint32_t height, const char *name)
-    : m_width(width), m_height(height), m_name(name)
+    : nameable(name), m_width(width), m_height(height)
 {
     init();
     input::install_callbacks(this);
@@ -27,7 +27,7 @@ void window::init()
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-    m_window = glfwCreateWindow((int)m_width, (int)m_height, m_name, nullptr, nullptr);
+    m_window = glfwCreateWindow((int)m_width, (int)m_height, name(), nullptr, nullptr);
     glfwSetWindowUserPointer(m_window, this);
 
     context::create(this);
@@ -179,10 +179,6 @@ std::uint32_t window::width() const
 std::uint32_t window::height() const
 {
     return m_height;
-}
-const char *window::name() const
-{
-    return m_name;
 }
 
 float window::aspect() const

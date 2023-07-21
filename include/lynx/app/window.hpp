@@ -8,6 +8,7 @@
 #include "lynx/drawing/drawable.hpp"
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
+#include "kit/interface/nameable.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -28,7 +29,7 @@ class camera3D;
 class orthographic2D;
 class perspective3D;
 
-class window : kit::non_copyable
+class window : kit::non_copyable, public kit::nameable
 {
   public:
     window(std::uint32_t width, std::uint32_t height, const char *name);
@@ -36,7 +37,6 @@ class window : kit::non_copyable
 
     std::uint32_t width() const;
     std::uint32_t height() const;
-    const char *name() const;
 
     float aspect() const;
     float swap_chain_aspect() const;
@@ -166,7 +166,6 @@ class window : kit::non_copyable
 
   private:
     std::uint32_t m_width, m_height;
-    const char *m_name;
     GLFWwindow *m_window;
 
     kit::ref<const lynx::device> m_device;
