@@ -13,6 +13,9 @@ class app;
 class layer : public kit::nameable, public kit::toggleable
 {
   public:
+    layer(const char *name);
+    virtual ~layer() = default;
+
     template <typename T = app> T *parent() const
     {
         if constexpr (std::is_same<T, app>::value)
