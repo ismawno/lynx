@@ -22,6 +22,8 @@ class app : kit::non_copyable
 
     kit::time frame_time() const;
 
+    const std::vector<kit::ref<layer>> &layers() const;
+
     std::uint32_t framerate_cap() const;
     void limit_framerate(std::uint32_t framerate);
 
@@ -79,6 +81,11 @@ class app : kit::non_copyable
     kit::time m_frame_time;
     kit::time m_min_frame_time;
 
+#ifdef LYNX_ENABLE_IMGUI
+    VkDescriptorPool m_imgui_pool;
+    ImGuiContext *m_imgui_context;
+#endif
+
     virtual void on_start()
     {
     }
@@ -101,6 +108,15 @@ class app : kit::non_copyable
     {
         return false;
     }
+
+#ifdef LYNX_ENABLE_IMGUI
+    void imgui_init();
+    void imgui_begin_render();
+    void imgui_end_render();
+    void imgui_submit_command(VkCommandBuffer command_buffer);
+    void imgui_shutdown();
+
+#endif
 };
 
 class app2D : public app

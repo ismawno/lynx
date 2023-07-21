@@ -17,9 +17,11 @@
 #include <limits>
 #include <queue>
 #include <vulkan/vulkan.hpp>
+#ifdef LYNX_ENABLE_IMGUI
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
+#endif
 #include <thread>
 #include "kit/debug/log.hpp"
 
