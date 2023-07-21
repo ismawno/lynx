@@ -13,7 +13,8 @@ class app;
 class layer : public kit::nameable, public kit::toggleable
 {
   public:
-    layer(const char *name);
+    using kit::nameable::nameable;
+
     virtual ~layer() = default;
 
     template <typename T = app> T *parent() const
