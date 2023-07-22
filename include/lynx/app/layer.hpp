@@ -3,6 +3,7 @@
 
 #include "lynx/app/input.hpp"
 #include "kit/interface/nameable.hpp"
+#include "kit/interface/identifiable.hpp"
 #include "kit/interface/toggleable.hpp"
 #include "kit/interface/serialization.hpp"
 #include <functional>
@@ -11,11 +12,10 @@
 namespace lynx
 {
 class app;
-class layer : public kit::nameable, public kit::toggleable, public kit::serializable
+class layer : public kit::identifiable<std::string>, public kit::toggleable, public kit::serializable
 {
   public:
-    using kit::nameable::nameable;
-
+    layer(const std::string &name);
     virtual ~layer() = default;
 
     template <typename T = app> T *parent() const
