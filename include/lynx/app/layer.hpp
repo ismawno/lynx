@@ -4,7 +4,7 @@
 #include "lynx/app/input.hpp"
 #include "kit/interface/nameable.hpp"
 #include "kit/interface/toggleable.hpp"
-#include "kit/interface/serializable.hpp"
+#include "kit/interface/serialization.hpp"
 #include <functional>
 #include <vulkan/vulkan.hpp>
 
