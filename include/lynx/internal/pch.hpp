@@ -5,9 +5,9 @@
 #include <GLFW/glfw3.h>
 #include <cstddef>
 #include <cstring>
-#include <iostream>
 #include <stdexcept>
 #include <vector>
+#include <fstream>
 #include <array>
 #include <memory>
 #include <chrono>

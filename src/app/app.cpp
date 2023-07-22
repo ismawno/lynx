@@ -132,12 +132,12 @@ const std::vector<kit::ref<layer>> &app::layers() const
 }
 std::uint32_t app::framerate_cap() const
 {
-    return (std::uint32_t)(1.f / m_min_frame_time.as<kit::time::seconds, float>());
+    const bool capped = m_min_frame_time.as<kit::time::nanoseconds, long long>() > 0;
+    return capped ? (std::uint32_t)(1.f / m_min_frame_time.as<kit::time::seconds, float>()) : 0;
 }
-void app::limit_framerate(std::uint32_t framerate)
+void app::limit_framerate(const std::uint32_t framerate)
 {
-    KIT_ASSERT_ERROR(framerate > 0, "Framerate must be greater than 0!")
-    m_min_frame_time = kit::time::from<kit::time::duration::seconds>(1.f / framerate);
+    m_min_frame_time = kit::time::from<kit::time::duration::seconds>(framerate > 0 ? (1.f / framerate) : 0.f);
 }
 
 bool app::pop_layer(const layer *ly)

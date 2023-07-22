@@ -26,13 +26,13 @@ class layer : public kit::nameable, public kit::toggleable, public kit::serializ
             return dynamic_cast<T *>(m_parent);
     }
 
-  private:
-    app *m_parent = nullptr;
-
 #ifdef KIT_USE_YAML_CPP
     virtual YAML::Node encode() const;
     virtual bool decode(const YAML::Node &node);
 #endif
+
+  private:
+    app *m_parent = nullptr;
 
     virtual void on_attach()
     {
