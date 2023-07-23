@@ -21,21 +21,6 @@ filter "system:macosx"
       "-Wconversion",
       "-Wno-unused-parameter"
    }
-
-   filter "kind:ConsoleApp"
-      libdirs "%{wks.location}/vendor/vulkan-sdk/macOS/lib"
-      links {
-         "cpp-kit",
-         "glfw",
-         "Cocoa.framework",
-         "IOKit.framework",
-         "CoreFoundation.framework",
-         "vulkan",
-         "imgui"
-      }
-      rpath = "-Wl,-rpath,".. rootpath .."vendor/vulkan-sdk/macOS/lib"
-      linkoptions {rpath}
-   filter {}
 filter {}
 
 targetdir("bin/" .. outputdir)
