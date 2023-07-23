@@ -5,6 +5,9 @@
 #include "lynx/app/layer.hpp"
 #include "lynx/utility/context.hpp"
 #include "kit/profile/clock.hpp"
+#ifdef LYNX_ENABLE_IMGUI
+#include <imgui.h>
+#endif
 
 namespace lynx
 {
@@ -34,6 +37,13 @@ class app : kit::non_copyable
 
         context::set(m_window.get());
         auto ly = kit::make_ref<T>(std::forward<Args>(args)...);
+#ifdef DEBUG
+        for (const auto &old : m_layers)
+        {
+            KIT_ASSERT_ERROR(*old != *ly,
+                             "Cannot add a layer with a name that already exists. Layer names act as identifiers")
+        }
+#endif
 
         ly->m_parent = this;
         m_layers.emplace_back(ly)->on_attach();

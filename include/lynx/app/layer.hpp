@@ -2,7 +2,6 @@
 #define LYNX_LAYER_HPP
 
 #include "lynx/app/input.hpp"
-#include "kit/interface/nameable.hpp"
 #include "kit/interface/identifiable.hpp"
 #include "kit/interface/toggleable.hpp"
 #include "kit/interface/serialization.hpp"
