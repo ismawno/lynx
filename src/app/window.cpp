@@ -66,7 +66,6 @@ bool window::display(const std::function<void(VkCommandBuffer)> &submission)
 void window::close()
 {
     clear_render_data();
-    wait_for_device();
     glfwDestroyWindow(m_window);
     m_window = nullptr;
 }

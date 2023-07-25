@@ -57,8 +57,6 @@ bool app::next_frame()
         return false;
     }
 
-    m_window->wait_for_device();
-
     while (const event ev = m_window->poll_event())
         if (!on_event(ev))
             for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
@@ -211,7 +209,6 @@ void app::imgui_init()
     m_window->renderer().immediate_submission(
         [](const VkCommandBuffer cmd) { ImGui_ImplVulkan_CreateFontsTexture(cmd); });
 
-    m_window->wait_for_device();
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 void app::imgui_begin_render()
@@ -242,7 +239,6 @@ void app::imgui_submit_command(const VkCommandBuffer command_buffer)
 void app::imgui_shutdown()
 {
     ImGui::SetCurrentContext(m_imgui_context);
-    m_window->wait_for_device();
     vkDestroyDescriptorPool(m_window->device()->vulkan_device(), m_imgui_pool, nullptr);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();

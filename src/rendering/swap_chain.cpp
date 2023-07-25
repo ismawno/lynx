@@ -371,7 +371,6 @@ VkSurfaceFormatKHR swap_chain::choose_swap_surface_format(const std::vector<VkSu
 
 VkPresentModeKHR swap_chain::choose_swap_present_mode(const std::vector<VkPresentModeKHR> &available_present_modes)
 {
-
     for (const auto &available_present_mode : available_present_modes)
         if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
         {
