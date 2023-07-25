@@ -371,8 +371,7 @@ VkSurfaceFormatKHR swap_chain::choose_swap_surface_format(const std::vector<VkSu
 
 VkPresentModeKHR swap_chain::choose_swap_present_mode(const std::vector<VkPresentModeKHR> &available_present_modes)
 {
-    KIT_INFO("Present mode: V-Sync")
-    return VK_PRESENT_MODE_FIFO_KHR;
+
     for (const auto &available_present_mode : available_present_modes)
         if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
         {
@@ -386,6 +385,8 @@ VkPresentModeKHR swap_chain::choose_swap_present_mode(const std::vector<VkPresen
             KIT_INFO("Present mode: Immediate")
             return available_present_mode;
         }
+    KIT_INFO("Present mode: V-Sync")
+    return VK_PRESENT_MODE_FIFO_KHR;
 }
 
 VkExtent2D swap_chain::choose_swap_extent(const VkSurfaceCapabilitiesKHR &capabilities)

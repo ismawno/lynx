@@ -87,7 +87,6 @@ class app : kit::non_copyable
 
     std::vector<kit::ref<layer>> m_layers;
     kit::scope<lynx::window> m_window;
-    kit::clock m_frame_clock;
     kit::time m_frame_time;
     kit::time m_min_frame_time;
 

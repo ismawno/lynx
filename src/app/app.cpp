@@ -34,13 +34,19 @@ void app::start()
     for (const auto &ly : m_layers)
         if (ly->enabled())
             ly->on_start();
-    m_frame_clock.restart();
 }
 
 bool app::next_frame()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     KIT_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
+
+    if (m_min_frame_time > m_frame_time)
+    {
+        kit::time::sleep(m_min_frame_time - m_frame_time);
+        m_frame_time = m_min_frame_time;
+    }
+    kit::clock frame_clock;
     m_ongoing_frame = true;
 
     context::set(m_window.get());
@@ -59,7 +65,6 @@ bool app::next_frame()
                 if ((*it)->enabled() && (*it)->on_event(ev))
                     break;
 
-    m_frame_time = m_frame_clock.restart();
     const float delta_time = m_frame_time.as<kit::time::seconds, float>();
 
     on_update(delta_time);
@@ -93,9 +98,9 @@ bool app::next_frame()
     KIT_CHECK_RETURN_VALUE(m_window->display(submission), true, CRITICAL,
                            "Display failed to get command buffer for new frame")
 
-    if (m_frame_time < m_min_frame_time)
-        kit::time::sleep(m_min_frame_time - m_frame_time);
     m_ongoing_frame = false;
+
+    m_frame_time = frame_clock.elapsed();
     return !m_window->closed() && !m_to_finish_next_frame;
 }
 
@@ -137,7 +142,7 @@ std::uint32_t app::framerate_cap() const
 }
 void app::limit_framerate(const std::uint32_t framerate)
 {
-    m_min_frame_time = kit::time::from<kit::time::duration::seconds>(framerate > 0 ? (1.f / framerate) : 0.f);
+    m_min_frame_time = kit::time::from<kit::time::seconds>(framerate > 0 ? (1.f / framerate) : 0.f);
 }
 
 bool app::pop_layer(const layer *ly)

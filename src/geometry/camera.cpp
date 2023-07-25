@@ -70,7 +70,7 @@ void orthographic2D::update_transformation_matrices()
 
 void camera3D::keep_aspect_ratio(const float aspect)
 {
-    transform.scale.x = aspect * transform.scale.y;
+    transform.scale.x = aspect * glm::abs(transform.scale.y);
 }
 
 glm::vec3 camera3D::screen_to_world(const glm::vec2 &screen_pos, const float z_screen) const
