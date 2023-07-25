@@ -129,7 +129,7 @@ kit::time app::frame_time() const
 {
     return m_frame_time;
 }
-const std::vector<kit::ref<layer>> &app::layers() const
+const std::vector<kit::scope<layer>> &app::layers() const
 {
     return m_layers;
 }

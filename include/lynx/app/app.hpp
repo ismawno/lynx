@@ -25,18 +25,19 @@ class app : kit::non_copyable
 
     kit::time frame_time() const;
 
-    const std::vector<kit::ref<layer>> &layers() const;
+    const std::vector<kit::scope<layer>> &layers() const;
 
     std::uint32_t framerate_cap() const;
     void limit_framerate(std::uint32_t framerate);
 
-    template <typename T, class... Args> kit::ref<T> push_layer(Args &&...args)
+    template <typename T, class... Args> T *push_layer(Args &&...args)
     {
         static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
         KIT_ASSERT_ERROR(!m_terminated, "Cannot push layers to a terminated app")
 
         context::set(m_window.get());
-        auto ly = kit::make_ref<T>(std::forward<Args>(args)...);
+        auto ly = kit::make_scope<T>(std::forward<Args>(args)...);
+        T *ptr = ly.get();
 #ifdef DEBUG
         for (const auto &old : m_layers)
         {
@@ -46,8 +47,8 @@ class app : kit::non_copyable
 #endif
 
         ly->m_parent = this;
-        m_layers.emplace_back(ly)->on_attach();
-        return ly;
+        m_layers.emplace_back(std::move(ly))->on_attach();
+        return ptr;
     }
 
     bool pop_layer(const layer *ly);
@@ -85,7 +86,7 @@ class app : kit::non_copyable
     bool m_to_finish_next_frame = false;
     bool m_ongoing_frame = false;
 
-    std::vector<kit::ref<layer>> m_layers;
+    std::vector<kit::scope<layer>> m_layers;
     kit::scope<lynx::window> m_window;
     kit::time m_frame_time;
     kit::time m_min_frame_time;
