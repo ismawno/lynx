@@ -7,6 +7,9 @@
 #include "kit/profile/clock.hpp"
 #ifdef LYNX_ENABLE_IMGUI
 #include <imgui.h>
+#ifdef LYNX_ENABLE_IMPLOT
+#include <implot.h>
+#endif
 #endif
 
 namespace lynx
@@ -120,6 +123,9 @@ class app : kit::non_copyable
 #ifdef LYNX_ENABLE_IMGUI
     VkDescriptorPool m_imgui_pool;
     ImGuiContext *m_imgui_context;
+#ifdef LYNX_ENABLE_IMPLOT
+    ImPlotContext *m_implot_context;
+#endif
 #endif
 
     virtual void on_start()

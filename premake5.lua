@@ -47,5 +47,6 @@ includedirs {
    "%{wks.location}/vendor/vulkan-sdk/macOS/include",
    "%{wks.location}/vendor/imgui",
    "%{wks.location}/vendor/imgui/backends",
+   "%{wks.location}/vendor/implot/include",
    "%{wks.location}/vendor/yaml-cpp/include"
 }

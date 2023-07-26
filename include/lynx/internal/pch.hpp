@@ -21,6 +21,9 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
+#ifdef LYNX_ENABLE_IMPLOT
+#include <implot.h>
+#endif
 #endif
 #include <thread>
 #include "kit/debug/log.hpp"

@@ -2,9 +2,6 @@
 #include "lynx/app/app.hpp"
 #include "lynx/geometry/camera.hpp"
 #include "kit/profile/perf.hpp"
-#ifdef LYNX_ENABLE_IMGUI
-#include <imgui.h>
-#endif
 
 namespace lynx
 {
@@ -179,6 +176,10 @@ void app::imgui_init()
 
     m_imgui_context = ImGui::CreateContext();
     ImGui::SetCurrentContext(m_imgui_context);
+#ifdef LYNX_ENABLE_IMPLOT
+    m_implot_context = ImPlot::CreateContext();
+    ImPlot::SetCurrentContext(m_implot_context);
+#endif
 
     IMGUI_CHECKVERSION();
     ImGuiIO &io = ImGui::GetIO();
@@ -208,6 +209,10 @@ void app::imgui_init()
 void app::imgui_begin_render()
 {
     ImGui::SetCurrentContext(m_imgui_context);
+#ifdef LYNX_ENABLE_IMPLOT
+    ImPlot::SetCurrentContext(m_implot_context);
+#endif
+
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
 
@@ -233,9 +238,16 @@ void app::imgui_submit_command(const VkCommandBuffer command_buffer)
 void app::imgui_shutdown()
 {
     ImGui::SetCurrentContext(m_imgui_context);
+#ifdef LYNX_ENABLE_IMPLOT
+    ImPlot::SetCurrentContext(m_implot_context);
+#endif
+
     vkDestroyDescriptorPool(m_window->device()->vulkan_device(), m_imgui_pool, nullptr);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
+#ifdef LYNX_ENABLE_IMPLOT
+    ImPlot::DestroyContext(m_implot_context);
+#endif
     ImGui::DestroyContext(m_imgui_context);
 }
 #endif
