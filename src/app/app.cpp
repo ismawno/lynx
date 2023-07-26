@@ -1,6 +1,7 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/app/app.hpp"
 #include "lynx/geometry/camera.hpp"
+#include "kit/profile/perf.hpp"
 #ifdef LYNX_ENABLE_IMGUI
 #include <imgui.h>
 #endif
@@ -41,6 +42,7 @@ bool app::next_frame()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     KIT_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
+    KIT_PERF_FUNCTION()
 
     if (m_min_frame_time > m_frame_time)
     {
