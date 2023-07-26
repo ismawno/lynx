@@ -52,6 +52,9 @@ class layer : public kit::identifiable<std::string>, public kit::toggleable, pub
     {
         return false;
     }
+    virtual void on_shutdown()
+    {
+    }
     virtual void on_command_submission(VkCommandBuffer command_buffer)
     {
     }

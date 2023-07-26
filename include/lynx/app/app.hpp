@@ -45,13 +45,39 @@ class app : kit::non_copyable
                              "Cannot add a layer with a name that already exists. Layer names act as identifiers")
         }
 #endif
-
         ly->m_parent = this;
         m_layers.emplace_back(std::move(ly))->on_attach();
         return ptr;
     }
 
-    bool pop_layer(const layer *ly);
+    template <typename T = layer> kit::scope<T> pop_layer(const std::string &name)
+    {
+        static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
+        KIT_ASSERT_ERROR(!m_terminated, "Cannot pop layers to a terminated app")
+
+        context::set(m_window.get());
+
+        for (auto it = m_layers.begin(); it != m_layers.end(); ++it)
+            if ((*it)->id() == name)
+            {
+                (*it)->on_detach();
+                kit::scope<T> to_remove;
+                if constexpr (std::is_same<T, layer>::value)
+                    to_remove = std::move(*it);
+                else
+                    to_remove = kit::scope<T>(dynamic_cast<T *>(it->release()));
+                m_layers.erase(it);
+                return to_remove;
+            }
+
+        return nullptr;
+    }
+
+    template <typename T> kit::scope<T> pop_layer(const T *ly)
+    {
+        static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
+        return pop_layer(ly->id());
+    }
 
     template <typename T = lynx::window> const T *window() const
     {
@@ -99,6 +125,9 @@ class app : kit::non_copyable
     virtual void on_start()
     {
     }
+    virtual void on_late_start()
+    {
+    }
     virtual void on_update(float ts)
     {
     }
@@ -114,9 +143,15 @@ class app : kit::non_copyable
     virtual void on_shutdown()
     {
     }
+    virtual void on_late_shutdown()
+    {
+    }
     virtual bool on_event(const event &ev)
     {
         return false;
+    }
+    virtual void on_late_event(const event &ev)
+    {
     }
 
 #ifdef LYNX_ENABLE_IMGUI

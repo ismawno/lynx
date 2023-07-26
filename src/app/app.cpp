@@ -34,6 +34,7 @@ void app::start()
     for (const auto &ly : m_layers)
         if (ly->enabled())
             ly->on_start();
+    on_late_start();
 }
 
 bool app::next_frame()
@@ -59,9 +60,12 @@ bool app::next_frame()
 
     while (const event ev = m_window->poll_event())
         if (!on_event(ev))
+        {
             for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
                 if ((*it)->enabled() && (*it)->on_event(ev))
                     break;
+            on_late_event(ev);
+        }
 
     const float delta_time = m_frame_time.as<kit::time::seconds, float>();
 
@@ -116,7 +120,8 @@ void app::shutdown()
     on_shutdown();
     for (const auto &ly : m_layers)
         if (ly->enabled())
-            ly->on_detach();
+            ly->on_shutdown();
+    on_late_shutdown();
 
 #ifdef LYNX_ENABLE_IMGUI
     imgui_shutdown();
@@ -141,19 +146,6 @@ std::uint32_t app::framerate_cap() const
 void app::limit_framerate(const std::uint32_t framerate)
 {
     m_min_frame_time = kit::time::from<kit::time::seconds>(framerate > 0 ? (1.f / framerate) : 0.f);
-}
-
-bool app::pop_layer(const layer *ly)
-{
-    context::set(m_window.get());
-    for (auto it = m_layers.begin(); it != m_layers.end(); ++it)
-        if (it->get() == ly)
-        {
-            (*it)->on_detach();
-            m_layers.erase(it);
-            return true;
-        }
-    return false;
 }
 
 #ifdef LYNX_ENABLE_IMGUI
