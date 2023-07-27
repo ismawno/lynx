@@ -35,7 +35,7 @@ class swap_chain : kit::non_copyable
     VkFormat find_depth_format() const;
 
     VkResult acquire_next_image(std::uint32_t *image_index) const;
-    VkResult submit_command_buffers(const VkCommandBuffer *buffers, std::uint32_t *image_index);
+    VkResult submit_command_buffers(const VkCommandBuffer *buffers, const std::uint32_t *image_index);
 
   private:
     void init();

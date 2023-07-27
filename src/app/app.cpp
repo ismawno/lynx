@@ -68,21 +68,27 @@ bool app::next_frame()
 
     const float delta_time = m_frame_time.as<kit::time::seconds, float>();
 
-    on_update(delta_time);
-    for (const auto &ly : m_layers)
-        if (ly->enabled())
-            ly->on_update(delta_time);
-    on_late_update(delta_time);
+    {
+        KIT_PERF_SCOPE("--On update--")
+        on_update(delta_time);
+        for (const auto &ly : m_layers)
+            if (ly->enabled())
+                ly->on_update(delta_time);
+        on_late_update(delta_time);
+    }
 
 #ifdef LYNX_ENABLE_IMGUI
     imgui_begin_render();
 #endif
 
-    on_render(delta_time);
-    for (const auto &ly : m_layers)
-        if (ly->enabled())
-            ly->on_render(delta_time);
-    on_late_render(delta_time);
+    {
+        KIT_PERF_SCOPE("--On render--")
+        on_render(delta_time);
+        for (const auto &ly : m_layers)
+            if (ly->enabled())
+                ly->on_render(delta_time);
+        on_late_render(delta_time);
+    }
 
 #ifdef LYNX_ENABLE_IMGUI
     imgui_end_render();

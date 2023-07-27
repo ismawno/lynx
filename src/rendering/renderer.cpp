@@ -2,6 +2,7 @@
 #include "lynx/rendering/renderer.hpp"
 #include "lynx/app/window.hpp"
 #include "lynx/rendering/device.hpp"
+#include "kit/profile/perf.hpp"
 
 namespace lynx
 {
@@ -72,6 +73,7 @@ void renderer::free_command_buffers()
 VkCommandBuffer renderer::begin_frame()
 {
     KIT_ASSERT_ERROR(!m_frame_started, "Cannot begin a new frame when there is already one in progress")
+    KIT_PERF_FUNCTION()
     const VkResult result = m_swap_chain->acquire_next_image(&m_image_index);
     if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
@@ -93,6 +95,7 @@ void renderer::end_frame()
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
     KIT_CHECK_RETURN_VALUE(vkEndCommandBuffer(m_command_buffers[m_frame_index]), VK_SUCCESS, CRITICAL,
                            "Failed to end command buffer")
+    KIT_PERF_FUNCTION()
 
     const VkResult result = m_swap_chain->submit_command_buffers(&m_command_buffers[m_frame_index], &m_image_index);
 
@@ -114,6 +117,7 @@ void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer, cons
     KIT_ASSERT_ERROR(m_frame_started, "Cannot begin render pass if a frame is not in progress")
     KIT_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
                      "Cannot begin render pass with a command buffer from another frame")
+    KIT_PERF_FUNCTION()
 
     VkRenderPassBeginInfo pass_info{};
     pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -151,6 +155,7 @@ void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end render pass if a frame is not in progress")
     KIT_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
                      "Cannot end render pass with a command buffer from another frame")
+    KIT_PERF_FUNCTION()
 
     vkCmdEndRenderPass(m_command_buffers[m_frame_index]);
 }

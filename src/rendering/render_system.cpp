@@ -5,6 +5,7 @@
 #include "lynx/geometry/camera.hpp"
 #include "lynx/rendering/buffer.hpp"
 #include "lynx/drawing/drawable.hpp"
+#include "kit/profile/perf.hpp"
 
 #define VERTEX_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.vert.spv"
 #define FRAGMENT_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.frag.spv"
@@ -59,6 +60,7 @@ void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::co
 
 void render_system::render(VkCommandBuffer command_buffer, const camera &cam) const
 {
+    KIT_PERF_PRETTY_FUNCTION()
     const glm::mat4 &proj = cam.projection();
     for (const render_data &rdata : m_render_data)
     {

@@ -1,5 +1,6 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/rendering/swap_chain.hpp"
+#include "kit/profile/perf.hpp"
 
 namespace lynx
 {
@@ -64,8 +65,10 @@ VkResult swap_chain::acquire_next_image(std::uint32_t *image_index) const
     return result;
 }
 
-VkResult swap_chain::submit_command_buffers(const VkCommandBuffer *buffers, std::uint32_t *image_index)
+VkResult swap_chain::submit_command_buffers(const VkCommandBuffer *buffers, const std::uint32_t *image_index)
 {
+    KIT_PERF_FUNCTION()
+
     if (m_images_in_flight[*image_index] != VK_NULL_HANDLE)
         vkWaitForFences(m_device->vulkan_device(), 1, &m_images_in_flight[*image_index], VK_TRUE, UINT64_MAX);
 

@@ -6,6 +6,7 @@
 #include "lynx/geometry/camera.hpp"
 #include "lynx/rendering/buffer.hpp"
 #include "lynx/utility/context.hpp"
+#include "kit/profile/perf.hpp"
 
 namespace lynx
 {
@@ -43,6 +44,7 @@ void window::create_surface(VkInstance instance, VkSurfaceKHR *surface) const
 
 bool window::display(const std::function<void(VkCommandBuffer)> &submission)
 {
+    KIT_PERF_FUNCTION()
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
     {
         if (m_maintain_camera_aspect_ratio)
@@ -89,6 +91,7 @@ bool window::closed()
 
 void window::render(const VkCommandBuffer command_buffer) const
 {
+    KIT_PERF_PRETTY_FUNCTION()
     for (const auto &sys : m_render_systems)
         sys->render(command_buffer, *m_camera);
 }
