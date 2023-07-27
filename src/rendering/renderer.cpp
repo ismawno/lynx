@@ -15,7 +15,7 @@ renderer::renderer(const kit::ref<const device> &dev, window &win) : m_window(wi
 renderer::~renderer()
 {
 #ifdef LYNX_MULTITHREADED
-    wait_for_end_of_frame();
+    wait_for_queue_submission();
 #endif
     free_command_buffers();
 }
@@ -77,7 +77,7 @@ VkCommandBuffer renderer::begin_frame()
 {
     KIT_PERF_FUNCTION()
 #ifdef LYNX_MULTITHREADED
-    wait_for_end_of_frame();
+    wait_for_queue_submission();
 #endif
 
     KIT_ASSERT_ERROR(!m_frame_started, "Cannot begin a new frame when there is already one in progress")
@@ -105,7 +105,7 @@ void renderer::end_frame()
 }
 
 #ifdef LYNX_MULTITHREADED
-void renderer::wait_for_end_of_frame() const
+void renderer::wait_for_queue_submission() const
 {
     if (m_end_frame_thread.joinable())
         m_end_frame_thread.join();
@@ -183,6 +183,9 @@ void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
 
 void renderer::immediate_submission(const std::function<void(VkCommandBuffer)> &submission) const
 {
+#ifdef LYNX_MULTITHREADED
+    wait_for_queue_submission();
+#endif
     const VkCommandBuffer command_buffer = m_device->begin_single_time_commands();
     submission(command_buffer);
     m_device->end_single_time_commands(command_buffer);

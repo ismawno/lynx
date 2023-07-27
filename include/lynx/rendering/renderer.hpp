@@ -33,7 +33,7 @@ class renderer : kit::non_copyable
     const swap_chain &swap_chain() const;
 
 #ifdef LYNX_MULTITHREADED
-    void wait_for_end_of_frame() const;
+    void wait_for_queue_submission() const;
 #endif
 
   private:

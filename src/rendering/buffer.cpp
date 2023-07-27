@@ -1,5 +1,7 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/rendering/buffer.hpp"
+#include "lynx/utility/context.hpp"
+#include "lynx/app/window.hpp"
 
 namespace lynx
 {
@@ -66,6 +68,9 @@ void buffer::write(const buffer &src_buffer)
                      "Destintaion buffer must have the VK_BUFFER_USAGE_TRANSFER_DST_BIT flag enabled")
     KIT_ASSERT_ERROR(src_buffer.m_usage & VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                      "Source buffer must have the VK_BUFFER_USAGE_TRANSFER_SRC_BIT flag enabled")
+#ifdef LYNX_MULTITHREADED
+    context::current()->window()->renderer().wait_for_queue_submission();
+#endif
     m_device->copy_buffer(m_buffer, src_buffer.m_buffer, m_buffer_size);
 }
 

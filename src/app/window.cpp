@@ -75,7 +75,7 @@ void window::close()
 void window::wait_for_device() const
 {
 #ifdef LYNX_MULTITHREADED
-    m_renderer->wait_for_end_of_frame();
+    m_renderer->wait_for_queue_submission();
 #endif
     vkDeviceWaitIdle(m_device->vulkan_device());
 }
@@ -107,11 +107,11 @@ void window::clear_render_data()
 
 bool window::was_resized() const
 {
-    return m_frame_buffer_resized;
+    return m_resized;
 }
 void window::complete_resize()
 {
-    m_frame_buffer_resized = false;
+    m_resized = false;
 }
 
 void window::make_context_current() const
@@ -128,11 +128,11 @@ void window::maintain_camera_aspect_ratio(const bool maintain)
     m_maintain_camera_aspect_ratio = maintain;
 }
 
-void window::frame_buffer_resize(const std::uint32_t width, const std::uint32_t height)
+void window::resize(const std::uint32_t width, const std::uint32_t height)
 {
     m_width = width;
     m_height = height;
-    m_frame_buffer_resized = true;
+    m_resized = true;
 }
 
 const glm::vec4 &window::clear_color() const
@@ -177,20 +177,29 @@ GLFWwindow *window::glfw_window() const
     return m_window;
 }
 
-std::uint32_t window::width() const
+std::uint32_t window::screen_width() const
 {
     return m_width;
 }
-std::uint32_t window::height() const
+std::uint32_t window::screen_height() const
 {
     return m_height;
 }
 
-float window::aspect() const
+std::uint32_t window::pixel_width() const
+{
+    return m_renderer->swap_chain().width();
+}
+std::uint32_t window::pixel_height() const
+{
+    return m_renderer->swap_chain().height();
+}
+
+float window::screen_aspect() const
 {
     return (float)m_width / (float)m_height;
 }
-float window::swap_chain_aspect() const
+float window::pixel_aspect() const
 {
     return m_renderer->swap_chain().extent_aspect_ratio();
 }
@@ -207,7 +216,7 @@ bool window::should_close() const
 
 window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) : window(width, height, name)
 {
-    set_camera<orthographic2D>(swap_chain_aspect(), 5.f);
+    set_camera<orthographic2D>(pixel_aspect(), 5.f);
 
     add_render_system<point_render_system2D>();
     add_render_system<line_render_system2D>();
@@ -240,7 +249,7 @@ void window2D::clear_render_data()
 
 window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) : window(width, height, name)
 {
-    set_camera<perspective3D>(swap_chain_aspect(), glm::radians(60.f));
+    set_camera<perspective3D>(pixel_aspect(), glm::radians(60.f));
 
     add_render_system<point_render_system3D>();
     add_render_system<line_render_system3D>();

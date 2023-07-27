@@ -39,16 +39,17 @@ bool mouse_button_pressed(const window &win, const mouse btn)
 
 glm::vec2 mouse_position()
 {
-    static glm::vec2 pixel_mouse{0.f};
+    static glm::vec2 screen_mouse{0.f};
     const window *win = context::current()->window();
     KIT_ASSERT_ERROR(context::current()->valid(), "Trying to get input feedback with a non valid current context")
     if (!win)
-        return pixel_mouse;
+        return screen_mouse;
 
     double x, y;
     glfwGetCursorPos(win->glfw_window(), &x, &y);
-    pixel_mouse = {2.f * (float)x / (float)win->width() - 1.f, 2.f * (float)y / (float)win->height() - 1.f};
-    return pixel_mouse;
+    screen_mouse = {2.f * (float)x / (float)win->screen_width() - 1.f,
+                    2.f * (float)y / (float)win->screen_height() - 1.f};
+    return screen_mouse;
 }
 
 const char *key_name(const key kc)
@@ -61,20 +62,20 @@ static window *from_glfw(GLFWwindow *win)
     return (window *)glfwGetWindowUserPointer(win);
 }
 
-static void frame_buffer_resize_callback(GLFWwindow *gwindow, const int width, const int height)
+static void window_resize_callback(GLFWwindow *gwindow, const int width, const int height)
 {
     event ev;
     ev.type = event::WINDOW_RESIZED;
 
     window *win = from_glfw(gwindow);
 
-    ev.window.old_width = win->width();
-    ev.window.old_height = win->height();
+    ev.window.old_width = win->screen_width();
+    ev.window.old_height = win->screen_height();
 
     ev.window.new_width = (std::uint32_t)width;
     ev.window.new_height = (std::uint32_t)height;
 
-    win->frame_buffer_resize(ev.window.new_width, ev.window.new_height);
+    win->resize(ev.window.new_width, ev.window.new_height);
     win->push_event(ev);
 }
 
@@ -125,7 +126,7 @@ static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 
 void install_callbacks(window *win)
 {
-    glfwSetFramebufferSizeCallback(win->glfw_window(), frame_buffer_resize_callback);
+    glfwSetWindowSizeCallback(win->glfw_window(), window_resize_callback);
     glfwSetKeyCallback(win->glfw_window(), key_callback);
     glfwSetCursorPosCallback(win->glfw_window(), cursor_position_callback);
     glfwSetMouseButtonCallback(win->glfw_window(), mouse_button_callback);

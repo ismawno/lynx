@@ -481,8 +481,8 @@ void device::copy_buffer(VkBuffer dst_buffer, VkBuffer src_buffer, VkDeviceSize 
     end_single_time_commands(command_buffer);
 }
 
-void device::copy_buffer_to_image(VkBuffer buffer, VkImage image, std::uint32_t width, std::uint32_t height,
-                                  std::uint32_t layer_count) const
+void device::copy_buffer_to_image(VkBuffer buffer, VkImage image, const std::uint32_t width, const std::uint32_t height,
+                                  const std::uint32_t layer_count) const
 {
     VkCommandBuffer command_buffer = begin_single_time_commands();
 

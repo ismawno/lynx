@@ -35,11 +35,14 @@ class window : kit::non_copyable, public kit::nameable
     window(std::uint32_t width, std::uint32_t height, const char *name);
     virtual ~window();
 
-    std::uint32_t width() const;
-    std::uint32_t height() const;
+    std::uint32_t screen_width() const;
+    std::uint32_t screen_height() const;
 
-    float aspect() const;
-    float swap_chain_aspect() const;
+    std::uint32_t pixel_width() const;
+    std::uint32_t pixel_height() const;
+
+    float screen_aspect() const;
+    float pixel_aspect() const;
 
     VkExtent2D extent() const;
 
@@ -83,7 +86,7 @@ class window : kit::non_copyable, public kit::nameable
 
     bool maintain_camera_aspect_ratio() const;
     void maintain_camera_aspect_ratio(bool maintain);
-    void frame_buffer_resize(std::uint32_t width, std::uint32_t height);
+    void resize(std::uint32_t width, std::uint32_t height);
 
     const glm::vec4 &clear_color() const;
     void clear_color(const glm::vec4 &color);
@@ -174,7 +177,7 @@ class window : kit::non_copyable, public kit::nameable
     std::queue<event> m_event_queue;
     std::vector<kit::scope<lynx::render_system>> m_render_systems;
 
-    bool m_frame_buffer_resized = false;
+    bool m_resized = false;
     glm::vec4 m_clear_color = {0.01f, 0.01f, 0.01f, 1.f};
 
     void init();
