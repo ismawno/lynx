@@ -13,6 +13,11 @@ const glm::mat4 &camera::inverse_projection() const
     return m_inv_projection;
 }
 
+void camera::flip_y_axis()
+{
+    m_y_flipped = !m_y_flipped;
+}
+
 void camera2D::keep_aspect_ratio(const float aspect)
 {
     transform.scale.x = aspect * transform.scale.y;
@@ -64,13 +69,17 @@ void orthographic2D::size(const float size)
 
 void orthographic2D::update_transformation_matrices()
 {
+    if (m_y_flipped)
+        transform.scale.y = -transform.scale.y;
     m_projection = transform.transform_as_camera();
     m_inv_projection = transform.inverse_as_camera();
+    if (m_y_flipped)
+        transform.scale.y = -transform.scale.y;
 }
 
 void camera3D::keep_aspect_ratio(const float aspect)
 {
-    transform.scale.x = aspect * glm::abs(transform.scale.y);
+    transform.scale.x = aspect * transform.scale.y;
 }
 
 glm::vec3 camera3D::screen_to_world(const glm::vec2 &screen_pos, const float z_screen) const
@@ -122,8 +131,12 @@ orthographic3D::orthographic3D(const glm::vec3 &position, const glm::vec3 &size,
 
 void orthographic3D::update_transformation_matrices()
 {
+    if (m_y_flipped)
+        transform.scale.y = -transform.scale.y;
     m_projection = transform.transform_as_camera();
     m_inv_projection = transform.inverse_as_camera();
+    if (m_y_flipped)
+        transform.scale.y = -transform.scale.y;
 }
 
 float orthographic3D::size() const
@@ -186,6 +199,9 @@ void perspective3D::keep_aspect_ratio(const float aspect)
 
 void perspective3D::update_transformation_matrices()
 {
+    if (m_y_flipped)
+        transform.scale.y = -transform.scale.y;
+
     glm::mat4 perspective = glm::mat4{0.0f};
     perspective[0][0] = 1.f / (m_aspect * m_half_tan_fovy);
     perspective[1][1] = 1.f / m_half_tan_fovy;
@@ -202,5 +218,8 @@ void perspective3D::update_transformation_matrices()
 
     m_projection = perspective * transform.transform_as_camera();
     m_inv_projection = transform.inverse_as_camera() * inv_perspective;
+
+    if (m_y_flipped)
+        transform.scale.y = -transform.scale.y;
 }
 } // namespace lynx

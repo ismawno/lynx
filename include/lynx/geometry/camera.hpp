@@ -15,9 +15,12 @@ class camera
     const glm::mat4 &projection() const;
     const glm::mat4 &inverse_projection() const;
 
+    void flip_y_axis();
+
   protected:
     glm::mat4 m_projection{1.f};
     glm::mat4 m_inv_projection{1.f};
+    bool m_y_flipped = false;
 };
 
 class camera2D : public camera
