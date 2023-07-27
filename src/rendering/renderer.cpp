@@ -14,6 +14,9 @@ renderer::renderer(const kit::ref<const device> &dev, window &win) : m_window(wi
 
 renderer::~renderer()
 {
+#ifdef LYNX_MULTITHREADED
+    wait_for_end_of_frame();
+#endif
     free_command_buffers();
 }
 
@@ -72,8 +75,13 @@ void renderer::free_command_buffers()
 
 VkCommandBuffer renderer::begin_frame()
 {
-    KIT_ASSERT_ERROR(!m_frame_started, "Cannot begin a new frame when there is already one in progress")
     KIT_PERF_FUNCTION()
+#ifdef LYNX_MULTITHREADED
+    wait_for_end_of_frame();
+#endif
+
+    KIT_ASSERT_ERROR(!m_frame_started, "Cannot begin a new frame when there is already one in progress")
+
     const VkResult result = m_swap_chain->acquire_next_image(&m_image_index);
     if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
@@ -92,10 +100,23 @@ VkCommandBuffer renderer::begin_frame()
 }
 void renderer::end_frame()
 {
+    KIT_PERF_FUNCTION()
+    m_end_frame_thread = std::thread(&renderer::end_frame_implementation, this);
+}
+
+#ifdef LYNX_MULTITHREADED
+void renderer::wait_for_end_of_frame() const
+{
+    if (m_end_frame_thread.joinable())
+        m_end_frame_thread.join();
+}
+#endif
+
+void renderer::end_frame_implementation()
+{
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
     KIT_CHECK_RETURN_VALUE(vkEndCommandBuffer(m_command_buffers[m_frame_index]), VK_SUCCESS, CRITICAL,
                            "Failed to end command buffer")
-    KIT_PERF_FUNCTION()
 
     const VkResult result = m_swap_chain->submit_command_buffers(&m_command_buffers[m_frame_index], &m_image_index);
 

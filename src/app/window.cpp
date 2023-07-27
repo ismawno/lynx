@@ -74,6 +74,9 @@ void window::close()
 
 void window::wait_for_device() const
 {
+#ifdef LYNX_MULTITHREADED
+    m_renderer->wait_for_end_of_frame();
+#endif
     vkDeviceWaitIdle(m_device->vulkan_device());
 }
 
