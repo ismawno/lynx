@@ -82,7 +82,7 @@ class polygon2D : public shape2D
     std::size_t size() const;
 
   private:
-    const std::size_t m_size;
+    std::size_t m_size;
 };
 
 class rect3D : public shape3D
