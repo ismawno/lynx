@@ -206,7 +206,7 @@ const vertex2D &model2D::operator[](const std::size_t index) const
     return read_vertex(index);
 }
 
-const model2D::vertex_index_pair &model2D::rect(const glm::vec4 &color)
+const model2D::vertex_index_pair &model2D::rect(const color &color)
 {
     static const std::vector<vertex2D> vertices = {
         {{-.5f, -.5f}, color}, {{.5f, .5f}, color}, {{-.5f, .5f}, color}, {{.5f, -.5f}, color}};
@@ -216,14 +216,14 @@ const model2D::vertex_index_pair &model2D::rect(const glm::vec4 &color)
     return build;
 }
 
-const std::vector<vertex2D> &model2D::line(const glm::vec4 &color1, const glm::vec4 &color2)
+const std::vector<vertex2D> &model2D::line(const color &color1, const color &color2)
 {
     static std::vector<vertex2D> vertices = {{{-1.f, 0.f}, color1}, {{1.f, 0.f}, color2}};
     return vertices;
 }
 
 template <typename VecType, typename ReturnType>
-static ReturnType circle_model(const std::uint32_t partitions, const glm::vec4 &color)
+static ReturnType circle_model(const std::uint32_t partitions, const color &color)
 {
     KIT_ASSERT_ERROR(partitions > 2, "Must at least have 3 partitions. Current: {0}", partitions)
 
@@ -248,7 +248,7 @@ static ReturnType circle_model(const std::uint32_t partitions, const glm::vec4 &
 }
 
 template <typename VecType, typename ReturnType>
-static ReturnType polygon_model(const std::vector<VecType> &local_vertices, const glm::vec4 &color)
+static ReturnType polygon_model(const std::vector<VecType> &local_vertices, const color &color)
 {
     KIT_ASSERT_ERROR(local_vertices.size() > 2, "Must at least have 3 vertices. Current: {0}", local_vertices.size())
     ReturnType build;
@@ -267,12 +267,12 @@ static ReturnType polygon_model(const std::vector<VecType> &local_vertices, cons
     return build;
 }
 
-model2D::vertex_index_pair model2D::circle(const std::uint32_t partitions, const glm::vec4 &color)
+model2D::vertex_index_pair model2D::circle(const std::uint32_t partitions, const color &color)
 {
     return circle_model<glm::vec2, vertex_index_pair>(partitions, color);
 }
 
-model2D::vertex_index_pair model2D::polygon(const std::vector<glm::vec2> &local_vertices, const glm::vec4 &color)
+model2D::vertex_index_pair model2D::polygon(const std::vector<glm::vec2> &local_vertices, const color &color)
 {
     return polygon_model<glm::vec2, vertex_index_pair>(local_vertices, color);
 }
@@ -321,7 +321,7 @@ const vertex3D &model3D::operator[](const std::size_t index) const
     return read_vertex(index);
 }
 
-const model3D::vertex_index_pair &model3D::rect(const glm::vec4 &color)
+const model3D::vertex_index_pair &model3D::rect(const color &color)
 {
     static std::vector<vertex3D> vertices = {
         {{-.5f, -.5f, .5f}, color}, {{.5f, .5f, .5f}, color}, {{-.5f, .5f, .5f}, color}, {{.5f, -.5f, .5f}, color}};
@@ -331,18 +331,18 @@ const model3D::vertex_index_pair &model3D::rect(const glm::vec4 &color)
     return build;
 }
 
-model3D::vertex_index_pair model3D::circle(const std::uint32_t partitions, const glm::vec4 &color)
+model3D::vertex_index_pair model3D::circle(const std::uint32_t partitions, const color &color)
 {
     return circle_model<glm::vec3, vertex_index_pair>(partitions, color);
 }
 
-model3D::vertex_index_pair model3D::polygon(const std::vector<glm::vec3> &local_vertices, const glm::vec4 &color)
+model3D::vertex_index_pair model3D::polygon(const std::vector<glm::vec3> &local_vertices, const color &color)
 {
     return polygon_model<glm::vec3, vertex_index_pair>(local_vertices, color);
 }
 
 model3D::vertex_index_pair model3D::sphere(const std::uint32_t lat_partitions, const std::uint32_t lon_partitions,
-                                           const glm::vec4 &color)
+                                           const color &color)
 {
     KIT_ASSERT_ERROR(lat_partitions > 2 && lon_partitions > 2,
                      "Must at least have 3 partitions for each angle. lat partitions: {0}, lon_partitions",
@@ -402,7 +402,7 @@ model3D::vertex_index_pair model3D::sphere(const std::uint32_t lat_partitions, c
     return build;
 }
 
-const model3D::vertex_index_pair &model3D::cube(const glm::vec4 &color)
+const model3D::vertex_index_pair &model3D::cube(const color &color)
 {
     static const std::vector<vertex3D> vertices = {
         // left face (white)
@@ -425,7 +425,7 @@ const model3D::vertex_index_pair &model3D::cube(const glm::vec4 &color)
     return build;
 }
 
-const std::vector<vertex3D> &model3D::line(const glm::vec4 &color1, const glm::vec4 &color2)
+const std::vector<vertex3D> &model3D::line(const color &color1, const color &color2)
 {
     static std::vector<vertex3D> vertices = {{{-1.f, 0.f, 0.f}, color1}, {{1.f, 0.f, 0.f}, color2}};
     return vertices;

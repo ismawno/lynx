@@ -5,6 +5,7 @@
 #include "lynx/drawing/model.hpp"
 #include "lynx/geometry/vertex.hpp"
 #include "lynx/geometry/transform.hpp"
+#include "lynx/drawing/color.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -17,8 +18,8 @@ namespace lynx
 class line2D : public drawable2D
 {
   public:
-    line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1 = glm::vec4(1.f),
-           const glm::vec4 &color2 = glm::vec4(1.f));
+    line2D(const glm::vec2 &p1, const glm::vec2 &p2, const color &color1 = color::white,
+           const color &color2 = color::white);
 
     void draw(window2D &win) const override;
 
@@ -28,11 +29,11 @@ class line2D : public drawable2D
     void p1(const glm::vec2 &p1);
     void p2(const glm::vec2 &p2);
 
-    const glm::vec4 &color1() const;
-    const glm::vec4 &color2() const;
+    const color &color1() const;
+    const color &color2() const;
 
-    void color1(const glm::vec4 &color1);
-    void color2(const glm::vec4 &color2);
+    void color1(const color &color1);
+    void color2(const color &color2);
 
   private:
     glm::vec2 m_p1;
@@ -47,8 +48,8 @@ class line2D : public drawable2D
 class line3D : public drawable3D
 {
   public:
-    line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color1 = glm::vec4(1.f),
-           const glm::vec4 &color2 = glm::vec4(1.f));
+    line3D(const glm::vec3 &p1, const glm::vec3 &p2, const color &color1 = color::white,
+           const color &color2 = color::white);
 
     void draw(window3D &win) const override;
 
@@ -58,11 +59,11 @@ class line3D : public drawable3D
     void p1(const glm::vec3 &p1);
     void p2(const glm::vec3 &p2);
 
-    const glm::vec4 &color1() const;
-    const glm::vec4 &color2() const;
+    const color &color1() const;
+    const color &color2() const;
 
-    void color1(const glm::vec4 &color1);
-    void color2(const glm::vec4 &color2);
+    void color1(const color &color1);
+    void color2(const color &color2);
 
   private:
     glm::vec3 m_p1;
@@ -77,7 +78,7 @@ class line3D : public drawable3D
 class line_strip2D : public drawable2D
 {
   public:
-    line_strip2D(const std::vector<glm::vec2> &points, const glm::vec4 &color = glm::vec4(1.f));
+    line_strip2D(const std::vector<glm::vec2> &points, const color &color = color::white);
     line_strip2D(const std::vector<vertex2D> &points);
 
     void draw(window2D &win) const override;
@@ -88,7 +89,8 @@ class line_strip2D : public drawable2D
 
     void update_points(const std::function<void(vertex2D &)> &for_each_fn);
 
-    void color(const glm::vec4 &color);
+    const color &color() const;
+    void color(const lynx::color &color);
 
   private:
     model2D m_model;
@@ -97,7 +99,7 @@ class line_strip2D : public drawable2D
 class line_strip3D : public drawable3D
 {
   public:
-    line_strip3D(const std::vector<glm::vec3> &points, const glm::vec4 &color = glm::vec4(1.f));
+    line_strip3D(const std::vector<glm::vec3> &points, const color &color = color::white);
     line_strip3D(const std::vector<vertex3D> &points);
 
     void draw(window3D &win) const override;
@@ -108,7 +110,8 @@ class line_strip3D : public drawable3D
 
     void update_points(const std::function<void(vertex3D &)> &for_each_fn);
 
-    void color(const glm::vec4 &color);
+    const color &color() const;
+    void color(const lynx::color &color);
 
   private:
     model3D m_model;

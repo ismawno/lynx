@@ -3,6 +3,7 @@
 
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
+#include "lynx/drawing/color.hpp"
 
 #include <functional>
 #include <vulkan/vulkan.hpp>
@@ -99,10 +100,10 @@ class model2D : public model
     const vertex2D &operator[](std::size_t index) const;
 
     // create NGon. HACER STATIC UNORDERED MAP
-    static const vertex_index_pair &rect(const glm::vec4 &color);
-    static const std::vector<vertex2D> &line(const glm::vec4 &color1, const glm::vec4 &color2);
-    static vertex_index_pair circle(std::uint32_t partitions, const glm::vec4 &color);
-    static vertex_index_pair polygon(const std::vector<glm::vec2> &local_vertices, const glm::vec4 &color);
+    static const vertex_index_pair &rect(const color &color);
+    static const std::vector<vertex2D> &line(const color &color1, const color &color2);
+    static vertex_index_pair circle(std::uint32_t partitions, const color &color);
+    static vertex_index_pair polygon(const std::vector<glm::vec2> &local_vertices, const color &color);
 };
 
 class model3D : public model
@@ -124,12 +125,12 @@ class model3D : public model
 
     const vertex3D &operator[](std::size_t index) const;
 
-    static const vertex_index_pair &rect(const glm::vec4 &color);
-    static vertex_index_pair circle(std::uint32_t partitions, const glm::vec4 &color);
-    static vertex_index_pair polygon(const std::vector<glm::vec3> &local_vertices, const glm::vec4 &color);
-    static vertex_index_pair sphere(std::uint32_t lat_partitions, std::uint32_t lon_partitions, const glm::vec4 &color);
-    static const vertex_index_pair &cube(const glm::vec4 &color);
-    static const std::vector<vertex3D> &line(const glm::vec4 &color1, const glm::vec4 &color2);
+    static const vertex_index_pair &rect(const color &color);
+    static vertex_index_pair circle(std::uint32_t partitions, const color &color);
+    static vertex_index_pair polygon(const std::vector<glm::vec3> &local_vertices, const color &color);
+    static vertex_index_pair sphere(std::uint32_t lat_partitions, std::uint32_t lon_partitions, const color &color);
+    static const vertex_index_pair &cube(const color &color);
+    static const std::vector<vertex3D> &line(const color &color1, const color &color2);
 };
 } // namespace lynx
 

@@ -7,7 +7,7 @@
 
 namespace lynx
 {
-line2D::line2D(const glm::vec2 &p1, const glm::vec2 &p2, const glm::vec4 &color1, const glm::vec4 &color2)
+line2D::line2D(const glm::vec2 &p1, const glm::vec2 &p2, const color &color1, const color &color2)
     : m_p1(p1), m_p2(p2), m_transform(as_transform()),
       m_model(context::current()->device(), model2D::line(color1, color2))
 {
@@ -49,32 +49,32 @@ void line2D::p2(const glm::vec2 &p2)
     m_transform = as_transform();
 }
 
-const glm::vec4 &line2D::color1() const
+const color &line2D::color1() const
 {
     return m_model.read_vertex(0).color;
 }
-const glm::vec4 &line2D::color2() const
+const color &line2D::color2() const
 {
     return m_model.read_vertex(1).color;
 }
 
-template <typename T> void update_vertex_color(const std::size_t index, T &model, const glm::vec4 &color)
+template <typename T> void update_vertex_color(const std::size_t index, T &model, const color &color)
 {
     auto vertex = model[index];
     vertex.color = color;
     model.write_vertex(index, vertex);
 }
 
-void line2D::color1(const glm::vec4 &color1)
+void line2D::color1(const color &color1)
 {
     update_vertex_color(0, m_model, color1);
 }
-void line2D::color2(const glm::vec4 &color2)
+void line2D::color2(const color &color2)
 {
     update_vertex_color(1, m_model, color2);
 }
 
-line3D::line3D(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec4 &color1, const glm::vec4 &color2)
+line3D::line3D(const glm::vec3 &p1, const glm::vec3 &p2, const color &color1, const color &color2)
     : m_p1(p1), m_p2(p2), m_transform(as_transform()),
       m_model(context::current()->device(), model3D::line(color1, color2))
 {
@@ -116,26 +116,26 @@ void line3D::p2(const glm::vec3 &p2)
     m_transform = as_transform();
 }
 
-const glm::vec4 &line3D::color1() const
+const color &line3D::color1() const
 {
     return m_model.read_vertex(0).color;
 }
-const glm::vec4 &line3D::color2() const
+const color &line3D::color2() const
 {
     return m_model.read_vertex(1).color;
 }
 
-void line3D::color1(const glm::vec4 &color1)
+void line3D::color1(const color &color1)
 {
     update_vertex_color(0, m_model, color1);
 }
-void line3D::color2(const glm::vec4 &color2)
+void line3D::color2(const color &color2)
 {
     update_vertex_color(1, m_model, color2);
 }
 
 template <typename T1, typename T2>
-static std::vector<T2> to_vertex_array(const std::vector<T1> &points, const glm::vec4 &color)
+static std::vector<T2> to_vertex_array(const std::vector<T1> &points, const color &color)
 {
     std::vector<T2> result;
     result.reserve(points.size());
@@ -144,7 +144,7 @@ static std::vector<T2> to_vertex_array(const std::vector<T1> &points, const glm:
     return result;
 }
 
-line_strip2D::line_strip2D(const std::vector<glm::vec2> &points, const glm::vec4 &color)
+line_strip2D::line_strip2D(const std::vector<glm::vec2> &points, const lynx::color &color)
     : m_model(context::current()->device(), to_vertex_array<glm::vec2, vertex2D>(points, color))
 {
 }
@@ -176,13 +176,18 @@ void line_strip2D::update_points(const std::function<void(vertex2D &)> &for_each
     m_model.update_vertex_buffer(for_each_fn);
 }
 
-void line_strip2D::color(const glm::vec4 &color)
+const color &line_strip2D::color() const
+{
+    return m_model.read_vertex(0).color;
+}
+
+void line_strip2D::color(const lynx::color &color)
 {
     const auto feach = [&color](vertex2D &vtx) { vtx.color = color; };
     m_model.update_vertex_buffer(feach);
 }
 
-line_strip3D::line_strip3D(const std::vector<glm::vec3> &points, const glm::vec4 &color)
+line_strip3D::line_strip3D(const std::vector<glm::vec3> &points, const lynx::color &color)
     : m_model(context::current()->device(), to_vertex_array<glm::vec3, vertex3D>(points, color))
 {
 }
@@ -214,7 +219,12 @@ void line_strip3D::update_points(const std::function<void(vertex3D &)> &for_each
     m_model.update_vertex_buffer(for_each_fn);
 }
 
-void line_strip3D::color(const glm::vec4 &color)
+const color &line_strip3D::color() const
+{
+    return m_model.read_vertex(0).color;
+}
+
+void line_strip3D::color(const lynx::color &color)
 {
     const auto feach = [&color](vertex3D &vtx) { vtx.color = color; };
     m_model.update_vertex_buffer(feach);

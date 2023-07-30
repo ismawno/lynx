@@ -3,7 +3,7 @@
 
 namespace lynx
 {
-vertex2D::vertex2D(const glm::vec2 &pposition, const glm::vec4 &pcolor) : position(pposition), color(pcolor)
+vertex2D::vertex2D(const glm::vec2 &pposition, const lynx::color &pcolor) : position(pposition), color(pcolor)
 {
 }
 std::vector<VkVertexInputBindingDescription> vertex2D::binding_descriptions()
@@ -16,7 +16,7 @@ std::vector<VkVertexInputAttributeDescription> vertex2D::attribute_descriptions(
             {1, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(vertex2D, color)}};
 }
 
-vertex3D::vertex3D(const glm::vec3 &pposition, const glm::vec4 &pcolor) : position(pposition), color(pcolor)
+vertex3D::vertex3D(const glm::vec3 &pposition, const lynx::color &pcolor) : position(pposition), color(pcolor)
 {
 }
 

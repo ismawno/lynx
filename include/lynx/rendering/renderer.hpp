@@ -2,6 +2,7 @@
 #define LYNX_RENDERER_HPP
 
 #include "lynx/rendering/swap_chain.hpp"
+#include "lynx/drawing/color.hpp"
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
 
@@ -22,7 +23,7 @@ class renderer : kit::non_copyable
     VkCommandBuffer begin_frame();
     void end_frame();
 
-    void begin_swap_chain_render_pass(VkCommandBuffer command_buffer, const glm::vec4 &clear_color);
+    void begin_swap_chain_render_pass(VkCommandBuffer command_buffer, const color &clear_color);
     void end_swap_chain_render_pass(VkCommandBuffer command_buffer);
 
     void immediate_submission(const std::function<void(VkCommandBuffer)> &submission) const;

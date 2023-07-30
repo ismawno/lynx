@@ -135,11 +135,11 @@ void window::resize(const std::uint32_t width, const std::uint32_t height)
     m_resized = true;
 }
 
-const glm::vec4 &window::clear_color() const
+const color &window::clear_color() const
 {
     return m_clear_color;
 }
-void window::clear_color(const glm::vec4 &color)
+void window::clear_color(const color &color)
 {
     m_clear_color = color;
 }

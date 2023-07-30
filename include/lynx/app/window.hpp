@@ -6,6 +6,7 @@
 #include "lynx/rendering/swap_chain.hpp"
 #include "lynx/app/input.hpp"
 #include "lynx/drawing/drawable.hpp"
+#include "lynx/drawing/color.hpp"
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
 #include "kit/interface/nameable.hpp"
@@ -88,8 +89,8 @@ class window : kit::non_copyable, public kit::nameable
     void maintain_camera_aspect_ratio(bool maintain);
     void resize(std::uint32_t width, std::uint32_t height);
 
-    const glm::vec4 &clear_color() const;
-    void clear_color(const glm::vec4 &color);
+    const color &clear_color() const;
+    void clear_color(const color &rgb);
 
     void push_event(const event &ev);
     event poll_event();
@@ -178,7 +179,7 @@ class window : kit::non_copyable, public kit::nameable
     std::vector<kit::scope<lynx::render_system>> m_render_systems;
 
     bool m_resized = false;
-    glm::vec4 m_clear_color = {0.01f, 0.01f, 0.01f, 1.f};
+    color m_clear_color = {0.01f, 0.01f, 0.01f, 1.f};
 
     void init();
     void render(VkCommandBuffer command_buffer) const;
