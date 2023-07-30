@@ -20,6 +20,9 @@ struct color
     color(float r, float g, float b, float a = 1.f);
     color(std::uint32_t r, std::uint32_t g, std::uint32_t b, std::uint32_t a = 255);
 
+    color(const color &rgb, float a);
+    color(const color &rgb, std::uint32_t a);
+
     std::uint32_t r() const;
     std::uint32_t g() const;
     std::uint32_t b() const;

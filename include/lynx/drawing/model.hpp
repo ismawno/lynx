@@ -4,6 +4,7 @@
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
 #include "lynx/drawing/color.hpp"
+#include "lynx/rendering/buffer.hpp"
 
 #include <functional>
 #include <vulkan/vulkan.hpp>
@@ -19,9 +20,6 @@ namespace lynx
 struct vertex2D;
 struct vertex3D;
 
-class camera2D;
-
-class buffer;
 class device;
 
 class model

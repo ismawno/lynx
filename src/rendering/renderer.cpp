@@ -101,7 +101,11 @@ VkCommandBuffer renderer::begin_frame()
 void renderer::end_frame()
 {
     KIT_PERF_FUNCTION()
+#ifdef LYNX_MULTITHREADED
     m_end_frame_thread = std::thread(&renderer::end_frame_implementation, this);
+#else
+    end_frame_implementation();
+#endif
 }
 
 #ifdef LYNX_MULTITHREADED
@@ -114,9 +118,6 @@ void renderer::wait_for_queue_submission() const
 
 void renderer::end_frame_implementation()
 {
-#ifndef LYNX_MULTITHREADED
-    KIT_PERF_FUNCTION()
-#endif
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
     KIT_CHECK_RETURN_VALUE(vkEndCommandBuffer(m_command_buffers[m_frame_index]), VK_SUCCESS, CRITICAL,
                            "Failed to end command buffer")

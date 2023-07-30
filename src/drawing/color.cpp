@@ -28,24 +28,50 @@ static float to_float(const std::uint32_t val)
 
 color::color(const float val) : normalized(val)
 {
+    KIT_ASSERT_ERROR(val <= 1.f, "Color floating values must be in the range [0, 1]");
 }
 color::color(const std::uint32_t val) : normalized(val / 255.f)
 {
+    KIT_ASSERT_ERROR(val < 256, "Color integer values must be in the range [0, 255]");
 }
 
 color::color(const glm::vec4 &rgba) : normalized(rgba)
 {
+    KIT_ASSERT_ERROR(rgba.r <= 1.f, "Red value must be in the range [0, 1]");
+    KIT_ASSERT_ERROR(rgba.g <= 1.f, "Green value must be in the range [0, 1]");
+    KIT_ASSERT_ERROR(rgba.b <= 1.f, "Blue value must be in the range [0, 1]");
+    KIT_ASSERT_ERROR(rgba.a <= 1.f, "Alpha value must be in the range [0, 1]");
 }
 color::color(const glm::vec3 &rgb) : normalized(rgb, 1.f)
 {
+    KIT_ASSERT_ERROR(rgb.r <= 1.f, "Red value must be in the range [0, 1]");
+    KIT_ASSERT_ERROR(rgb.g <= 1.f, "Green value must be in the range [0, 1]");
+    KIT_ASSERT_ERROR(rgb.b <= 1.f, "Blue value must be in the range [0, 1]");
 }
 
 color::color(const float r, const float g, const float b, const float a) : normalized(r, g, b, a)
 {
+    KIT_ASSERT_ERROR(r <= 1.f, "Red value must be in the range [0, 1]");
+    KIT_ASSERT_ERROR(g <= 1.f, "Green value must be in the range [0, 1]");
+    KIT_ASSERT_ERROR(b <= 1.f, "Blue value must be in the range [0, 1]");
+    KIT_ASSERT_ERROR(a <= 1.f, "Alpha value must be in the range [0, 1]");
 }
 color::color(const std::uint32_t r, const std::uint32_t g, const std::uint32_t b, const std::uint32_t a)
     : normalized(to_float(r), to_float(g), to_float(b), to_float(a))
 {
+    KIT_ASSERT_ERROR(r < 256, "Red value must be in the range [0, 255]");
+    KIT_ASSERT_ERROR(g < 256, "Green value must be in the range [0, 255]");
+    KIT_ASSERT_ERROR(b < 256, "Blue value must be in the range [0, 255]");
+    KIT_ASSERT_ERROR(a < 256, "Alpha value must be in the range [0, 255]");
+}
+
+color::color(const color &rgb, float a) : normalized(glm::vec3(rgb.normalized), a)
+{
+    KIT_ASSERT_ERROR(a <= 1.f, "Alpha value must be in the range [0, 1]");
+}
+color::color(const color &rgb, std::uint32_t a) : normalized(glm::vec3(rgb.normalized), to_float(a))
+{
+    KIT_ASSERT_ERROR(a < 256, "Alpha value must be in the range [0, 255]");
 }
 
 std::uint32_t color::r() const
@@ -67,18 +93,22 @@ std::uint32_t color::a() const
 
 void color::r(std::uint32_t r)
 {
+    KIT_ASSERT_ERROR(r < 256, "Color integer values must be in the range [0, 255]")
     normalized.r = to_float(r);
 }
 void color::g(std::uint32_t g)
 {
+    KIT_ASSERT_ERROR(g < 256, "Color integer values must be in the range [0, 255]")
     normalized.g = to_float(g);
 }
 void color::b(std::uint32_t b)
 {
+    KIT_ASSERT_ERROR(b < 256, "Color integer values must be in the range [0, 255]")
     normalized.b = to_float(b);
 }
 void color::a(std::uint32_t a)
 {
+    KIT_ASSERT_ERROR(a < 256, "Color integer values must be in the range [0, 255]")
     normalized.a = to_float(a);
 }
 

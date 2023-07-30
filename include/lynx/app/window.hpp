@@ -22,7 +22,6 @@ namespace lynx
 {
 class device;
 class renderer;
-class buffer;
 
 class camera2D;
 class camera3D;
