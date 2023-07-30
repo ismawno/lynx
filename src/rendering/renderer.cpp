@@ -114,6 +114,9 @@ void renderer::wait_for_queue_submission() const
 
 void renderer::end_frame_implementation()
 {
+#ifndef LYNX_MULTITHREADED
+    KIT_PERF_FUNCTION()
+#endif
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
     KIT_CHECK_RETURN_VALUE(vkEndCommandBuffer(m_command_buffers[m_frame_index]), VK_SUCCESS, CRITICAL,
                            "Failed to end command buffer")
