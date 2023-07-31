@@ -101,6 +101,7 @@ void window::render(const VkCommandBuffer command_buffer) const
 
 void window::clear_render_data()
 {
+    KIT_PERF_FUNCTION()
     for (const auto &sys : m_render_systems)
         sys->clear_render_data();
 }

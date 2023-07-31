@@ -214,24 +214,27 @@ void app::imgui_init()
 }
 void app::imgui_begin_render()
 {
+    KIT_PERF_FUNCTION()
     ImGui::SetCurrentContext(m_imgui_context);
 #ifdef LYNX_ENABLE_IMPLOT
     ImPlot::SetCurrentContext(m_implot_context);
 #endif
 
-    ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplVulkan_NewFrame();
 
     ImGui::NewFrame();
     ImGui::PushID(this);
 }
 void app::imgui_end_render()
 {
+    KIT_PERF_FUNCTION()
     ImGui::PopID();
     ImGui::Render();
 }
 void app::imgui_submit_command(const VkCommandBuffer command_buffer)
 {
+    KIT_PERF_FUNCTION()
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
@@ -259,13 +262,11 @@ void app::imgui_shutdown()
 #endif
 
 app2D::app2D(const std::uint32_t width, const std::uint32_t height, const char *name)
-
 {
     set_window(width, height, name);
 }
 
 app3D::app3D(const std::uint32_t width, const std::uint32_t height, const char *name)
-
 {
     set_window(width, height, name);
 }

@@ -1,5 +1,6 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/geometry/camera.hpp"
+#include "kit/profile/perf.hpp"
 
 namespace lynx
 {
@@ -69,6 +70,7 @@ void orthographic2D::size(const float size)
 
 void orthographic2D::update_transformation_matrices()
 {
+    KIT_PERF_FUNCTION()
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
     m_projection = transform.transform_as_camera();
@@ -131,6 +133,7 @@ orthographic3D::orthographic3D(const glm::vec3 &position, const glm::vec3 &size,
 
 void orthographic3D::update_transformation_matrices()
 {
+    KIT_PERF_FUNCTION()
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
     m_projection = transform.transform_as_camera();
@@ -199,6 +202,7 @@ void perspective3D::keep_aspect_ratio(const float aspect)
 
 void perspective3D::update_transformation_matrices()
 {
+    KIT_PERF_FUNCTION()
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
 

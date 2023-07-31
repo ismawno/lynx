@@ -55,6 +55,7 @@ swap_chain::~swap_chain()
 
 VkResult swap_chain::acquire_next_image(std::uint32_t *image_index) const
 {
+    KIT_PERF_FUNCTION()
     vkWaitForFences(m_device->vulkan_device(), 1, &m_in_flight_fences[m_current_frame], VK_TRUE,
                     std::numeric_limits<uint64_t>::max());
 

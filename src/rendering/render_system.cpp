@@ -61,11 +61,14 @@ void render_system::create_pipeline(const VkRenderPass render_pass, pipeline::co
 void render_system::render(VkCommandBuffer command_buffer, const camera &cam) const
 {
     KIT_PERF_PRETTY_FUNCTION()
+    if (m_render_data.empty())
+        return;
+
+    m_pipeline->bind(command_buffer);
     const glm::mat4 &proj = cam.projection();
     for (const render_data &rdata : m_render_data)
     {
         KIT_ASSERT_CRITICAL(m_device, "Render system must be properly initialized before rendering!")
-        m_pipeline->bind(command_buffer);
 
         const push_constant_data push_with_camera = {rdata.mdl_transform, proj};
         vkCmdPushConstants(command_buffer, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
