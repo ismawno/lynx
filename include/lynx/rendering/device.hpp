@@ -100,12 +100,9 @@ class device : kit::non_copyable
 #ifdef DEBUG
     static inline constexpr std::array<const char *const, 1> s_validation_layers = {"VK_LAYER_KHRONOS_validation"};
 #endif
-#ifdef __arm64__
     static inline constexpr std::array<const char *const, 2> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
                                                                                     "VK_KHR_portability_subset"};
-#else
-    static inline constexpr std::array<const char *const, 2> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-#endif
+    // static inline constexpr std::array<const char *const, 1> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 };
 
 } // namespace lynx
