@@ -96,13 +96,6 @@ class device : kit::non_copyable
 #endif
     bool check_device_extension_support(VkPhysicalDevice device) const;
     swap_chain_support_details query_swap_chain_support(VkPhysicalDevice device) const;
-
-#ifdef DEBUG
-    static inline constexpr std::array<const char *const, 1> s_validation_layers = {"VK_LAYER_KHRONOS_validation"};
-#endif
-    static inline constexpr std::array<const char *const, 2> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-                                                                                    "VK_KHR_portability_subset"};
-    // static inline constexpr std::array<const char *const, 1> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 };
 
 } // namespace lynx

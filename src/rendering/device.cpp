@@ -6,6 +6,11 @@
 namespace lynx
 {
 #ifdef DEBUG
+static constexpr std::array<const char *const, 1> s_validation_layers = {"VK_LAYER_KHRONOS_validation"};
+#endif
+static constexpr std::array<const char *const, 2> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                                                                         "VK_KHR_portability_subset"};
+#ifdef DEBUG
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT,
                                                      VkDebugUtilsMessageTypeFlagsEXT,
                                                      const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *)
@@ -84,9 +89,9 @@ void device::create_instance()
     const std::vector<const char *> extensions = required_extensions();
     create_info.enabledExtensionCount = static_cast<std::uint32_t>(extensions.size());
     create_info.ppEnabledExtensionNames = extensions.data();
-#ifdef __arm64__
+    // #ifdef __arm64__
     create_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-#endif
+    // #endif
 
 #ifdef DEBUG
     create_info.enabledLayerCount = static_cast<std::uint32_t>(s_validation_layers.size());
@@ -273,10 +278,10 @@ std::vector<const char *> device::required_extensions() const
 #ifdef DEBUG
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
-#ifdef __arm64__
+    // #ifdef __arm64__
     extensions.insert(extensions.end(), {VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME,
                                          "VK_KHR_get_physical_device_properties2"});
-#endif
+    // #endif
 
     return extensions;
 }
