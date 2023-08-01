@@ -8,6 +8,8 @@ while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
 
+mkdir -p "$DIR/../shaders/bin"
+
 /usr/local/bin/glslc "$DIR/../shaders/shader2D.vert" -o "$DIR/../shaders/bin/shader2D.vert.spv"
 /usr/local/bin/glslc "$DIR/../shaders/shader2D.frag" -o "$DIR/../shaders/bin/shader2D.frag.spv"
 
