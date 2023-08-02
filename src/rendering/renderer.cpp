@@ -94,6 +94,8 @@ VkCommandBuffer renderer::begin_frame()
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
+    KIT_CHECK_RETURN_VALUE(vkResetCommandBuffer(m_command_buffers[m_frame_index], 0), VK_SUCCESS, CRITICAL,
+                           "Failed to reset command buffer")
     KIT_CHECK_RETURN_VALUE(vkBeginCommandBuffer(m_command_buffers[m_frame_index], &begin_info), VK_SUCCESS, CRITICAL,
                            "Failed to begin command buffer")
     return m_command_buffers[m_frame_index];

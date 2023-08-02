@@ -71,9 +71,9 @@ class swap_chain : kit::non_copyable
 
     VkSwapchainKHR m_swap_chain;
 
-    std::vector<VkSemaphore> m_image_available_semaphores;
-    std::vector<VkSemaphore> m_render_finished_semaphores;
-    std::vector<VkFence> m_in_flight_fences;
+    std::array<VkSemaphore, MAX_FRAMES_IN_FLIGHT> m_image_available_semaphores;
+    std::array<VkSemaphore, MAX_FRAMES_IN_FLIGHT> m_render_finished_semaphores;
+    std::array<VkFence, MAX_FRAMES_IN_FLIGHT> m_in_flight_fences;
     std::vector<VkFence> m_images_in_flight;
     std::size_t m_current_frame = 0;
 };

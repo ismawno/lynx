@@ -335,9 +335,6 @@ void swap_chain::create_depth_resources()
 
 void swap_chain::create_sync_objects()
 {
-    m_image_available_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    m_render_finished_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    m_in_flight_fences.resize(MAX_FRAMES_IN_FLIGHT);
     m_images_in_flight.resize(m_swap_chain_images.size(), VK_NULL_HANDLE);
 
     VkSemaphoreCreateInfo semaphore_info{};
