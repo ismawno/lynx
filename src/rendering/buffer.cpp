@@ -23,6 +23,7 @@ buffer::buffer(const kit::ref<const device> &dev, VkDeviceSize instance_size, st
 
 buffer::~buffer()
 {
+    vkDeviceWaitIdle(m_device->vulkan_device());
     unmap();
     vkDestroyBuffer(m_device->vulkan_device(), m_buffer, nullptr);
     vkFreeMemory(m_device->vulkan_device(), m_memory, nullptr);

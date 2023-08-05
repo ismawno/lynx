@@ -105,6 +105,11 @@ bool app::next_frame()
     KIT_CHECK_RETURN_VALUE(m_window->display(submission), true, CRITICAL,
                            "Display failed to get command buffer for new frame")
 
+    on_frame_end(delta_time);
+    for (const auto &ly : m_layers)
+        ly->on_frame_end(delta_time);
+    on_late_frame_end(delta_time);
+
     m_ongoing_frame = false;
 
     m_frame_time = frame_clock.elapsed();
