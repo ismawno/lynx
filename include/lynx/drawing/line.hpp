@@ -18,22 +18,50 @@ namespace lynx
 class line2D : public drawable2D
 {
   public:
-    line2D(const glm::vec2 &p1, const glm::vec2 &p2, const color &color1 = color::white,
-           const color &color2 = color::white);
+    virtual const glm::vec2 &p1() const = 0;
+    virtual const glm::vec2 &p2() const = 0;
+
+    virtual void p1(const glm::vec2 &p1) = 0;
+    virtual void p2(const glm::vec2 &p2) = 0;
+
+    virtual const color &color() const = 0;
+    virtual void color(const lynx::color &color) = 0;
+};
+
+class line3D : public drawable3D
+{
+  public:
+    virtual const glm::vec3 &p1() const = 0;
+    virtual const glm::vec3 &p2() const = 0;
+
+    virtual void p1(const glm::vec3 &p1) = 0;
+    virtual void p2(const glm::vec3 &p2) = 0;
+
+    virtual const color &color() const = 0;
+    virtual void color(const lynx::color &color) = 0;
+};
+
+class thin_line2D : public line2D
+{
+  public:
+    thin_line2D(const glm::vec2 &p1 = {0.f, 0.f}, const glm::vec2 &p2 = {1.f, 0.f},
+                const lynx::color &color1 = color::white, const lynx::color &color2 = color::white);
 
     void draw(window2D &win) const override;
 
-    const glm::vec2 &p1() const;
-    const glm::vec2 &p2() const;
+    const glm::vec2 &p1() const override;
+    const glm::vec2 &p2() const override;
 
-    void p1(const glm::vec2 &p1);
-    void p2(const glm::vec2 &p2);
+    void p1(const glm::vec2 &p1) override;
+    void p2(const glm::vec2 &p2) override;
 
-    const color &color1() const;
-    const color &color2() const;
+    const lynx::color &color1() const;
+    const lynx::color &color2() const;
+    const lynx::color &color() const override;
 
-    void color1(const color &color1);
-    void color2(const color &color2);
+    void color1(const lynx::color &color1);
+    void color2(const lynx::color &color2);
+    void color(const lynx::color &color) override;
 
   private:
     glm::vec2 m_p1;
@@ -45,25 +73,27 @@ class line2D : public drawable2D
     transform2D as_transform() const;
 };
 
-class line3D : public drawable3D
+class thin_line3D : public line3D
 {
   public:
-    line3D(const glm::vec3 &p1, const glm::vec3 &p2, const color &color1 = color::white,
-           const color &color2 = color::white);
+    thin_line3D(const glm::vec3 &p1 = {0.f, 0.f, 0.f}, const glm::vec3 &p2 = {1.f, 0.f, 0.f},
+                const lynx::color &color1 = color::white, const lynx::color &color2 = color::white);
 
     void draw(window3D &win) const override;
 
-    const glm::vec3 &p1() const;
-    const glm::vec3 &p2() const;
+    const glm::vec3 &p1() const override;
+    const glm::vec3 &p2() const override;
 
-    void p1(const glm::vec3 &p1);
-    void p2(const glm::vec3 &p2);
+    void p1(const glm::vec3 &p1) override;
+    void p2(const glm::vec3 &p2) override;
 
-    const color &color1() const;
-    const color &color2() const;
+    const lynx::color &color1() const;
+    const lynx::color &color2() const;
+    const lynx::color &color() const override;
 
-    void color1(const color &color1);
-    void color2(const color &color2);
+    void color1(const lynx::color &color1);
+    void color2(const lynx::color &color2);
+    void color(const lynx::color &color) override;
 
   private:
     glm::vec3 m_p1;
@@ -78,8 +108,8 @@ class line3D : public drawable3D
 class line_strip2D : public drawable2D
 {
   public:
-    line_strip2D(const std::vector<glm::vec2> &points, const color &color = color::white);
-    line_strip2D(const std::vector<vertex2D> &points);
+    line_strip2D(const std::vector<glm::vec2> &points = {{0.f, 0.f}, {1.f, 0.f}}, const color &color = color::white);
+    line_strip2D(const std::vector<vertex2D> &points = {{{0.f, 0.f}, color::white}, {{1.f, 0.f}, color::white}});
 
     void draw(window2D &win) const override;
 
@@ -99,8 +129,10 @@ class line_strip2D : public drawable2D
 class line_strip3D : public drawable3D
 {
   public:
-    line_strip3D(const std::vector<glm::vec3> &points, const color &color = color::white);
-    line_strip3D(const std::vector<vertex3D> &points);
+    line_strip3D(const std::vector<glm::vec3> &points = {{0.f, 0.f, 0.f}, {1.f, 0.f, 0.f}},
+                 const color &color = color::white);
+    line_strip3D(const std::vector<vertex3D> &points = {{{0.f, 0.f, 0.f}, color::white},
+                                                        {{1.f, 0.f, 0.f}, color::white}});
 
     void draw(window3D &win) const override;
 
