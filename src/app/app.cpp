@@ -30,7 +30,7 @@ void app::start()
 #endif
     on_start();
     for (const auto &ly : m_layers)
-        if (ly->enabled())
+        if (ly->enabled)
             ly->on_start();
     on_late_start();
 }
@@ -61,7 +61,7 @@ bool app::next_frame()
         if (!on_event(ev))
         {
             for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
-                if ((*it)->enabled() && (*it)->on_event(ev))
+                if ((*it)->enabled && (*it)->on_event(ev))
                     break;
             on_late_event(ev);
         }
@@ -72,7 +72,7 @@ bool app::next_frame()
         KIT_PERF_SCOPE("--On update--")
         on_update(delta_time);
         for (const auto &ly : m_layers)
-            if (ly->enabled())
+            if (ly->enabled)
                 ly->on_update(delta_time);
         on_late_update(delta_time);
     }
@@ -85,7 +85,7 @@ bool app::next_frame()
         KIT_PERF_SCOPE("--On render--")
         on_render(delta_time);
         for (const auto &ly : m_layers)
-            if (ly->enabled())
+            if (ly->enabled)
                 ly->on_render(delta_time);
         on_late_render(delta_time);
     }
@@ -99,7 +99,7 @@ bool app::next_frame()
         imgui_submit_command(cmd);
 #endif
         for (const auto &ly : m_layers)
-            if (ly->enabled())
+            if (ly->enabled)
                 ly->on_command_submission(cmd);
     };
     KIT_CHECK_RETURN_VALUE(m_window->display(submission), true, CRITICAL,
@@ -129,7 +129,7 @@ void app::shutdown()
 
     on_shutdown();
     for (const auto &ly : m_layers)
-        if (ly->enabled())
+        if (ly->enabled)
             ly->on_shutdown();
     on_late_shutdown();
 

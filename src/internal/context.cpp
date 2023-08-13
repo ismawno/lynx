@@ -34,7 +34,7 @@ const context *context::get(const lynx::window *win)
     for (std::size_t i = 0; i < s_active_contexts; i++)
         if (s_contexts[i].m_window == win)
             return &s_contexts[i];
-    KIT_DEBUG("No context found for window {0}", win->name())
+    KIT_DEBUG("No context found for window {0}", win->name)
     return nullptr;
 }
 
@@ -50,7 +50,7 @@ void context::set(const lynx::window *win)
             s_current = &s_contexts[i];
             return;
         }
-    KIT_DEBUG("No context found for window {0}", win->name())
+    KIT_DEBUG("No context found for window {0}", win->name)
 }
 
 void context::set(const context *ctx)

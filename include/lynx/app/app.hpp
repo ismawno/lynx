@@ -61,7 +61,7 @@ class app : kit::non_copyable
         context::set(m_window.get());
 
         for (auto it = m_layers.begin(); it != m_layers.end(); ++it)
-            if ((*it)->id() == name)
+            if ((*it)->id == name)
             {
                 (*it)->on_detach();
                 kit::scope<T> to_remove;
@@ -79,7 +79,7 @@ class app : kit::non_copyable
     template <typename T> kit::scope<T> pop_layer(const T *ly)
     {
         static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
-        return pop_layer(ly->id());
+        return pop_layer(ly->id);
     }
 
     template <typename T = lynx::window> const T *window() const

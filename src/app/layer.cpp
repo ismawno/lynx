@@ -12,7 +12,7 @@ layer::layer(const std::string &name) : kit::identifiable<std::string>(name)
 YAML::Node layer::encode() const
 {
     YAML::Node node;
-    node["Enabled"] = enabled();
+    node["Enabled"] = enabled;
     return node;
 }
 
@@ -20,7 +20,7 @@ bool layer::decode(const YAML::Node &node)
 {
     if (!node.IsMap() || node.size() < 1)
         return false;
-    enabled(node["Enabled"].as<bool>());
+    enabled = node["Enabled"].as<bool>();
     return true;
 }
 } // namespace lynx
