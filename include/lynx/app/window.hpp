@@ -207,9 +207,9 @@ class window2D : public window
         return window::render_system<T>();
     }
 
-    void draw(const std::vector<vertex2D> &vertices, topology tplg, const transform2D &transform = {});
+    void draw(const std::vector<vertex2D> &vertices, topology tplg, const kit::transform2D &transform = {});
     void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
-              const transform2D &transform = {});
+              const kit::transform2D &transform = {});
     void draw(const drawable2D &drawable);
 
     template <typename T = camera2D> const T *camera() const
@@ -257,9 +257,9 @@ class window3D : public window
         return window::render_system<T>();
     }
 
-    void draw(const std::vector<vertex3D> &vertices, topology tplg, const transform3D &transform = {});
+    void draw(const std::vector<vertex3D> &vertices, topology tplg, const kit::transform3D &transform = {});
     void draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
-              const transform3D &transform = {});
+              const kit::transform3D &transform = {});
     void draw(const drawable3D &drawable);
 
     template <typename T = camera3D> const T *camera() const

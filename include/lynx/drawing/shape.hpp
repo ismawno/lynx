@@ -2,7 +2,7 @@
 #define LYNX_SHAPE_HPP
 
 #include "lynx/drawing/drawable.hpp"
-#include "lynx/geometry/transform.hpp"
+#include "kit/utility/transform.hpp"
 #include "lynx/drawing/model.hpp"
 #include "lynx/drawing/color.hpp"
 
@@ -25,7 +25,7 @@ class shape2D : public drawable2D
     const lynx::color &color() const;
     void color(const lynx::color &color);
 
-    transform2D transform{};
+    kit::transform2D transform{};
 
   protected:
     model2D m_model;
@@ -43,7 +43,7 @@ class shape3D : public drawable3D
     const lynx::color &color() const;
     void color(const lynx::color &color);
 
-    transform3D transform{};
+    kit::transform3D transform{};
 
   protected:
     model3D m_model;

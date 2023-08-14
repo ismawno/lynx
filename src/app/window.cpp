@@ -226,13 +226,13 @@ window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) 
     add_render_system<triangle_strip_render_system2D>();
 }
 
-void window2D::draw(const std::vector<vertex2D> &vertices, const topology tplg, const transform2D &transform)
+void window2D::draw(const std::vector<vertex2D> &vertices, const topology tplg, const kit::transform2D &transform)
 {
     render_system_as_topology<render_system2D>(tplg)->draw(vertices, transform);
 }
 
 void window2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
-                    const topology tplg, const transform2D &transform)
+                    const topology tplg, const kit::transform2D &transform)
 {
     render_system_as_topology<render_system2D>(tplg)->draw(vertices, indices, transform);
 }
@@ -259,13 +259,13 @@ window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) 
     add_render_system<triangle_strip_render_system3D>();
 }
 
-void window3D::draw(const std::vector<vertex3D> &vertices, const topology tplg, const transform3D &transform)
+void window3D::draw(const std::vector<vertex3D> &vertices, const topology tplg, const kit::transform3D &transform)
 {
     render_system_as_topology<render_system3D>(tplg)->draw(vertices, transform);
 }
 
 void window3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
-                    const topology tplg, const transform3D &transform)
+                    const topology tplg, const kit::transform3D &transform)
 {
     render_system_as_topology<render_system3D>(tplg)->draw(vertices, indices, transform);
 }

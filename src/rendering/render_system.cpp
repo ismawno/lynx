@@ -112,7 +112,7 @@ void render_system::pipeline_config(pipeline::config_info &config) const
     config.constant_range_size = sizeof(push_constant_data);
 }
 
-void render_system2D::draw(const std::vector<vertex2D> &vertices, const transform2D &transform)
+void render_system2D::draw(const std::vector<vertex2D> &vertices, const kit::transform2D &transform)
 {
     glm::mat4 mdl_mat = transform.transform();
     const render_data rdata = create_render_data(new model2D(m_device, vertices), mdl_mat, true);
@@ -120,7 +120,7 @@ void render_system2D::draw(const std::vector<vertex2D> &vertices, const transfor
 }
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
-                           const transform2D &transform)
+                           const kit::transform2D &transform)
 {
     glm::mat4 mdl_mat = transform.transform();
     const render_data rdata = create_render_data(new model2D(m_device, vertices, indices), mdl_mat, true);
@@ -153,7 +153,7 @@ void render_system2D::pipeline_config(pipeline::config_info &config) const
     config.attribute_descriptions = vertex2D::attribute_descriptions();
 }
 
-void render_system3D::draw(const std::vector<vertex3D> &vertices, const transform3D &transform)
+void render_system3D::draw(const std::vector<vertex3D> &vertices, const kit::transform3D &transform)
 {
     glm::mat4 mdl_mat = transform.transform();
     const render_data rdata = create_render_data(new model3D(m_device, vertices), mdl_mat, true);
@@ -161,7 +161,7 @@ void render_system3D::draw(const std::vector<vertex3D> &vertices, const transfor
 }
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
-                           const transform3D &transform)
+                           const kit::transform3D &transform)
 {
     glm::mat4 mdl_mat = transform.transform();
     const render_data rdata = create_render_data(new model3D(m_device, vertices, indices), mdl_mat, true);

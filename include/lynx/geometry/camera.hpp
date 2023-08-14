@@ -1,7 +1,7 @@
 #ifndef LYNX_CAMERA_HPP
 #define LYNX_CAMERA_HPP
 
-#include "lynx/geometry/transform.hpp"
+#include "kit/utility/transform.hpp"
 
 namespace lynx
 {
@@ -26,7 +26,7 @@ class camera
 class camera2D : public camera
 {
   public:
-    transform2D transform{};
+    kit::transform2D transform{};
 
     virtual void keep_aspect_ratio(float aspect) override;
     glm::vec2 screen_to_world(const glm::vec2 &screen_pos) const;
@@ -36,7 +36,7 @@ class camera2D : public camera
 class camera3D : public camera
 {
   public:
-    transform3D transform{};
+    kit::transform3D transform{};
 
     virtual void keep_aspect_ratio(float aspect) override;
 

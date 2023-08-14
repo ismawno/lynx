@@ -4,7 +4,7 @@
 #include "lynx/drawing/drawable.hpp"
 #include "lynx/drawing/model.hpp"
 #include "lynx/geometry/vertex.hpp"
-#include "lynx/geometry/transform.hpp"
+#include "kit/utility/transform.hpp"
 #include "lynx/drawing/color.hpp"
 
 #define GLM_FORCE_RADIANS
@@ -67,10 +67,10 @@ class thin_line2D : public line2D
     glm::vec2 m_p1;
     glm::vec2 m_p2;
 
-    transform2D m_transform;
+    kit::transform2D m_transform;
     model2D m_model;
 
-    transform2D as_transform() const;
+    kit::transform2D as_transform() const;
 };
 
 class thin_line3D : public line3D
@@ -99,10 +99,10 @@ class thin_line3D : public line3D
     glm::vec3 m_p1;
     glm::vec3 m_p2;
 
-    transform3D m_transform;
+    kit::transform3D m_transform;
     model3D m_model;
 
-    transform3D as_transform() const;
+    kit::transform3D as_transform() const;
 };
 
 class line_strip2D : public drawable2D

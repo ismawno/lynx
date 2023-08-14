@@ -3,7 +3,7 @@
 
 #include "lynx/rendering/pipeline.hpp"
 #include "lynx/drawing/model.hpp"
-#include "lynx/geometry/transform.hpp"
+#include "kit/utility/transform.hpp"
 #include <vulkan/vulkan.hpp>
 #include <utility>
 
@@ -60,9 +60,9 @@ class render_system
 class render_system2D : public render_system
 {
   public:
-    void draw(const std::vector<vertex2D> &vertices, const transform2D &transform = {});
+    void draw(const std::vector<vertex2D> &vertices, const kit::transform2D &transform = {});
     void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
-              const transform2D &transform = {});
+              const kit::transform2D &transform = {});
     void draw(const drawable2D &drawable);
 
     template <class... Args> kit::ref<model2D> model_from_vertices(Args &&...args) const
@@ -83,9 +83,9 @@ class render_system2D : public render_system
 class render_system3D : public render_system
 {
   public:
-    void draw(const std::vector<vertex3D> &vertices, const transform3D &transform = {});
+    void draw(const std::vector<vertex3D> &vertices, const kit::transform3D &transform = {});
     void draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
-              const transform3D &transform = {});
+              const kit::transform3D &transform = {});
     void draw(const drawable3D &drawable);
 
     template <class... Args> kit::ref<model3D> model_from_vertices(Args &&...args) const
