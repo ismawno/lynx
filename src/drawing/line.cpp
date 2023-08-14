@@ -15,7 +15,7 @@ thin_line2D::thin_line2D(const glm::vec2 &p1, const glm::vec2 &p2, const lynx::c
 
 void thin_line2D::draw(window2D &win) const
 {
-    drawable::default_draw(win, &m_model, m_transform.transform(), topology::LINE_LIST);
+    drawable::default_draw(win, &m_model, m_transform.center_scale_rotate_translate4(), topology::LINE_LIST);
 }
 
 kit::transform2D thin_line2D::as_transform() const
@@ -91,7 +91,7 @@ thin_line3D::thin_line3D(const glm::vec3 &p1, const glm::vec3 &p2, const lynx::c
 
 void thin_line3D::draw(window3D &win) const
 {
-    drawable::default_draw(win, &m_model, m_transform.transform(), topology::LINE_LIST);
+    drawable::default_draw(win, &m_model, m_transform.center_scale_rotate_translate4(), topology::LINE_LIST);
 }
 
 kit::transform3D thin_line3D::as_transform() const

@@ -114,7 +114,7 @@ void render_system::pipeline_config(pipeline::config_info &config) const
 
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const kit::transform2D &transform)
 {
-    glm::mat4 mdl_mat = transform.transform();
+    glm::mat4 mdl_mat = transform.center_scale_rotate_translate4();
     const render_data rdata = create_render_data(new model2D(m_device, vertices), mdl_mat, true);
     push_render_data(rdata);
 }
@@ -122,7 +122,7 @@ void render_system2D::draw(const std::vector<vertex2D> &vertices, const kit::tra
 void render_system2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
                            const kit::transform2D &transform)
 {
-    glm::mat4 mdl_mat = transform.transform();
+    glm::mat4 mdl_mat = transform.center_scale_rotate_translate4();
     const render_data rdata = create_render_data(new model2D(m_device, vertices, indices), mdl_mat, true);
     push_render_data(rdata);
 }
@@ -155,7 +155,7 @@ void render_system2D::pipeline_config(pipeline::config_info &config) const
 
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const kit::transform3D &transform)
 {
-    glm::mat4 mdl_mat = transform.transform();
+    glm::mat4 mdl_mat = transform.center_scale_rotate_translate4();
     const render_data rdata = create_render_data(new model3D(m_device, vertices), mdl_mat, true);
     push_render_data(rdata);
 }
@@ -163,7 +163,7 @@ void render_system3D::draw(const std::vector<vertex3D> &vertices, const kit::tra
 void render_system3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
                            const kit::transform3D &transform)
 {
-    glm::mat4 mdl_mat = transform.transform();
+    glm::mat4 mdl_mat = transform.center_scale_rotate_translate4();
     const render_data rdata = create_render_data(new model3D(m_device, vertices, indices), mdl_mat, true);
     push_render_data(rdata);
 }

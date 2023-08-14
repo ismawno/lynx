@@ -27,7 +27,7 @@ void shape2D::color(const lynx::color &color)
 
 void shape2D::draw(window2D &win) const
 {
-    drawable::default_draw(win, &m_model, transform.transform(), m_topology);
+    drawable::default_draw(win, &m_model, transform.center_scale_rotate_translate4(), m_topology);
 }
 
 // Color should already be encoded in arguments when constructing the model
@@ -50,7 +50,7 @@ void shape3D::color(const lynx::color &color)
 
 void shape3D::draw(window3D &win) const
 {
-    drawable::default_draw(win, &m_model, transform.transform(), m_topology);
+    drawable::default_draw(win, &m_model, transform.center_scale_rotate_translate4(), m_topology);
 }
 
 rect2D::rect2D(const glm::vec2 &position, const glm::vec2 &dimensions, const lynx::color &color)

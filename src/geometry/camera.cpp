@@ -73,8 +73,8 @@ void orthographic2D::update_transformation_matrices()
     KIT_PERF_FUNCTION()
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
-    m_projection = transform.transform_as_camera();
-    m_inv_projection = transform.inverse_as_camera();
+    m_projection = transform.inverse_scale_center_rotate_translate4();
+    m_inv_projection = transform.scale_center_rotate_translate4();
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
 }
@@ -136,8 +136,8 @@ void orthographic3D::update_transformation_matrices()
     KIT_PERF_FUNCTION()
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
-    m_projection = transform.transform_as_camera();
-    m_inv_projection = transform.inverse_as_camera();
+    m_projection = transform.inverse_scale_center_rotate_translate4();
+    m_inv_projection = transform.scale_center_rotate_translate4();
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
 }
@@ -220,8 +220,8 @@ void perspective3D::update_transformation_matrices()
     inv_perspective[3][2] = 1.f;
     inv_perspective[2][3] = (m_near - m_far) / (m_far * m_near);
 
-    m_projection = perspective * transform.transform_as_camera();
-    m_inv_projection = transform.inverse_as_camera() * inv_perspective;
+    m_projection = perspective * transform.inverse_scale_center_rotate_translate4();
+    m_inv_projection = transform.scale_center_rotate_translate4() * inv_perspective;
 
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
