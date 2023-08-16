@@ -14,6 +14,7 @@ const color color::black{0u};
 const color color::pink{255u, 192u, 203u};
 const color color::purple{191u, 64u, 191u};
 const color color::white{255u};
+const color color::transparent{white, 0u};
 
 static constexpr float one_over_255 = 1.f / 255.f;
 static std::uint32_t to_int(const float val)

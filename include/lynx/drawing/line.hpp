@@ -115,12 +115,15 @@ class line_strip2D : public drawable2D
 
     const vertex2D &operator[](std::size_t index) const;
     const vertex2D &point(std::size_t index) const;
+
     void point(std::size_t index, const vertex2D &vertex);
+    void point(std::size_t index, const glm::vec2 &position);
 
     void update_points(const std::function<void(vertex2D &)> &for_each_fn);
 
-    const color &color() const;
+    const color &color(std::size_t index = 0) const;
     void color(const lynx::color &color);
+    void color(std::size_t index, const lynx::color &color);
 
   private:
     model2D m_model;
@@ -137,12 +140,15 @@ class line_strip3D : public drawable3D
 
     const vertex3D &operator[](std::size_t index) const;
     const vertex3D &point(std::size_t index) const;
+
     void point(std::size_t index, const vertex3D &vertex);
+    void point(std::size_t index, const glm::vec3 &position);
 
     void update_points(const std::function<void(vertex3D &)> &for_each_fn);
 
-    const color &color() const;
+    const color &color(std::size_t index = 0) const;
     void color(const lynx::color &color);
+    void color(std::size_t index, const lynx::color &color);
 
   private:
     model3D m_model;

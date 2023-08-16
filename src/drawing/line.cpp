@@ -178,15 +178,28 @@ void line_strip2D::draw(window2D &win) const
 
 const vertex2D &line_strip2D::operator[](const std::size_t index) const
 {
-    return m_model.read_vertex(index);
+    return point(index);
 }
 const vertex2D &line_strip2D::point(const std::size_t index) const
 {
+    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
     return m_model.read_vertex(index);
 }
+
 void line_strip2D::point(const std::size_t index, const vertex2D &vertex)
 {
+    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
     m_model.write_vertex(index, vertex);
+}
+void line_strip2D::point(const std::size_t index, const glm::vec2 &position)
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
+    vertex2D v = m_model.read_vertex(index);
+    v.position = position;
+    m_model.write_vertex(index, v);
 }
 
 void line_strip2D::update_points(const std::function<void(vertex2D &)> &for_each_fn)
@@ -194,15 +207,23 @@ void line_strip2D::update_points(const std::function<void(vertex2D &)> &for_each
     m_model.update_vertex_buffer(for_each_fn);
 }
 
-const color &line_strip2D::color() const
+const color &line_strip2D::color(const std::size_t index) const
 {
-    return m_model.read_vertex(0).color;
+    return m_model.read_vertex(index).color;
 }
 
 void line_strip2D::color(const lynx::color &color)
 {
     const auto feach = [&color](vertex2D &vtx) { vtx.color = color; };
     m_model.update_vertex_buffer(feach);
+}
+void line_strip2D::color(std::size_t index, const lynx::color &color)
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
+    vertex2D v = m_model.read_vertex(index);
+    v.color = color;
+    m_model.write_vertex(index, v);
 }
 
 line_strip3D::line_strip3D(const std::vector<glm::vec3> &points, const lynx::color &color)
@@ -221,15 +242,28 @@ void line_strip3D::draw(window3D &win) const
 
 const vertex3D &line_strip3D::operator[](const std::size_t index) const
 {
+    return point(index);
+}
+const vertex3D &line_strip3D::point(const std::size_t index) const
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
     return m_model.read_vertex(index);
 }
-const vertex3D &line_strip3D::point(std::size_t index) const
+
+void line_strip3D::point(const std::size_t index, const vertex3D &vertex)
 {
-    return m_model.read_vertex(index);
-}
-void line_strip3D::point(std::size_t index, const vertex3D &vertex)
-{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
     m_model.write_vertex(index, vertex);
+}
+void line_strip3D::point(const std::size_t index, const glm::vec3 &position)
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
+    vertex3D v = m_model.read_vertex(index);
+    v.position = position;
+    m_model.write_vertex(index, v);
 }
 
 void line_strip3D::update_points(const std::function<void(vertex3D &)> &for_each_fn)
@@ -237,14 +271,22 @@ void line_strip3D::update_points(const std::function<void(vertex3D &)> &for_each
     m_model.update_vertex_buffer(for_each_fn);
 }
 
-const color &line_strip3D::color() const
+const color &line_strip3D::color(const std::size_t index) const
 {
-    return m_model.read_vertex(0).color;
+    return m_model.read_vertex(index).color;
 }
 
 void line_strip3D::color(const lynx::color &color)
 {
     const auto feach = [&color](vertex3D &vtx) { vtx.color = color; };
     m_model.update_vertex_buffer(feach);
+}
+void line_strip3D::color(std::size_t index, const lynx::color &color)
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
+    vertex3D v = m_model.read_vertex(index);
+    v.color = color;
+    m_model.write_vertex(index, v);
 }
 } // namespace lynx

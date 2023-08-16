@@ -94,21 +94,49 @@ polygon2D::polygon2D(const std::vector<glm::vec2> &local_vertices, const lynx::c
 {
 }
 
-const glm::vec2 &polygon2D::vertex(const std::size_t index) const
+const vertex2D &polygon2D::operator[](const std::size_t index) const
 {
-    return m_model.read_vertex(index + 1).position; // +1 to account for center vertex
+    return vertex(index);
 }
 
+const vertex2D &polygon2D::vertex(const std::size_t index) const
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
+                     m_model.vertices_count() - 1)
+    return m_model.read_vertex(index + 1); // +1 to account for center vertex
+}
+
+void polygon2D::vertex(std::size_t index, const vertex2D &vertex)
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
+                     m_model.vertices_count() - 1)
+    m_model.write_vertex(index + 1, vertex);
+}
 void polygon2D::vertex(const std::size_t index, const glm::vec2 &vertex)
 {
+    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
+                     m_model.vertices_count() - 1)
     vertex2D v = m_model.read_vertex(index + 1);
     v.position = vertex;
     m_model.write_vertex(index + 1, v); //+1 to account for center vertex
 }
 
-const glm::vec2 &polygon2D::operator[](const std::size_t index) const
+void polygon2D::update_vertices(const std::function<void(vertex2D &)> &for_each_fn)
 {
-    return m_model.read_vertex(index + 1).position;
+    m_model.update_vertex_buffer(for_each_fn);
+}
+
+void polygon2D::color(std::size_t index, const lynx::color &color)
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
+                     m_model.vertices_count() - 1)
+    vertex2D v = m_model.read_vertex(index + 1);
+    v.color = color;
+    m_model.write_vertex(index + 1, v);
 }
 
 std::size_t polygon2D::size() const

@@ -49,6 +49,7 @@ struct color
     static const color pink;
     static const color purple;
     static const color white;
+    static const color transparent;
 };
 } // namespace lynx
 

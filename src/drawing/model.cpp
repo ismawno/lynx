@@ -134,6 +134,16 @@ void model::update_index_buffer(const std::function<void(std::uint32_t &)> &for_
     update_buffer(for_each_fn, *m_host_index_buffer, *m_device_index_buffer);
 }
 
+std::size_t model::vertices_count() const
+{
+    return m_host_vertex_buffer->instance_count();
+}
+
+std::size_t model::indices_count() const
+{
+    return m_host_index_buffer ? m_host_index_buffer->instance_count() : 0;
+}
+
 template <typename T> void model::write_vertex(const std::size_t buffer_index, const T &vertex)
 {
     m_host_vertex_buffer->write_at_index(&vertex, buffer_index);

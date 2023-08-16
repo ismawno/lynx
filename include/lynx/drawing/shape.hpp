@@ -75,12 +75,18 @@ class polygon2D : public shape2D
   public:
     polygon2D(const std::vector<glm::vec2> &local_vertices = {{-1.f, 0.5f}, {1.f, 0.5f}, {0.f, -0.5f}},
               const lynx::color &color = lynx::color::white);
+    polygon2D(const std::vector<vertex2D> &local_vertices);
 
-    const glm::vec2 &vertex(std::size_t index) const;
-    void vertex(std::size_t index, const glm::vec2 &vertex);
+    const vertex2D &operator[](std::size_t index) const;
+    const vertex2D &vertex(std::size_t index) const;
 
-    const glm::vec2 &operator[](std::size_t index) const;
+    void vertex(std::size_t index, const vertex2D &vertex);
+    void vertex(std::size_t index, const glm::vec2 &position);
+
+    void update_vertices(const std::function<void(vertex2D &)> &for_each_fn);
     std::size_t size() const;
+
+    void color(std::size_t index, const lynx::color &color);
 
   private:
     std::size_t m_size;

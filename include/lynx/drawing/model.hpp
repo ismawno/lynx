@@ -56,6 +56,9 @@ class model
     template <typename T> void update_vertex_buffer(const std::function<void(T &)> &for_each_fn = nullptr);
     void update_index_buffer(const std::function<void(std::uint32_t &)> &for_each_fn = nullptr);
 
+    std::size_t vertices_count() const;
+    std::size_t indices_count() const;
+
 #ifdef DEBUG
     mutable bool to_be_rendered = false;
 #endif
