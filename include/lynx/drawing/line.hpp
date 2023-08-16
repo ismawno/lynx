@@ -109,7 +109,7 @@ class line_strip2D : public drawable2D
 {
   public:
     line_strip2D(const std::vector<glm::vec2> &points = {{0.f, 0.f}, {1.f, 0.f}}, const color &color = color::white);
-    line_strip2D(const std::vector<vertex2D> &points = {{{0.f, 0.f}, color::white}, {{1.f, 0.f}, color::white}});
+    line_strip2D(const std::vector<vertex2D> &points);
 
     void draw(window2D &win) const override;
 
@@ -131,8 +131,7 @@ class line_strip3D : public drawable3D
   public:
     line_strip3D(const std::vector<glm::vec3> &points = {{0.f, 0.f, 0.f}, {1.f, 0.f, 0.f}},
                  const color &color = color::white);
-    line_strip3D(const std::vector<vertex3D> &points = {{{0.f, 0.f, 0.f}, color::white},
-                                                        {{1.f, 0.f, 0.f}, color::white}});
+    line_strip3D(const std::vector<vertex3D> &points);
 
     void draw(window3D &win) const override;
 
