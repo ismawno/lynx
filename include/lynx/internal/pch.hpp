@@ -39,5 +39,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/geometric.hpp>
+#include <glm/gtx/norm.hpp>
 
 #endif

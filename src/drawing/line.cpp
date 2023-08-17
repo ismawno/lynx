@@ -202,7 +202,7 @@ void line_strip2D::point(const std::size_t index, const glm::vec2 &position)
     m_model.write_vertex(index, v);
 }
 
-void line_strip2D::update_points(const std::function<void(vertex2D &)> &for_each_fn)
+void line_strip2D::update_points(const std::function<void(std::size_t, vertex2D &)> &for_each_fn)
 {
     m_model.update_vertex_buffer(for_each_fn);
 }
@@ -214,7 +214,7 @@ const color &line_strip2D::color(const std::size_t index) const
 
 void line_strip2D::color(const lynx::color &color)
 {
-    const auto feach = [&color](vertex2D &vtx) { vtx.color = color; };
+    const auto feach = [&color](std::size_t, vertex2D &vtx) { vtx.color = color; };
     m_model.update_vertex_buffer(feach);
 }
 void line_strip2D::color(std::size_t index, const lynx::color &color)
@@ -266,7 +266,7 @@ void line_strip3D::point(const std::size_t index, const glm::vec3 &position)
     m_model.write_vertex(index, v);
 }
 
-void line_strip3D::update_points(const std::function<void(vertex3D &)> &for_each_fn)
+void line_strip3D::update_points(const std::function<void(std::size_t, vertex3D &)> &for_each_fn)
 {
     m_model.update_vertex_buffer(for_each_fn);
 }
@@ -278,7 +278,7 @@ const color &line_strip3D::color(const std::size_t index) const
 
 void line_strip3D::color(const lynx::color &color)
 {
-    const auto feach = [&color](vertex3D &vtx) { vtx.color = color; };
+    const auto feach = [&color](std::size_t, vertex3D &vtx) { vtx.color = color; };
     m_model.update_vertex_buffer(feach);
 }
 void line_strip3D::color(std::size_t index, const lynx::color &color)

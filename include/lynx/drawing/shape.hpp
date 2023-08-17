@@ -25,14 +25,25 @@ class shape2D : public drawable2D
     const lynx::color &color() const;
     void color(const lynx::color &color);
 
+    const lynx::color &outline_color() const;
+    void outline_color(const lynx::color &color);
+
+    float outline_thickness() const;
+    void outline_thickness(float thickness);
+
     kit::transform2D transform{};
 
   protected:
     model2D m_model;
 
   private:
+    mutable model2D m_outline_model;
+    float m_outline_thickness = 0.f;
+
     topology m_topology;
-    virtual void draw(window2D &win) const override;
+
+    void update_outline_thickness(); // Always update vertices
+    void draw(window2D &win) const override;
 };
 
 class shape3D : public drawable3D
@@ -83,7 +94,7 @@ class polygon2D : public shape2D
     void vertex(std::size_t index, const vertex2D &vertex);
     void vertex(std::size_t index, const glm::vec2 &position);
 
-    void update_vertices(const std::function<void(vertex2D &)> &for_each_fn);
+    void update_vertices(const std::function<void(std::size_t, vertex2D &)> &for_each_fn);
     std::size_t size() const;
 
     const lynx::color &color(std::size_t index = 0) const; // APLICAR A POLYGON3D
@@ -124,7 +135,7 @@ class polygon3D : public shape3D
     void vertex(std::size_t index, const vertex3D &vertex);
     void vertex(std::size_t index, const glm::vec3 &position);
 
-    void update_vertices(const std::function<void(vertex3D &)> &for_each_fn);
+    void update_vertices(const std::function<void(std::size_t, vertex3D &)> &for_each_fn);
     std::size_t size() const;
 
     const lynx::color &color(std::size_t index = 0) const; // APLICAR A POLYGON3D

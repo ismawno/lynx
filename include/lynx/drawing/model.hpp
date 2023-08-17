@@ -53,8 +53,8 @@ class model
     template <typename T> const T &read_vertex(std::size_t buffer_index) const;
     std::uint32_t read_index(std::size_t buffer_index) const;
 
-    template <typename T> void update_vertex_buffer(const std::function<void(T &)> &for_each_fn = nullptr);
-    void update_index_buffer(const std::function<void(std::uint32_t &)> &for_each_fn = nullptr);
+    template <typename T> void update_vertex_buffer(const std::function<void(std::size_t, T &)> &for_each_fn = nullptr);
+    void update_index_buffer(const std::function<void(std::size_t, std::uint32_t &)> &for_each_fn = nullptr);
 
     std::size_t vertices_count() const;
     std::size_t indices_count() const;
@@ -96,7 +96,7 @@ class model2D : public model
     void write_vertex(std::size_t buffer_index, const vertex2D &vertex);
     const vertex2D &read_vertex(std::size_t buffer_index) const;
 
-    void update_vertex_buffer(const std::function<void(vertex2D &)> &for_each_fn = nullptr);
+    void update_vertex_buffer(const std::function<void(std::size_t, vertex2D &)> &for_each_fn = nullptr);
 
     const vertex2D &operator[](std::size_t index) const;
 
@@ -123,7 +123,7 @@ class model3D : public model
     void write_vertex(std::size_t buffer_index, const vertex3D &vertex);
     const vertex3D &read_vertex(std::size_t buffer_index) const;
 
-    void update_vertex_buffer(const std::function<void(vertex3D &)> &for_each_fn = nullptr);
+    void update_vertex_buffer(const std::function<void(std::size_t, vertex3D &)> &for_each_fn = nullptr);
 
     const vertex3D &operator[](std::size_t index) const;
 

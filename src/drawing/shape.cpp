@@ -4,13 +4,15 @@
 #include "lynx/app/window.hpp"
 #include "lynx/rendering/buffer.hpp"
 #include "lynx/geometry/vertex.hpp"
+#include "kit/utility/utils.hpp"
 
 namespace lynx
 {
 // Color should already be encoded in arguments when constructing the model
 template <class... ModelArgs>
 shape2D::shape2D(topology tplg, ModelArgs &&...args)
-    : m_model(context::current()->device(), std::forward<ModelArgs>(args)...), m_topology(tplg)
+    : m_model(context::current()->device(), std::forward<ModelArgs>(args)...),
+      m_outline_model(context::current()->device(), std::forward<ModelArgs>(args)...), m_topology(tplg)
 {
 }
 
@@ -18,15 +20,46 @@ const color &shape2D::color() const
 {
     return m_model.read_vertex(0).color;
 }
-
 void shape2D::color(const lynx::color &color)
 {
-    const auto feach = [&color](vertex2D &vtx) { vtx.color = color; };
+    const auto feach = [&color](std::size_t, vertex2D &vtx) { vtx.color = color; };
     m_model.update_vertex_buffer(feach);
+}
+
+const color &shape2D::outline_color() const
+{
+    return m_outline_model.read_vertex(0).color;
+}
+void shape2D::outline_color(const lynx::color &color)
+{
+    const auto feach = [&color](std::size_t, vertex2D &vtx) { vtx.color = color; };
+    m_outline_model.update_vertex_buffer(feach);
+}
+
+float shape2D::outline_thickness() const
+{
+    return m_outline_thickness;
+}
+void shape2D::outline_thickness(const float thickness)
+{
+    m_outline_thickness = thickness;
 }
 
 void shape2D::draw(window2D &win) const
 {
+    if (!kit::approaches_zero(m_outline_thickness))
+    {
+        const auto feach = [this](std::size_t index, vertex2D &outline_vertex) {
+            const glm::vec2 real_vertex = m_model.read_vertex(index).position;
+            if (!kit::approaches_zero(glm::length2(real_vertex)) &&
+                !kit::approaches_zero(glm::length2(transform.scale)))
+                outline_vertex.position =
+                    real_vertex + (glm::normalize(real_vertex) * m_outline_thickness) / transform.scale;
+        };
+        m_outline_model.update_vertex_buffer(feach);
+        drawable::default_draw(win, &m_outline_model, transform.center_scale_rotate_translate4(), m_topology);
+    }
+
     drawable::default_draw(win, &m_model, transform.center_scale_rotate_translate4(), m_topology);
 }
 
@@ -44,7 +77,7 @@ const color &shape3D::color() const
 
 void shape3D::color(const lynx::color &color)
 {
-    const auto feach = [&color](vertex3D &vtx) { vtx.color = color; };
+    const auto feach = [&color](std::size_t, vertex3D &vtx) { vtx.color = color; };
     m_model.update_vertex_buffer(feach);
 }
 
@@ -128,7 +161,7 @@ void polygon2D::vertex(const std::size_t index, const glm::vec2 &vertex)
     m_model.write_vertex(index + 1, v); //+1 to account for center vertex
 }
 
-void polygon2D::update_vertices(const std::function<void(vertex2D &)> &for_each_fn)
+void polygon2D::update_vertices(const std::function<void(std::size_t, vertex2D &)> &for_each_fn)
 {
     m_model.update_vertex_buffer(for_each_fn);
 }
@@ -234,7 +267,7 @@ void polygon3D::vertex(const std::size_t index, const glm::vec3 &vertex)
     m_model.write_vertex(index + 1, v); //+1 to account for center vertex
 }
 
-void polygon3D::update_vertices(const std::function<void(vertex3D &)> &for_each_fn)
+void polygon3D::update_vertices(const std::function<void(std::size_t, vertex3D &)> &for_each_fn)
 {
     m_model.update_vertex_buffer(for_each_fn);
 }
