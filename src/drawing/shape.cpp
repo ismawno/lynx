@@ -93,6 +93,10 @@ polygon2D::polygon2D(const std::vector<glm::vec2> &local_vertices, const lynx::c
     : shape2D(topology::TRIANGLE_LIST, model2D::polygon(local_vertices, color)), m_size(local_vertices.size())
 {
 }
+polygon2D::polygon2D(const std::vector<vertex2D> &local_vertices, const lynx::color &center_color)
+    : shape2D(topology::TRIANGLE_LIST, model2D::polygon(local_vertices, center_color)), m_size(local_vertices.size())
+{
+}
 
 const vertex2D &polygon2D::operator[](const std::size_t index) const
 {
@@ -127,6 +131,16 @@ void polygon2D::vertex(const std::size_t index, const glm::vec2 &vertex)
 void polygon2D::update_vertices(const std::function<void(vertex2D &)> &for_each_fn)
 {
     m_model.update_vertex_buffer(for_each_fn);
+}
+
+const lynx::color &polygon2D::color(std::size_t index) const
+{
+    return m_model.read_vertex(index).color;
+}
+
+void polygon2D::color(const lynx::color &color)
+{
+    shape2D::color(color);
 }
 
 void polygon2D::color(std::size_t index, const lynx::color &color)
@@ -185,21 +199,64 @@ polygon3D::polygon3D(const std::vector<glm::vec3> &local_vertices, const lynx::c
 {
 }
 
-const glm::vec3 &polygon3D::vertex(const std::size_t index) const
+polygon3D::polygon3D(const std::vector<vertex3D> &local_vertices, const lynx::color &center_color)
+    : shape3D(topology::TRIANGLE_LIST, model3D::polygon(local_vertices, center_color)), m_size(local_vertices.size())
 {
-    return m_model.read_vertex(index + 1).position; // +1 to account for center vertex
 }
 
+const vertex3D &polygon3D::operator[](const std::size_t index) const
+{
+    return vertex(index);
+}
+
+const vertex3D &polygon3D::vertex(const std::size_t index) const
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
+                     m_model.vertices_count() - 1)
+    return m_model.read_vertex(index + 1); // +1 to account for center vertex
+}
+
+void polygon3D::vertex(std::size_t index, const vertex3D &vertex)
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
+                     m_model.vertices_count() - 1)
+    m_model.write_vertex(index + 1, vertex);
+}
 void polygon3D::vertex(const std::size_t index, const glm::vec3 &vertex)
 {
+    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
+                     m_model.vertices_count() - 1)
     vertex3D v = m_model.read_vertex(index + 1);
     v.position = vertex;
     m_model.write_vertex(index + 1, v); //+1 to account for center vertex
 }
 
-const glm::vec3 &polygon3D::operator[](const std::size_t index) const
+void polygon3D::update_vertices(const std::function<void(vertex3D &)> &for_each_fn)
 {
-    return m_model.read_vertex(index + 1).position;
+    m_model.update_vertex_buffer(for_each_fn);
+}
+
+const lynx::color &polygon3D::color(std::size_t index) const
+{
+    return m_model.read_vertex(index).color;
+}
+
+void polygon3D::color(const lynx::color &color)
+{
+    shape3D::color(color);
+}
+
+void polygon3D::color(std::size_t index, const lynx::color &color)
+{
+    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
+                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
+                     m_model.vertices_count() - 1)
+    vertex3D v = m_model.read_vertex(index + 1);
+    v.color = color;
+    m_model.write_vertex(index + 1, v);
 }
 
 std::size_t polygon3D::size() const

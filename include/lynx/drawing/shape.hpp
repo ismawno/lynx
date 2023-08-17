@@ -75,7 +75,7 @@ class polygon2D : public shape2D
   public:
     polygon2D(const std::vector<glm::vec2> &local_vertices = {{-1.f, 0.5f}, {1.f, 0.5f}, {0.f, -0.5f}},
               const lynx::color &color = lynx::color::white);
-    polygon2D(const std::vector<vertex2D> &local_vertices);
+    polygon2D(const std::vector<vertex2D> &local_vertices, const lynx::color &center_color = lynx::color::white);
 
     const vertex2D &operator[](std::size_t index) const;
     const vertex2D &vertex(std::size_t index) const;
@@ -86,6 +86,8 @@ class polygon2D : public shape2D
     void update_vertices(const std::function<void(vertex2D &)> &for_each_fn);
     std::size_t size() const;
 
+    const lynx::color &color(std::size_t index = 0) const; // APLICAR A POLYGON3D
+    void color(const lynx::color &color);                  // Getter y setter para el center color
     void color(std::size_t index, const lynx::color &color);
 
   private:
@@ -114,15 +116,23 @@ class polygon3D : public shape3D
 {
     polygon3D(const std::vector<glm::vec3> &local_vertices = {{-1.f, 0.5f, 1.f}, {1.f, 0.5f, 1.f}, {0.f, -0.5f, 1.f}},
               const lynx::color &color = lynx::color::white);
+    polygon3D(const std::vector<vertex3D> &local_vertices, const lynx::color &center_color = lynx::color::white);
 
-    const glm::vec3 &vertex(std::size_t index) const;
-    void vertex(std::size_t index, const glm::vec3 &vertex);
+    const vertex3D &operator[](std::size_t index) const;
+    const vertex3D &vertex(std::size_t index) const;
 
-    const glm::vec3 &operator[](std::size_t index) const;
+    void vertex(std::size_t index, const vertex3D &vertex);
+    void vertex(std::size_t index, const glm::vec3 &position);
+
+    void update_vertices(const std::function<void(vertex3D &)> &for_each_fn);
     std::size_t size() const;
 
+    const lynx::color &color(std::size_t index = 0) const; // APLICAR A POLYGON3D
+    void color(const lynx::color &color);                  // Getter y setter para el center color
+    void color(std::size_t index, const lynx::color &color);
+
   private:
-    const std::size_t m_size;
+    std::size_t m_size;
 };
 
 class ellipsoid3D : public shape3D

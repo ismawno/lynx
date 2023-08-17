@@ -17,8 +17,8 @@ struct vertex2D
 {
     vertex2D() = default;
     vertex2D(const glm::vec2 &position, const color &color);
-    glm::vec2 position;
-    color color;
+    glm::vec2 position{0.f};
+    color color{color::white};
 
     static std::vector<VkVertexInputBindingDescription> binding_descriptions();
     static std::vector<VkVertexInputAttributeDescription> attribute_descriptions();
