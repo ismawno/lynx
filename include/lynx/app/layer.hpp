@@ -19,7 +19,7 @@ class layer : public kit::identifiable<std::string>, public kit::toggleable, pub
 
     template <typename T = app> T *parent() const
     {
-        if constexpr (std::is_same<T, app>::value)
+        if constexpr (std::is_same_v<T, app>)
             return m_parent;
         else
             return dynamic_cast<T *>(m_parent);

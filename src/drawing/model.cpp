@@ -246,7 +246,7 @@ static ReturnType circle_model(const std::uint32_t partitions, const color &colo
     for (std::uint32_t i = 0; i < partitions; i++)
     {
         const float angle = i * dangle;
-        if constexpr (std::is_same<VecType, glm::vec2>::value)
+        if constexpr (std::is_same_v<VecType, glm::vec2>)
             build.vertices.emplace_back(VecType(cosf(angle), sinf(angle)), color);
         else
             build.vertices.emplace_back(VecType(cosf(angle), sinf(angle), 0.f), color);

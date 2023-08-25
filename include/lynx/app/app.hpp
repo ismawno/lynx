@@ -35,7 +35,7 @@ class app : kit::non_copyable
 
     template <typename T, class... Args> T *push_layer(Args &&...args)
     {
-        static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
+        static_assert(std::is_base_of_v<layer, T>, "Type must inherit from layer class");
         KIT_ASSERT_ERROR(!m_terminated, "Cannot push layers to a terminated app")
 
         context::set(m_window.get());
@@ -55,7 +55,7 @@ class app : kit::non_copyable
 
     template <typename T = layer> kit::scope<T> pop_layer(const std::string &name)
     {
-        static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
+        static_assert(std::is_base_of_v<layer, T>, "Type must inherit from layer class");
         KIT_ASSERT_ERROR(!m_terminated, "Cannot pop layers to a terminated app")
 
         context::set(m_window.get());
@@ -65,7 +65,7 @@ class app : kit::non_copyable
             {
                 (*it)->on_detach();
                 kit::scope<T> to_remove;
-                if constexpr (std::is_same<T, layer>::value)
+                if constexpr (std::is_same_v<T, layer>)
                     to_remove = std::move(*it);
                 else
                     to_remove = kit::scope<T>(dynamic_cast<T *>(it->release()));
@@ -78,14 +78,14 @@ class app : kit::non_copyable
 
     template <typename T> kit::scope<T> pop_layer(const T *ly)
     {
-        static_assert(std::is_base_of<layer, T>::value, "Type must inherit from layer class");
+        static_assert(std::is_base_of_v<layer, T>, "Type must inherit from layer class");
         return pop_layer(ly->id);
     }
 
     template <typename T = lynx::window> const T *window() const
     {
-        static_assert(std::is_base_of<lynx::window, T>::value, "Type must inherit from window class");
-        if constexpr (std::is_same<T, lynx::window>::value)
+        static_assert(std::is_base_of_v<lynx::window, T>, "Type must inherit from window class");
+        if constexpr (std::is_same_v<T, lynx::window>)
             return m_window.get();
         else
             return dynamic_cast<const T *>(m_window.get());
@@ -93,8 +93,8 @@ class app : kit::non_copyable
 
     template <typename T = lynx::window> T *window()
     {
-        static_assert(std::is_base_of<lynx::window, T>::value, "Type must inherit from window class");
-        if constexpr (std::is_same<T, lynx::window>::value)
+        static_assert(std::is_base_of_v<lynx::window, T>, "Type must inherit from window class");
+        if constexpr (std::is_same_v<T, lynx::window>)
             return m_window.get();
         else
             return dynamic_cast<T *>(m_window.get());
@@ -102,7 +102,7 @@ class app : kit::non_copyable
 
     template <typename T, class... Args> T *set_window(Args &&...args)
     {
-        static_assert(std::is_base_of<lynx::window, T>::value, "Window type must inherit from window");
+        static_assert(std::is_base_of_v<lynx::window, T>, "Window type must inherit from window");
         auto win = kit::make_scope<T>(std::forward<Args>(args)...);
         T *ptr = win.get();
         m_window = std::move(win);
@@ -183,19 +183,19 @@ class app2D : public app
 
     template <typename T = window2D> const T *window() const
     {
-        static_assert(std::is_base_of<lynx::window2D, T>::value, "Window type must inherit from window2D");
+        static_assert(std::is_base_of_v<lynx::window2D, T>, "Window type must inherit from window2D");
         return app::window<T>();
     }
 
     template <typename T = window2D> T *window()
     {
-        static_assert(std::is_base_of<lynx::window2D, T>::value, "Window type must inherit from window2D");
+        static_assert(std::is_base_of_v<lynx::window2D, T>, "Window type must inherit from window2D");
         return app::window<T>();
     }
 
     template <typename T = window2D, class... Args> T *set_window(Args &&...args)
     {
-        static_assert(std::is_base_of<lynx::window2D, T>::value, "Window type must inherit from window2D");
+        static_assert(std::is_base_of_v<lynx::window2D, T>, "Window type must inherit from window2D");
         return app::set_window<T>(std::forward<Args>(args)...);
     }
 };
@@ -207,19 +207,19 @@ class app3D : public app
 
     template <typename T = window3D> const T *window() const
     {
-        static_assert(std::is_base_of<lynx::window3D, T>::value, "Window type must inherit from window3D");
+        static_assert(std::is_base_of_v<lynx::window3D, T>, "Window type must inherit from window3D");
         return app::window<T>();
     }
 
     template <typename T = window3D> T *window()
     {
-        static_assert(std::is_base_of<lynx::window3D, T>::value, "Window type must inherit from window3D");
+        static_assert(std::is_base_of_v<lynx::window3D, T>, "Window type must inherit from window3D");
         return app::window<T>();
     }
 
     template <typename T = window3D, class... Args> T *set_window(Args &&...args)
     {
-        static_assert(std::is_base_of<lynx::window3D, T>::value, "Window type must inherit from window3D");
+        static_assert(std::is_base_of_v<lynx::window3D, T>, "Window type must inherit from window3D");
         return app::set_window<T>(std::forward<Args>(args)...);
     }
 };
