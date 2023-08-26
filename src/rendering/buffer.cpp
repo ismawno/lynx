@@ -23,6 +23,10 @@ buffer::buffer(const kit::ref<const device> &dev, VkDeviceSize instance_size, st
 
 buffer::~buffer()
 {
+#ifdef LYNX_MULTITHREADED
+    if (context::current()->valid())
+        context::current()->window()->renderer().wait_for_queue_submission();
+#endif
     vkDeviceWaitIdle(m_device->vulkan_device());
     unmap();
     vkDestroyBuffer(m_device->vulkan_device(), m_buffer, nullptr);
