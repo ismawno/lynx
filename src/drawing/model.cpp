@@ -216,20 +216,16 @@ const vertex2D &model2D::operator[](const std::size_t index) const
     return read_vertex(index);
 }
 
-const model2D::vertex_index_pair &model2D::rect(const color &color)
+model2D::vertex_index_pair model2D::rect(const color &color)
 {
-    static const std::vector<vertex2D> vertices = {
-        {{-.5f, -.5f}, color}, {{.5f, .5f}, color}, {{-.5f, .5f}, color}, {{.5f, -.5f}, color}};
-
-    static const std::vector<std::uint32_t> indices = {0, 1, 2, 0, 3, 1};
-    static const vertex_index_pair build = {vertices, indices};
+    const vertex_index_pair build = {
+        {{{-.5f, -.5f}, color}, {{.5f, .5f}, color}, {{-.5f, .5f}, color}, {{.5f, -.5f}, color}}, {0, 1, 2, 0, 3, 1}};
     return build;
 }
 
-const std::vector<vertex2D> &model2D::line(const color &color1, const color &color2)
+std::vector<vertex2D> model2D::line(const color &color1, const color &color2)
 {
-    static std::vector<vertex2D> vertices = {{{-1.f, 0.f}, color1}, {{1.f, 0.f}, color2}};
-    return vertices;
+    return {{{-1.f, 0.f}, color1}, {{1.f, 0.f}, color2}};
 }
 
 template <typename VecType, typename ReturnType>
@@ -349,13 +345,11 @@ const vertex3D &model3D::operator[](const std::size_t index) const
     return read_vertex(index);
 }
 
-const model3D::vertex_index_pair &model3D::rect(const color &color)
+model3D::vertex_index_pair model3D::rect(const color &color)
 {
-    static std::vector<vertex3D> vertices = {
-        {{-.5f, -.5f, .5f}, color}, {{.5f, .5f, .5f}, color}, {{-.5f, .5f, .5f}, color}, {{.5f, -.5f, .5f}, color}};
-
-    static const std::vector<std::uint32_t> indices = {0, 1, 2, 0, 3, 1};
-    static const vertex_index_pair build = {vertices, indices};
+    const vertex_index_pair build = {
+        {{{-.5f, -.5f, .5f}, color}, {{.5f, .5f, .5f}, color}, {{-.5f, .5f, .5f}, color}, {{.5f, -.5f, .5f}, color}},
+        {0, 1, 2, 0, 3, 1}};
     return build;
 }
 
@@ -435,33 +429,28 @@ model3D::vertex_index_pair model3D::sphere(const std::uint32_t lat_partitions, c
     return build;
 }
 
-const model3D::vertex_index_pair &model3D::cube(const color &color)
+model3D::vertex_index_pair model3D::cube(const color &color)
 {
-    static const std::vector<vertex3D> vertices = {
-        // left face (white)
-        {{-.5f, -.5f, -.5f}, color},
-        {{-.5f, .5f, .5f}, color},
-        {{-.5f, -.5f, .5f}, color},
-        {{-.5f, .5f, -.5f}, color},
+    const vertex_index_pair build = {
+        {
+            {{-.5f, -.5f, -.5f}, color},
+            {{-.5f, .5f, .5f}, color},
+            {{-.5f, -.5f, .5f}, color},
+            {{-.5f, .5f, -.5f}, color},
 
-        // right face (yellow)
-        {{.5f, -.5f, -.5f}, color},
-        {{.5f, .5f, .5f}, color},
-        {{.5f, -.5f, .5f}, color},
-        {{.5f, .5f, -.5f}, color},
+            {{.5f, -.5f, -.5f}, color},
+            {{.5f, .5f, .5f}, color},
+            {{.5f, -.5f, .5f}, color},
+            {{.5f, .5f, -.5f}, color},
 
-    };
-
-    static const std::vector<std::uint32_t> indices = {0, 1, 2, 0, 3, 1, 4, 5, 6, 4, 7, 5, 0, 6, 2, 0, 4, 6,
-                                                       3, 5, 1, 3, 7, 5, 2, 5, 1, 2, 6, 5, 0, 7, 3, 0, 4, 7};
-    static const vertex_index_pair build = {vertices, indices};
+        },
+        {0, 1, 2, 0, 3, 1, 4, 5, 6, 4, 7, 5, 0, 6, 2, 0, 4, 6, 3, 5, 1, 3, 7, 5, 2, 5, 1, 2, 6, 5, 0, 7, 3, 0, 4, 7}};
     return build;
 }
 
-const std::vector<vertex3D> &model3D::line(const color &color1, const color &color2)
+std::vector<vertex3D> model3D::line(const color &color1, const color &color2)
 {
-    static std::vector<vertex3D> vertices = {{{-1.f, 0.f, 0.f}, color1}, {{1.f, 0.f, 0.f}, color2}};
-    return vertices;
+    return {{{-1.f, 0.f, 0.f}, color1}, {{1.f, 0.f, 0.f}, color2}};
 }
 
 } // namespace lynx

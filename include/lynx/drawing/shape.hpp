@@ -87,6 +87,7 @@ class polygon2D : public shape2D
     polygon2D(const std::vector<glm::vec2> &local_vertices = {{-1.f, 0.5f}, {1.f, 0.5f}, {0.f, -0.5f}},
               const lynx::color &color = lynx::color::white);
     polygon2D(const std::vector<vertex2D> &local_vertices, const lynx::color &center_color = lynx::color::white);
+    polygon2D(const lynx::color &color);
 
     const vertex2D &operator[](std::size_t index) const;
     const vertex2D &vertex(std::size_t index) const;
@@ -128,6 +129,7 @@ class polygon3D : public shape3D
     polygon3D(const std::vector<glm::vec3> &local_vertices = {{-1.f, 0.5f, 1.f}, {1.f, 0.5f, 1.f}, {0.f, -0.5f, 1.f}},
               const lynx::color &color = lynx::color::white);
     polygon3D(const std::vector<vertex3D> &local_vertices, const lynx::color &center_color = lynx::color::white);
+    polygon3D(const lynx::color &color);
 
     const vertex3D &operator[](std::size_t index) const;
     const vertex3D &vertex(std::size_t index) const;

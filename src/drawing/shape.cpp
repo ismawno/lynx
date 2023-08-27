@@ -130,6 +130,9 @@ polygon2D::polygon2D(const std::vector<vertex2D> &local_vertices, const lynx::co
     : shape2D(topology::TRIANGLE_LIST, model2D::polygon(local_vertices, center_color)), m_size(local_vertices.size())
 {
 }
+polygon2D::polygon2D(const lynx::color &color) : polygon2D({{-1.f, 0.5f}, {1.f, 0.5f}, {0.f, -0.5f}}, color)
+{
+}
 
 const vertex2D &polygon2D::operator[](const std::size_t index) const
 {
@@ -234,6 +237,10 @@ polygon3D::polygon3D(const std::vector<glm::vec3> &local_vertices, const lynx::c
 
 polygon3D::polygon3D(const std::vector<vertex3D> &local_vertices, const lynx::color &center_color)
     : shape3D(topology::TRIANGLE_LIST, model3D::polygon(local_vertices, center_color)), m_size(local_vertices.size())
+{
+}
+polygon3D::polygon3D(const lynx::color &color)
+    : polygon3D({{-1.f, 0.5f, 1.f}, {1.f, 0.5f, 1.f}, {0.f, -0.5f, 1.f}}, color)
 {
 }
 

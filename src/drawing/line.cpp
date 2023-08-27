@@ -12,6 +12,13 @@ thin_line2D::thin_line2D(const glm::vec2 &p1, const glm::vec2 &p2, const lynx::c
       m_model(context::current()->device(), model2D::line(color1, color2))
 {
 }
+thin_line2D::thin_line2D(const lynx::color &color1, const lynx::color &color2)
+    : thin_line2D({0.f, 0.f}, {1.f, 0.f}, color1, color2)
+{
+}
+thin_line2D::thin_line2D(const lynx::color &color) : thin_line2D(color, color)
+{
+}
 
 void thin_line2D::draw(window2D &win) const
 {
@@ -86,6 +93,13 @@ void thin_line2D::color(const lynx::color &color)
 thin_line3D::thin_line3D(const glm::vec3 &p1, const glm::vec3 &p2, const lynx::color &color1, const lynx::color &color2)
     : m_p1(p1), m_p2(p2), m_transform(as_transform()),
       m_model(context::current()->device(), model3D::line(color1, color2))
+{
+}
+thin_line3D::thin_line3D(const lynx::color &color1, const lynx::color &color2)
+    : thin_line3D({0.f, 0.f, 0.f}, {1.f, 0.f, 0.f}, color1, color2)
+{
+}
+thin_line3D::thin_line3D(const lynx::color &color) : thin_line3D(color, color)
 {
 }
 
@@ -166,8 +180,11 @@ line_strip2D::line_strip2D(const std::vector<glm::vec2> &points, const lynx::col
     : m_model(context::current()->device(), to_vertex_array<glm::vec2, vertex2D>(points, color))
 {
 }
-
 line_strip2D::line_strip2D(const std::vector<vertex2D> &points) : m_model(context::current()->device(), points)
+{
+}
+
+line_strip2D::line_strip2D(const lynx::color &color) : line_strip2D({{0.f, 0.f}, {1.f, 0.f}}, color)
 {
 }
 
@@ -230,8 +247,10 @@ line_strip3D::line_strip3D(const std::vector<glm::vec3> &points, const lynx::col
     : m_model(context::current()->device(), to_vertex_array<glm::vec3, vertex3D>(points, color))
 {
 }
-
 line_strip3D::line_strip3D(const std::vector<vertex3D> &points) : m_model(context::current()->device(), points)
+{
+}
+line_strip3D::line_strip3D(const lynx::color &color) : line_strip3D({{0.f, 0.f, 0.f}, {1.f, 0.f, 0.f}}, color)
 {
 }
 

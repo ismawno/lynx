@@ -46,6 +46,8 @@ class thin_line2D : public line2D
   public:
     thin_line2D(const glm::vec2 &p1 = {0.f, 0.f}, const glm::vec2 &p2 = {1.f, 0.f},
                 const lynx::color &color1 = color::white, const lynx::color &color2 = color::white);
+    thin_line2D(const lynx::color &color1, const lynx::color &color2);
+    thin_line2D(const lynx::color &color);
 
     void draw(window2D &win) const override;
 
@@ -78,6 +80,8 @@ class thin_line3D : public line3D
   public:
     thin_line3D(const glm::vec3 &p1 = {0.f, 0.f, 0.f}, const glm::vec3 &p2 = {1.f, 0.f, 0.f},
                 const lynx::color &color1 = color::white, const lynx::color &color2 = color::white);
+    thin_line3D(const lynx::color &color1, const lynx::color &color2);
+    thin_line3D(const lynx::color &color);
 
     void draw(window3D &win) const override;
 
@@ -110,6 +114,7 @@ class line_strip2D : public drawable2D
   public:
     line_strip2D(const std::vector<glm::vec2> &points = {{0.f, 0.f}, {1.f, 0.f}}, const color &color = color::white);
     line_strip2D(const std::vector<vertex2D> &points);
+    line_strip2D(const color &color);
 
     void draw(window2D &win) const override;
 
@@ -135,6 +140,7 @@ class line_strip3D : public drawable3D
     line_strip3D(const std::vector<glm::vec3> &points = {{0.f, 0.f, 0.f}, {1.f, 0.f, 0.f}},
                  const color &color = color::white);
     line_strip3D(const std::vector<vertex3D> &points);
+    line_strip3D(const color &color);
 
     void draw(window3D &win) const override;
 
