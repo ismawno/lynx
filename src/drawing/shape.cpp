@@ -45,20 +45,30 @@ void shape2D::outline_thickness(const float thickness)
     m_outline_thickness = thickness;
 }
 
+void shape2D::draw_outline_thickness(window2D &win) const
+{
+    kit::transform2D outline_transform = transform;
+    glm::vec2 mm{FLT_MAX}, mx{-FLT_MAX};
+
+    for (std::size_t i = 0; i < m_outline_model.vertices_count(); i++)
+    {
+        const glm::vec2 vertex = m_outline_model.read_vertex(i).position;
+        mm.x = glm::min(mm.x, vertex.x);
+        mm.y = glm::min(mm.y, vertex.y);
+        mx.x = glm::max(mx.x, vertex.x);
+        mx.y = glm::max(mx.y, vertex.y);
+    }
+
+    outline_transform.origin = 0.5f * (mx + mm);
+    outline_transform.position += kit::transform2D::rotation_matrix(transform.rotation) * outline_transform.origin;
+    outline_transform.scale = transform.scale + (2.f * m_outline_thickness) / (mx - mm);
+    drawable::default_draw(win, &m_outline_model, outline_transform.center_scale_rotate_translate4(), m_topology);
+}
+
 void shape2D::draw(window2D &win) const
 {
     if (!kit::approaches_zero(m_outline_thickness))
-    {
-        const auto feach = [this](std::size_t index, vertex2D &outline_vertex) {
-            const glm::vec2 real_vertex = m_model.read_vertex(index).position;
-            if (!kit::approaches_zero(glm::length2(real_vertex)) &&
-                !kit::approaches_zero(glm::length2(transform.scale)))
-                outline_vertex.position =
-                    real_vertex + (glm::normalize(real_vertex) * m_outline_thickness) / transform.scale;
-        };
-        m_outline_model.update_vertex_buffer(feach);
-        drawable::default_draw(win, &m_outline_model, transform.center_scale_rotate_translate4(), m_topology);
-    }
+        draw_outline_thickness(win);
 
     drawable::default_draw(win, &m_model, transform.center_scale_rotate_translate4(), m_topology);
 }

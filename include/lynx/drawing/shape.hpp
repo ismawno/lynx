@@ -42,7 +42,7 @@ class shape2D : public drawable2D
 
     topology m_topology;
 
-    void update_outline_thickness(); // Always update vertices
+    void draw_outline_thickness(window2D &win) const;
     void draw(window2D &win) const override;
 };
 
