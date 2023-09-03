@@ -39,7 +39,7 @@ bool app::next_frame()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     KIT_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("--Frame--")
 
     if (m_min_frame_time > m_frame_time)
     {
