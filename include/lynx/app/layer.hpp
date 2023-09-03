@@ -48,9 +48,6 @@ class layer : public kit::identifiable<std::string>, public kit::toggleable, pub
     virtual void on_render(float ts)
     {
     }
-    virtual void on_frame_end(float ts)
-    {
-    }
     virtual bool on_event(const event &ev)
     {
         return false;

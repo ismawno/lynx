@@ -146,12 +146,6 @@ class app : kit::non_copyable
     virtual void on_late_render(float ts)
     {
     }
-    virtual void on_frame_end(float ts)
-    {
-    }
-    virtual void on_late_frame_end(float ts)
-    {
-    }
     virtual void on_shutdown()
     {
     }
