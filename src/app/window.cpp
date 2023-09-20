@@ -228,13 +228,13 @@ window2D::window2D(std::uint32_t width, std::uint32_t height, const char *name) 
 
 void window2D::draw(const std::vector<vertex2D> &vertices, const topology tplg, const kit::transform2D &transform)
 {
-    render_system_as_topology<render_system2D>(tplg)->draw(vertices, transform);
+    render_system_from_topology<render_system2D>(tplg)->draw(vertices, transform);
 }
 
 void window2D::draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
                     const topology tplg, const kit::transform2D &transform)
 {
-    render_system_as_topology<render_system2D>(tplg)->draw(vertices, indices, transform);
+    render_system_from_topology<render_system2D>(tplg)->draw(vertices, indices, transform);
 }
 
 void window2D::draw(const drawable2D &drawable)
@@ -261,13 +261,13 @@ window3D::window3D(std::uint32_t width, std::uint32_t height, const char *name) 
 
 void window3D::draw(const std::vector<vertex3D> &vertices, const topology tplg, const kit::transform3D &transform)
 {
-    render_system_as_topology<render_system3D>(tplg)->draw(vertices, transform);
+    render_system_from_topology<render_system3D>(tplg)->draw(vertices, transform);
 }
 
 void window3D::draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
                     const topology tplg, const kit::transform3D &transform)
 {
-    render_system_as_topology<render_system3D>(tplg)->draw(vertices, indices, transform);
+    render_system_from_topology<render_system3D>(tplg)->draw(vertices, indices, transform);
 }
 
 void window3D::draw(const drawable3D &drawable)

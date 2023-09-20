@@ -10,6 +10,7 @@
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
 #include "kit/interface/nameable.hpp"
+#include "kit/utility/utils.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -55,29 +56,13 @@ class window : kit::non_copyable, public kit::nameable
     void close();
     void wait_for_device() const;
 
-    template <typename T = lynx::render_system> const T *render_system_as_topology(topology tplg) const
+    template <typename T = lynx::render_system> const T *render_system_from_topology(topology tplg) const
     {
-        static_assert(std::is_same_v<T, lynx::render_system> || std::is_same_v<T, render_system2D> ||
-                          std::is_same_v<T, render_system3D>,
-                      "When retrieving render system from topology, the type must be either render_system, "
-                      "render_system2D or render_system3D");
-
-        if constexpr (std::is_same_v<T, lynx::render_system>)
-            return m_render_systems[(std::size_t)tplg].get();
-        else
-            return dynamic_cast<const T *>(m_render_systems[(std::size_t)tplg].get());
+        return kit::const_get_casted_raw_ptr<T>(m_render_systems[(std::size_t)tplg]);
     }
-    template <typename T = lynx::render_system> T *render_system_as_topology(topology tplg)
+    template <typename T = lynx::render_system> T *render_system_from_topology(topology tplg)
     {
-        static_assert(std::is_same_v<T, lynx::render_system> || std::is_same_v<T, render_system2D> ||
-                          std::is_same_v<T, render_system3D>,
-                      "When retrieving render system from topology, the type must be either render_system, "
-                      "render_system2D or render_system3D");
-
-        if constexpr (std::is_same_v<T, lynx::render_system>)
-            return m_render_systems[(std::size_t)tplg].get();
-        else
-            return dynamic_cast<T *>(m_render_systems[(std::size_t)tplg].get());
+        return kit::get_casted_raw_ptr<T>(m_render_systems[(std::size_t)tplg]);
     }
 
     bool was_resized() const;
@@ -99,20 +84,12 @@ class window : kit::non_copyable, public kit::nameable
 
     template <typename T = lynx::camera> const T *camera() const
     {
-        static_assert(std::is_base_of_v<lynx::camera, T>, "Type must inherit from camera");
-        if constexpr (std::is_same_v<T, lynx::camera>)
-            return m_camera.get();
-        else
-            return dynamic_cast<const T *>(m_camera.get());
+        return kit::const_get_casted_raw_ptr<T>(m_camera);
     }
 
     template <typename T = lynx::camera> T *camera()
     {
-        static_assert(std::is_base_of_v<lynx::camera, T>, "Type must inherit from camera");
-        if constexpr (std::is_same_v<T, lynx::camera>)
-            return m_camera.get();
-        else
-            return dynamic_cast<T *>(m_camera.get());
+        return kit::get_casted_raw_ptr<T>(m_camera);
     }
 
     template <typename T, class... Args> T *set_camera(Args &&...args)
@@ -189,46 +166,10 @@ class window2D : public window
   public:
     window2D(std::uint32_t width, std::uint32_t height, const char *name);
 
-    template <typename T, class... Args> T *add_render_system(Args &&...args)
-    {
-        static_assert(std::is_base_of_v<render_system2D, T>, "Type must inherit from render_system2D");
-        return window::add_render_system<T>(std::forward<Args>(args)...);
-    }
-
-    template <typename T> const T *render_system() const
-    {
-        static_assert(std::is_base_of_v<render_system2D, T>, "Type must inherit from render_system2D");
-        return window::render_system<T>();
-    }
-
-    template <typename T> T *render_system()
-    {
-        static_assert(std::is_base_of_v<render_system2D, T>, "Type must inherit from render_system2D");
-        return window::render_system<T>();
-    }
-
     void draw(const std::vector<vertex2D> &vertices, topology tplg, const kit::transform2D &transform = {});
     void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
               const kit::transform2D &transform = {});
     void draw(const drawable2D &drawable);
-
-    template <typename T = camera2D> const T *camera() const
-    {
-        static_assert(std::is_base_of_v<camera2D, T>, "Type must inherit from camera2D");
-        return window::camera<T>();
-    }
-
-    template <typename T = camera2D> T *camera()
-    {
-        static_assert(std::is_base_of_v<camera2D, T>, "Type must inherit from camera2D");
-        return window::camera<T>();
-    }
-
-    template <typename T = orthographic2D, class... Args> T *set_camera(Args &&...args)
-    {
-        static_assert(std::is_base_of_v<camera2D, T>, "Type must inherit from camera2D");
-        return window::set_camera<T>(std::forward<Args>(args)...);
-    }
 
   private:
     void clear_render_data() override;
@@ -239,46 +180,10 @@ class window3D : public window
   public:
     window3D(std::uint32_t width, std::uint32_t height, const char *name);
 
-    template <typename T, class... Args> T *add_render_system(Args &&...args)
-    {
-        static_assert(std::is_base_of_v<render_system3D, T>, "Type must inherit from render_system3D");
-        return window::add_render_system<T>(std::forward<Args>(args)...);
-    }
-
-    template <typename T> const T *render_system() const
-    {
-        static_assert(std::is_base_of_v<render_system3D, T>, "Type must inherit from render_system3D");
-        return window::render_system<T>();
-    }
-
-    template <typename T> T *render_system()
-    {
-        static_assert(std::is_base_of_v<render_system3D, T>, "Type must inherit from render_system3D");
-        return window::render_system<T>();
-    }
-
     void draw(const std::vector<vertex3D> &vertices, topology tplg, const kit::transform3D &transform = {});
     void draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices, topology tplg,
               const kit::transform3D &transform = {});
     void draw(const drawable3D &drawable);
-
-    template <typename T = camera3D> const T *camera() const
-    {
-        static_assert(std::is_base_of_v<camera3D, T>, "Type must inherit from camera3D");
-        return window::camera<T>();
-    }
-
-    template <typename T = camera3D> T *camera()
-    {
-        static_assert(std::is_base_of_v<camera3D, T>, "Type must inherit from camera3D");
-        return window::camera<T>();
-    }
-
-    template <typename T = perspective3D, class... Args> T *set_camera(Args &&...args)
-    {
-        static_assert(std::is_base_of_v<camera3D, T>, "Type must inherit from camera3D");
-        return window::set_camera<T>(std::forward<Args>(args)...);
-    }
 };
 } // namespace lynx
 

@@ -261,14 +261,4 @@ void app::imgui_shutdown()
 }
 #endif
 
-app2D::app2D(const std::uint32_t width, const std::uint32_t height, const char *name)
-{
-    set_window(width, height, name);
-}
-
-app3D::app3D(const std::uint32_t width, const std::uint32_t height, const char *name)
-{
-    set_window(width, height, name);
-}
-
 } // namespace lynx

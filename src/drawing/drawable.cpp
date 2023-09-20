@@ -8,7 +8,7 @@ namespace lynx::drawable
 {
 void default_draw(window &win, const model *mdl, glm::mat4 transform, topology tplg)
 {
-    render_system *rs = win.render_system_as_topology(tplg);
+    render_system *rs = win.render_system_from_topology(tplg);
     const render_data rdata = rs->create_render_data(mdl, transform);
     rs->push_render_data(rdata);
 }
