@@ -2,6 +2,7 @@
 #define LYNX_VERTEX_HPP
 
 #include "lynx/drawing/color.hpp"
+#include "lynx/geometry/dimension.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -13,27 +14,21 @@
 
 namespace lynx
 {
-struct vertex2D
+template <typename Dim> struct vertex
 {
-    vertex2D() = default;
-    vertex2D(const glm::vec2 &position, const color &color);
-    glm::vec2 position{0.f};
+    using vec_t = typename Dim::vec_t;
+    vertex() = default;
+    vertex(const vec_t &position, const color &color);
+
+    vec_t position;
     color color{color::white};
 
     static std::vector<VkVertexInputBindingDescription> binding_descriptions();
     static std::vector<VkVertexInputAttributeDescription> attribute_descriptions();
 };
 
-struct vertex3D
-{
-    vertex3D() = default;
-    vertex3D(const glm::vec3 &position, const color &color);
-    glm::vec3 position;
-    color color;
-
-    static std::vector<VkVertexInputBindingDescription> binding_descriptions();
-    static std::vector<VkVertexInputAttributeDescription> attribute_descriptions();
-};
+using vertex2D = vertex<dimension::two>;
+using vertex3D = vertex<dimension::three>;
 } // namespace lynx
 
 #endif

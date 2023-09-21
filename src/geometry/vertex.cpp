@@ -3,30 +3,21 @@
 
 namespace lynx
 {
-vertex2D::vertex2D(const glm::vec2 &pposition, const lynx::color &pcolor) : position(pposition), color(pcolor)
+template <typename Dim>
+vertex<Dim>::vertex(const vec_t &position, const lynx::color &pcolor) : position(position), color(pcolor)
 {
 }
-std::vector<VkVertexInputBindingDescription> vertex2D::binding_descriptions()
+template <typename Dim> std::vector<VkVertexInputBindingDescription> vertex<Dim>::binding_descriptions()
 {
-    return {{0, sizeof(vertex2D), VK_VERTEX_INPUT_RATE_VERTEX}};
+    return {{0, sizeof(vertex), VK_VERTEX_INPUT_RATE_VERTEX}};
 }
-std::vector<VkVertexInputAttributeDescription> vertex2D::attribute_descriptions()
+template <typename Dim> std::vector<VkVertexInputAttributeDescription> vertex<Dim>::attribute_descriptions()
 {
-    return {{0, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(vertex2D, position)},
-            {1, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(vertex2D, color)}};
-}
-
-vertex3D::vertex3D(const glm::vec3 &pposition, const lynx::color &pcolor) : position(pposition), color(pcolor)
-{
-}
-
-std::vector<VkVertexInputBindingDescription> vertex3D::binding_descriptions()
-{
-    return {{0, sizeof(vertex3D), VK_VERTEX_INPUT_RATE_VERTEX}};
-}
-std::vector<VkVertexInputAttributeDescription> vertex3D::attribute_descriptions()
-{
-    return {{0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex3D, position)},
-            {1, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(vertex3D, color)}};
+    if constexpr (std::is_same_v<Dim, dimension::two>)
+        return {{0, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(vertex, position)},
+                {1, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(vertex, color)}};
+    else
+        return {{0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex3D, position)},
+                {1, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(vertex3D, color)}};
 }
 } // namespace lynx
