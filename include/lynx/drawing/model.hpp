@@ -5,6 +5,7 @@
 #include "kit/memory/scope.hpp"
 #include "lynx/drawing/color.hpp"
 #include "lynx/rendering/buffer.hpp"
+#include "lynx/geometry/vertex.hpp"
 
 #include <functional>
 #include <vulkan/vulkan.hpp>
@@ -17,9 +18,6 @@
 
 namespace lynx
 {
-struct vertex2D;
-struct vertex3D;
-
 class device;
 
 class model

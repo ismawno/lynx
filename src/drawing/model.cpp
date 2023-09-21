@@ -1,6 +1,5 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/drawing/model.hpp"
-#include "lynx/geometry/vertex.hpp"
 #include "lynx/geometry/camera.hpp"
 
 namespace lynx

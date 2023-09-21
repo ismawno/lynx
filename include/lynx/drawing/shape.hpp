@@ -5,6 +5,7 @@
 #include "kit/utility/transform.hpp"
 #include "lynx/drawing/model.hpp"
 #include "lynx/drawing/color.hpp"
+#include "lynx/geometry/vertex.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -14,9 +15,6 @@
 
 namespace lynx
 {
-struct vertex2D;
-struct vertex3D;
-
 class shape2D : public drawable2D
 {
   public:
