@@ -4,36 +4,53 @@
 
 namespace lynx
 {
-const glm::mat4 &camera::projection() const
+template <typename Dim> const glm::mat4 &camera<Dim>::projection() const
 {
     return m_projection;
 }
-
-const glm::mat4 &camera::inverse_projection() const
+template <typename Dim> const glm::mat4 &camera<Dim>::inverse_projection() const
 {
     return m_inv_projection;
 }
-
-void camera::flip_y_axis()
+template <typename Dim> void camera<Dim>::flip_y_axis()
 {
     m_y_flipped = !m_y_flipped;
 }
 
-void camera2D::keep_aspect_ratio(const float aspect)
+template <typename Dim> void camera<Dim>::keep_aspect_ratio(const float aspect)
 {
     transform.scale.x = aspect * transform.scale.y;
 }
 
-glm::vec2 camera2D::screen_to_world(const glm::vec2 &screen_pos) const
+template <typename Dim> camera<Dim>::vec_t camera<Dim>::screen_to_world(const glm::vec2 &screen_pos) const
 {
     const glm::vec4 pos4 = m_inv_projection * glm::vec4(screen_pos, 0.5f, 1.f);
-    return glm::vec2(pos4) * pos4.w;
+    return vec_t(pos4) * pos4.w;
 }
 
-glm::vec2 camera2D::world_to_screen(const glm::vec2 &world_pos) const
+template <typename Dim> glm::vec2 camera<Dim>::world_to_screen(const vec_t &world_pos) const
 {
-    const glm::vec4 pos4 = m_projection * glm::vec4(world_pos, 0.5f, 1.f);
-    return glm::vec2(pos4) / pos4.w;
+    if constexpr (std::is_same_v<Dim, dimension::two>)
+    {
+        const glm::vec4 pos4 = m_projection * glm::vec4(world_pos, 0.5f, 1.f);
+        return glm::vec2(pos4) / pos4.w;
+    }
+    else
+    {
+        const glm::vec4 pos4 = m_projection * glm::vec4(world_pos, 1.f);
+        return glm::vec2(pos4) / pos4.w;
+    }
+}
+
+void camera3D::point_towards(const glm::vec3 &direction)
+{
+    const float roty = atan2f(direction.x, direction.z);
+    const float rotx = -atan2f(direction.y, direction.z * cosf(roty) + direction.x * sinf(roty));
+    transform.rotation = kit::transform3D::YX(roty, rotx);
+}
+void camera3D::point_to(const glm::vec3 &position)
+{
+    point_towards(position - transform.position);
 }
 
 orthographic2D::orthographic2D(const float aspect, const float size, const float rotation)
@@ -77,37 +94,6 @@ void orthographic2D::update_transformation_matrices()
     m_inv_projection = transform.scale_center_rotate_translate4();
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
-}
-
-void camera3D::keep_aspect_ratio(const float aspect)
-{
-    transform.scale.x = aspect * transform.scale.y;
-}
-
-glm::vec3 camera3D::screen_to_world(const glm::vec2 &screen_pos, const float z_screen) const
-{
-    KIT_ASSERT_ERROR(z_screen >= 0.f && z_screen <= 1.f,
-                     "Value of z-screen must be normalized ([0, 1]) to fit into vulkan's canonical volume. z: {0}",
-                     z_screen)
-    const glm::vec4 pos4 = m_inv_projection * glm::vec4(screen_pos, z_screen, 1.f);
-    return glm::vec3(pos4) * pos4.w;
-}
-
-glm::vec2 camera3D::world_to_screen(const glm::vec3 &world_pos) const
-{
-    const glm::vec4 pos4 = m_projection * glm::vec4(world_pos, 1.f);
-    return glm::vec2(pos4) / pos4.w;
-}
-
-void camera3D::point_towards(const glm::vec3 &direction)
-{
-    const float roty = atan2f(direction.x, direction.z);
-    const float rotx = -atan2f(direction.y, direction.z * cosf(roty) + direction.x * sinf(roty));
-    transform.rotation = kit::transform3D::YX(roty, rotx);
-}
-void camera3D::point_to(const glm::vec3 &position)
-{
-    point_towards(position - transform.position);
 }
 
 orthographic3D::orthographic3D(float aspect, float xy_size, float z_size, const glm::mat3 &rotation)

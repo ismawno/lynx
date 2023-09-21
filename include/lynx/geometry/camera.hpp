@@ -2,15 +2,24 @@
 #define LYNX_CAMERA_HPP
 
 #include "kit/utility/transform.hpp"
+#include "lynx/geometry/dimension.hpp"
 
 namespace lynx
 {
-class camera
+template <typename Dim> class camera
 {
   public:
+    using vec_t = typename Dim::vec_t;
+    using transform_t = typename Dim::transform_t;
+
     virtual ~camera() = default;
     virtual void update_transformation_matrices() = 0;
-    virtual void keep_aspect_ratio(float aspect) = 0;
+
+    transform_t transform;
+
+    virtual void keep_aspect_ratio(float aspect);
+    vec_t screen_to_world(const glm::vec2 &screen_pos) const;
+    glm::vec2 world_to_screen(const vec_t &world_pos) const;
 
     const glm::mat4 &projection() const;
     const glm::mat4 &inverse_projection() const;
@@ -23,26 +32,11 @@ class camera
     bool m_y_flipped = false;
 };
 
-class camera2D : public camera
+using camera2D = camera<dimension::two>;
+
+class camera3D : public camera<dimension::three>
 {
   public:
-    kit::transform2D transform{};
-
-    virtual void keep_aspect_ratio(float aspect) override;
-    glm::vec2 screen_to_world(const glm::vec2 &screen_pos) const;
-    glm::vec2 world_to_screen(const glm::vec2 &world_pos) const;
-};
-
-class camera3D : public camera
-{
-  public:
-    kit::transform3D transform{};
-
-    virtual void keep_aspect_ratio(float aspect) override;
-
-    glm::vec3 screen_to_world(const glm::vec2 &screen_pos, float z_screen = 0.5f) const;
-    glm::vec2 world_to_screen(const glm::vec3 &world_pos) const;
-
     void point_towards(const glm::vec3 &direction);
     void point_to(const glm::vec3 &position);
 };
