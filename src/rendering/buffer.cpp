@@ -5,14 +5,15 @@
 
 namespace lynx
 {
-static VkDeviceSize compute_alignment_size(VkDeviceSize instance_size, VkDeviceSize min_offset_alignment)
+static VkDeviceSize compute_alignment_size(const VkDeviceSize instance_size, const VkDeviceSize min_offset_alignment)
 {
     return min_offset_alignment > 1 ? ((instance_size + min_offset_alignment - 1) & ~(min_offset_alignment - 1))
                                     : instance_size;
 }
 
-buffer::buffer(const kit::ref<const device> &dev, VkDeviceSize instance_size, std::size_t instance_count,
-               VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDeviceSize min_offset_alignment)
+buffer::buffer(const kit::ref<const device> &dev, const VkDeviceSize instance_size, const std::size_t instance_count,
+               const VkBufferUsageFlags usage, const VkMemoryPropertyFlags properties,
+               const VkDeviceSize min_offset_alignment)
     : m_device(dev), m_instance_count(instance_count), m_instance_size(instance_size),
       m_min_offset_alignment(min_offset_alignment),
       m_alignment_size(compute_alignment_size(m_instance_size, min_offset_alignment)),
