@@ -2,6 +2,7 @@
 #define LYNX_LAYER_HPP
 
 #include "lynx/app/input.hpp"
+#include "lynx/internal/dimension.hpp"
 #include "kit/interface/identifiable.hpp"
 #include "kit/interface/toggleable.hpp"
 #include "kit/interface/serialization.hpp"
@@ -10,16 +11,21 @@
 
 namespace lynx
 {
-class app;
+template <typename Dim> class app;
+template <typename Dim>
 class layer : public kit::identifiable<std::string>, public kit::toggleable, public kit::serializable
 {
   public:
+    using app_t = app<Dim>;
+    using event_t = event<Dim>;
+
     layer(const std::string &name);
     virtual ~layer() = default;
 
-    template <typename T = app> T *parent() const
+    template <typename T = app_t> T *parent() const
     {
-        if constexpr (std::is_same_v<T, app>)
+        static_assert(std::is_base_of_v<T, app_t>, "Type must inherit from app class");
+        if constexpr (std::is_same_v<T, app_t>)
             return m_parent;
         else
             return dynamic_cast<T *>(m_parent);
@@ -31,7 +37,7 @@ class layer : public kit::identifiable<std::string>, public kit::toggleable, pub
 #endif
 
   private:
-    app *m_parent = nullptr;
+    app_t *m_parent = nullptr;
 
     virtual void on_attach()
     {
@@ -48,7 +54,7 @@ class layer : public kit::identifiable<std::string>, public kit::toggleable, pub
     virtual void on_render(float ts)
     {
     }
-    virtual bool on_event(const event &ev)
+    virtual bool on_event(const event_t &ev)
     {
         return false;
     }
@@ -59,8 +65,11 @@ class layer : public kit::identifiable<std::string>, public kit::toggleable, pub
     {
     }
 
-    friend class app;
+    template <typename T> friend class app;
 };
+
+using layer2D = layer<dimension::two>;
+using layer3D = layer<dimension::three>;
 } // namespace lynx
 
 #endif

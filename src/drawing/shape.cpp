@@ -1,5 +1,4 @@
 #include "lynx/internal/pch.hpp"
-#include "lynx/utility/context.hpp"
 #include "lynx/drawing/shape.hpp"
 #include "lynx/app/window.hpp"
 #include "lynx/rendering/buffer.hpp"
@@ -7,22 +6,19 @@
 
 namespace lynx
 {
-// Color should already be encoded in arguments when constructing the model
-template <class... ModelArgs>
-shape2D::shape2D(topology tplg, ModelArgs &&...args)
-    : m_model(context::current()->device(), std::forward<ModelArgs>(args)...),
-      m_outline_model(context::current()->device(), std::forward<ModelArgs>(args)...), m_topology(tplg)
-{
-}
-
-const color &shape2D::color() const
+template <typename Dim> const color &shape<Dim>::color() const
 {
     return m_model.read_vertex(0).color;
 }
-void shape2D::color(const lynx::color &color)
+template <typename Dim> void shape<Dim>::color(const lynx::color &color)
 {
     const auto feach = [&color](std::size_t, vertex2D &vtx) { vtx.color = color; };
     m_model.update_vertex_buffer(feach);
+}
+
+template <typename Dim> void shape<Dim>::draw(window_t &win) const
+{
+    drawable_t::default_draw(win, &m_model, transform.center_scale_rotate_translate4(), m_topology);
 }
 
 const color &shape2D::outline_color() const
@@ -35,16 +31,7 @@ void shape2D::outline_color(const lynx::color &color)
     m_outline_model.update_vertex_buffer(feach);
 }
 
-float shape2D::outline_thickness() const
-{
-    return m_outline_thickness;
-}
-void shape2D::outline_thickness(const float thickness)
-{
-    m_outline_thickness = thickness;
-}
-
-void shape2D::draw_outline_thickness(window2D &win) const
+void shape2D::draw_outline_thickness(window_t &win) const
 {
     kit::transform2D outline_transform = transform;
     glm::vec2 mm{FLT_MAX}, mx{-FLT_MAX};
@@ -60,95 +47,90 @@ void shape2D::draw_outline_thickness(window2D &win) const
 
     outline_transform.origin = 0.5f * (mx + mm);
     outline_transform.position += kit::transform2D::rotation_matrix(transform.rotation) * outline_transform.origin;
-    outline_transform.scale = transform.scale + (2.f * m_outline_thickness) / (mx - mm);
+    outline_transform.scale = transform.scale + (2.f * outline_thickness) / (mx - mm);
     drawable::default_draw(win, &m_outline_model, outline_transform.center_scale_rotate_translate4(), m_topology);
 }
 
-void shape2D::draw(window2D &win) const
+void shape2D::draw(window_t &win) const
 {
-    if (!kit::approaches_zero(m_outline_thickness))
+    if (!kit::approaches_zero(outline_thickness))
         draw_outline_thickness(win);
 
-    drawable::default_draw(win, &m_model, transform.center_scale_rotate_translate4(), m_topology);
+    shape::draw(win);
 }
 
-// Color should already be encoded in arguments when constructing the model
-template <class... ModelArgs>
-shape3D::shape3D(topology tplg, ModelArgs &&...args)
-    : m_model(context::current()->device(), std::forward<ModelArgs>(args)...), m_topology(tplg)
-{
-}
-
-const color &shape3D::color() const
-{
-    return m_model.read_vertex(0).color;
-}
-
-void shape3D::color(const lynx::color &color)
-{
-    const auto feach = [&color](std::size_t, vertex3D &vtx) { vtx.color = color; };
-    m_model.update_vertex_buffer(feach);
-}
-
-void shape3D::draw(window3D &win) const
-{
-    drawable::default_draw(win, &m_model, transform.center_scale_rotate_translate4(), m_topology);
-}
-
-rect2D::rect2D(const glm::vec2 &position, const glm::vec2 &dimensions, const lynx::color &color)
-    : shape2D(topology::TRIANGLE_LIST, model2D::rect(color))
+template <typename Dim>
+rect<Dim>::rect(const vec_t &position, const glm::vec2 &dimensions, const lynx::color &color)
+    : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::rect(color))
 {
     transform.position = position;
-    transform.scale = dimensions;
+    if constexpr (std::is_same_v<Dim, dimension::two>)
+        transform.scale = dimensions;
+    else
+        transform.scale = vec_t(dimensions, 1.f);
 }
 
-rect2D::rect2D(const lynx::color &color) : shape2D(topology::TRIANGLE_LIST, model2D::rect(color))
-{
-}
-
-ellipse2D::ellipse2D(const float ra, const float rb, const lynx::color &color, const std::uint32_t partitions)
-    : shape2D(topology::TRIANGLE_LIST, model2D::circle(partitions, color))
-{
-    transform.scale = {ra, rb};
-}
-ellipse2D::ellipse2D(const float radius, const lynx::color &color, const std::uint32_t partitions)
-    : shape2D(topology::TRIANGLE_LIST, model2D::circle(partitions, color))
-{
-    transform.scale = {radius, radius};
-}
-ellipse2D::ellipse2D(const lynx::color &color, const std::uint32_t partitions)
-    : shape2D(topology::TRIANGLE_LIST, model2D::circle(partitions, color))
+template <typename Dim>
+rect<Dim>::rect(const lynx::color &color) : shape2D(topology::TRIANGLE_LIST, shape_t::model_t::rect(color))
 {
 }
 
-float ellipse2D::radius() const
+template <typename Dim>
+ellipse<Dim>::ellipse(const float ra, const float rb, const lynx::color &color, const std::uint32_t partitions)
+    : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::circle(partitions, color))
 {
-    return 0.5f * (transform.scale.x + transform.scale.y);
+    if constexpr (std::is_same_v<Dim, dimension::two>)
+        transform.scale = {ra, rb};
+    else
+        transform.scale = {ra, rb, 1.f};
+}
+template <typename Dim>
+ellipse<Dim>::ellipse(const float radius, const lynx::color &color, const std::uint32_t partitions)
+    : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::circle(partitions, color))
+{
+    transform.scale = vec_t(radius);
+}
+template <typename Dim>
+ellipse<Dim>::ellipse(const lynx::color &color, const std::uint32_t partitions)
+    : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::circle(partitions, color))
+{
 }
 
-void ellipse2D::radius(const float radius)
+template <typename Dim> float ellipse<Dim>::radius() const
 {
-    transform.scale = {radius, radius};
+    if constexpr (std::is_same_v<Dim, dimension::two>)
+        return 0.5f * (transform.scale.x + transform.scale.y);
+    else
+        return (transform.scale.x + transform.scale.y + transform.scale.z) / 3.f;
 }
 
-polygon2D::polygon2D(const std::vector<glm::vec2> &local_vertices, const lynx::color &color)
-    : shape2D(topology::TRIANGLE_LIST, model2D::polygon(local_vertices, color)), m_size(local_vertices.size())
+template <typename Dim> void ellipse<Dim>::radius(const float radius)
+{
+    transform.scale = vec_t(radius);
+}
+
+template <typename Dim>
+polygon<Dim>::polygon(const std::vector<vec_t> &local_vertices, const lynx::color &color)
+    : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::polygon(local_vertices, color)), m_size(local_vertices.size())
 {
 }
-polygon2D::polygon2D(const std::vector<vertex2D> &local_vertices, const lynx::color &center_color)
-    : shape2D(topology::TRIANGLE_LIST, model2D::polygon(local_vertices, center_color)), m_size(local_vertices.size())
+template <typename Dim>
+polygon<Dim>::polygon(const std::vector<vertex_t> &local_vertices, const lynx::color &center_color)
+    : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::polygon(local_vertices, center_color)),
+      m_size(local_vertices.size())
 {
 }
-polygon2D::polygon2D(const lynx::color &color) : polygon2D({{-1.f, 0.5f}, {1.f, 0.5f}, {0.f, -0.5f}}, color)
+template <typename Dim>
+polygon<Dim>::polygon(const lynx::color &color) : polygon({vec_t(0.f), vec_t(0.f), vec_t(0.f)}, color)
 {
 }
 
-const vertex2D &polygon2D::operator[](const std::size_t index) const
+template <typename Dim> const vertex<Dim> &polygon<Dim>::operator[](const std::size_t index) const
 {
     return vertex(index);
 }
 
-const vertex2D &polygon2D::vertex(const std::size_t index) const
+template <typename Dim> const vertex<Dim> &polygon<Dim>::vertex(const std::size_t index) const
 {
     KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
                      "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
@@ -156,159 +138,50 @@ const vertex2D &polygon2D::vertex(const std::size_t index) const
     return m_model.read_vertex(index + 1); // +1 to account for center vertex
 }
 
-void polygon2D::vertex(std::size_t index, const vertex2D &vertex)
+template <typename Dim> void polygon<Dim>::vertex(std::size_t index, const vertex_t &vertex)
 {
     KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
                      "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
                      m_model.vertices_count() - 1)
     m_model.write_vertex(index + 1, vertex);
 }
-void polygon2D::vertex(const std::size_t index, const glm::vec2 &vertex)
+template <typename Dim> void polygon<Dim>::vertex(const std::size_t index, const vec_t &vertex)
 {
     KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
                      "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
                      m_model.vertices_count() - 1)
-    vertex2D v = m_model.read_vertex(index + 1);
+    vertex_t v = m_model.read_vertex(index + 1);
     v.position = vertex;
     m_model.write_vertex(index + 1, v); //+1 to account for center vertex
 }
 
-void polygon2D::update_vertices(const std::function<void(std::size_t, vertex2D &)> &for_each_fn)
+template <typename Dim>
+void polygon<Dim>::update_vertices(const std::function<void(std::size_t, vertex_t &)> &for_each_fn)
 {
     m_model.update_vertex_buffer(for_each_fn);
 }
 
-const lynx::color &polygon2D::color(std::size_t index) const
+template <typename Dim> const lynx::color &polygon<Dim>::color(std::size_t index) const
 {
     return m_model.read_vertex(index).color;
 }
 
-void polygon2D::color(const lynx::color &color)
+template <typename Dim> void polygon<Dim>::color(const lynx::color &color)
 {
     shape2D::color(color);
 }
 
-void polygon2D::color(std::size_t index, const lynx::color &color)
+template <typename Dim> void polygon<Dim>::color(std::size_t index, const lynx::color &color)
 {
     KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
                      "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
                      m_model.vertices_count() - 1)
-    vertex2D v = m_model.read_vertex(index + 1);
+    vertex_t v = m_model.read_vertex(index + 1);
     v.color = color;
     m_model.write_vertex(index + 1, v);
 }
 
-std::size_t polygon2D::size() const
-{
-    return m_size;
-}
-
-rect3D::rect3D(const glm::vec3 &position, const glm::vec2 &dimensions, const lynx::color &color)
-    : shape3D(topology::TRIANGLE_LIST, model3D::rect(color))
-{
-    transform.position = position;
-    transform.scale = glm::vec3(dimensions, 1.f);
-}
-
-rect3D::rect3D(const lynx::color &color) : shape3D(topology::TRIANGLE_LIST, model3D::rect(color))
-{
-}
-
-ellipse3D::ellipse3D(const float ra, const float rb, const lynx::color &color, const std::uint32_t partitions)
-    : shape3D(topology::TRIANGLE_LIST, model3D::circle(partitions, color))
-{
-    transform.scale = {ra, rb, 1.f};
-}
-ellipse3D::ellipse3D(const float radius, const lynx::color &color, const std::uint32_t partitions)
-    : shape3D(topology::TRIANGLE_LIST, model3D::circle(partitions, color))
-{
-    transform.scale = {radius, radius, radius};
-}
-ellipse3D::ellipse3D(const lynx::color &color, const std::uint32_t partitions)
-    : shape3D(topology::TRIANGLE_LIST, model3D::circle(partitions, color))
-{
-}
-
-float ellipse3D::radius() const
-{
-    return (transform.scale.x + transform.scale.y + transform.scale.z) / 3.f;
-}
-
-void ellipse3D::radius(const float radius)
-{
-    transform.scale = {radius, radius, radius};
-}
-
-polygon3D::polygon3D(const std::vector<glm::vec3> &local_vertices, const lynx::color &color)
-    : shape3D(topology::TRIANGLE_LIST, model3D::polygon(local_vertices, color)), m_size(local_vertices.size())
-{
-}
-
-polygon3D::polygon3D(const std::vector<vertex3D> &local_vertices, const lynx::color &center_color)
-    : shape3D(topology::TRIANGLE_LIST, model3D::polygon(local_vertices, center_color)), m_size(local_vertices.size())
-{
-}
-polygon3D::polygon3D(const lynx::color &color)
-    : polygon3D({{-1.f, 0.5f, 1.f}, {1.f, 0.5f, 1.f}, {0.f, -0.5f, 1.f}}, color)
-{
-}
-
-const vertex3D &polygon3D::operator[](const std::size_t index) const
-{
-    return vertex(index);
-}
-
-const vertex3D &polygon3D::vertex(const std::size_t index) const
-{
-    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
-                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
-                     m_model.vertices_count() - 1)
-    return m_model.read_vertex(index + 1); // +1 to account for center vertex
-}
-
-void polygon3D::vertex(std::size_t index, const vertex3D &vertex)
-{
-    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
-                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
-                     m_model.vertices_count() - 1)
-    m_model.write_vertex(index + 1, vertex);
-}
-void polygon3D::vertex(const std::size_t index, const glm::vec3 &vertex)
-{
-    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
-                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
-                     m_model.vertices_count() - 1)
-    vertex3D v = m_model.read_vertex(index + 1);
-    v.position = vertex;
-    m_model.write_vertex(index + 1, v); //+1 to account for center vertex
-}
-
-void polygon3D::update_vertices(const std::function<void(std::size_t, vertex3D &)> &for_each_fn)
-{
-    m_model.update_vertex_buffer(for_each_fn);
-}
-
-const lynx::color &polygon3D::color(std::size_t index) const
-{
-    return m_model.read_vertex(index).color;
-}
-
-void polygon3D::color(const lynx::color &color)
-{
-    shape3D::color(color);
-}
-
-void polygon3D::color(std::size_t index, const lynx::color &color)
-{
-    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
-                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
-                     m_model.vertices_count() - 1)
-    vertex3D v = m_model.read_vertex(index + 1);
-    v.color = color;
-    m_model.write_vertex(index + 1, v);
-}
-
-std::size_t polygon3D::size() const
+template <typename Dim> std::size_t polygon<Dim>::size() const
 {
     return m_size;
 }

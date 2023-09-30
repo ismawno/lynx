@@ -3,6 +3,8 @@
 
 #include "lynx/rendering/pipeline.hpp"
 #include "lynx/drawing/model.hpp"
+#include "lynx/internal/dimension.hpp"
+#include "lynx/drawing/drawable.hpp"
 #include "kit/utility/transform.hpp"
 #include <vulkan/vulkan.hpp>
 #include <utility>
@@ -10,10 +12,6 @@
 namespace lynx
 {
 class device;
-class camera;
-
-class drawable2D;
-class drawable3D;
 
 struct push_constant_data
 {
@@ -21,27 +19,38 @@ struct push_constant_data
     glm::mat4 projection{1.f};
 };
 
-struct render_data
-{
-    const model *mdl;
-    glm::mat4 mdl_transform;
-    bool unowned;
-
-  private:
-    render_data() = default;
-    friend class render_system;
-};
-class render_system
+template <typename Dim> class render_system
 {
   public:
+    using vertex_t = vertex<Dim>;
+    using transform_t = typename Dim::transform_t;
+    using drawable_t = drawable<Dim>;
+    using model_t = typename Dim::model_t;
+    using camera_t = typename Dim::camera_t;
+
+    struct render_data
+    {
+        const model_t *mdl;
+        glm::mat4 mdl_transform;
+        bool unowned;
+
+      private:
+        render_data() = default;
+    };
+
     virtual ~render_system();
 
     void init(const kit::ref<const device> &dev, VkRenderPass render_pass);
-    void render(VkCommandBuffer command_buffer, const camera &cam) const;
+    void render(VkCommandBuffer command_buffer, const camera_t &cam) const;
 
-    virtual render_data create_render_data(const model *mdl, glm::mat4 &transform, bool unowned = false) const;
+    virtual render_data create_render_data(const model_t *mdl, glm::mat4 &transform, bool unowned = false) const;
     void push_render_data(const render_data &rdata);
     void clear_render_data();
+
+    void draw(const std::vector<vertex_t> &vertices, const transform_t &transform = {});
+    void draw(const std::vector<vertex_t> &vertices, const std::vector<std::uint32_t> &indices,
+              const transform_t &transform = {});
+    void draw(const drawable_t &drawable);
 
   protected:
     kit::ref<const device> m_device;
@@ -57,95 +66,57 @@ class render_system
     std::vector<render_data> m_render_data;
 };
 
-class render_system2D : public render_system
+class render_system2D : public render_system<dimension::two>
 {
   public:
-    void draw(const std::vector<vertex2D> &vertices, const kit::transform2D &transform = {});
-    void draw(const std::vector<vertex2D> &vertices, const std::vector<std::uint32_t> &indices,
-              const kit::transform2D &transform = {});
-    void draw(const drawable2D &drawable);
-
-    template <class... Args> kit::ref<model2D> model_from_vertices(Args &&...args) const
-    {
-        return kit::make_ref<model2D>(m_device, std::forward<Args>(args)...);
-    }
-
-    render_data create_render_data(const model *mdl, glm::mat4 &transform, bool unowned = false) const override;
+    render_data create_render_data(const model_t *mdl, glm::mat4 &transform, bool unowned = false) const override;
     static void reset_z_offset_counter();
-
-  protected:
-    virtual void pipeline_config(pipeline::config_info &config) const override;
 
   private:
     static inline std::uint32_t s_z_offset_counter = 0;
 };
 
-class render_system3D : public render_system
-{
-  public:
-    void draw(const std::vector<vertex3D> &vertices, const kit::transform3D &transform = {});
-    void draw(const std::vector<vertex3D> &vertices, const std::vector<std::uint32_t> &indices,
-              const kit::transform3D &transform = {});
-    void draw(const drawable3D &drawable);
+using render_system3D = render_system<dimension::three>;
 
-    template <class... Args> kit::ref<model3D> model_from_vertices(Args &&...args) const
-    {
-        return kit::make_ref<model3D>(m_device, std::forward<Args>(args)...);
-    }
-
-  protected:
-    virtual void pipeline_config(pipeline::config_info &config) const override;
-};
-
-class point_render_system2D : public render_system2D
+template <typename Dim> class point_render_system : public Dim::render_system_t
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-class line_render_system2D : public render_system2D
+template <typename Dim> class line_render_system : public Dim::render_system_t
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-class line_strip_render_system2D : public render_system2D
+template <typename Dim> class line_strip_render_system : public Dim::render_system_t
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-class triangle_render_system2D : public render_system2D
+template <typename Dim> class triangle_render_system : public Dim::render_system_t
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-class triangle_strip_render_system2D : public render_system2D
+template <typename Dim> class triangle_strip_render_system : public Dim::render_system_t
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-class point_render_system3D : public render_system3D
-{
-    void pipeline_config(pipeline::config_info &config) const override;
-};
+using point_render_system2D = point_render_system<dimension::two>;
+using point_render_system3D = point_render_system<dimension::three>;
 
-class line_render_system3D : public render_system3D
-{
-    void pipeline_config(pipeline::config_info &config) const override;
-};
+using line_render_system2D = line_render_system<dimension::two>;
+using line_render_system3D = line_render_system<dimension::three>;
 
-class line_strip_render_system3D : public render_system3D
-{
-    void pipeline_config(pipeline::config_info &config) const override;
-};
+using line_strip_render_system2D = line_strip_render_system<dimension::two>;
+using line_strip_render_system3D = line_strip_render_system<dimension::three>;
 
-class triangle_render_system3D : public render_system3D
-{
-    void pipeline_config(pipeline::config_info &config) const override;
-};
+using triangle_render_system2D = triangle_render_system<dimension::two>;
+using triangle_render_system3D = triangle_render_system<dimension::three>;
 
-class triangle_strip_render_system3D : public render_system3D
-{
-    void pipeline_config(pipeline::config_info &config) const override;
-};
+using triangle_strip_render_system2D = triangle_strip_render_system<dimension::two>;
+using triangle_strip_render_system3D = triangle_strip_render_system<dimension::three>;
 } // namespace lynx
 
 #endif

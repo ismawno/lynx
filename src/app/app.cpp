@@ -5,13 +5,14 @@
 
 namespace lynx
 {
-app::~app()
+
+template <typename Dim> app<Dim>::~app()
 {
     if (!m_terminated)
         shutdown();
 }
 
-void app::run()
+template <typename Dim> void app<Dim>::run()
 {
     start();
     while (next_frame())
@@ -19,12 +20,12 @@ void app::run()
     shutdown();
 }
 
-void app::start()
+template <typename Dim> void app<Dim>::start()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot call start on a terminated app")
     KIT_ASSERT_ERROR(!m_started, "Cannot call start on a started app")
     m_started = true;
-    context::set(m_window.get());
+    context_t::set(m_window.get());
 #ifdef LYNX_ENABLE_IMGUI
     imgui_init();
 #endif
@@ -35,7 +36,7 @@ void app::start()
     on_late_start();
 }
 
-bool app::next_frame()
+template <typename Dim> bool app<Dim>::next_frame()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     KIT_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
@@ -49,8 +50,8 @@ bool app::next_frame()
     kit::clock frame_clock;
     m_ongoing_frame = true;
 
-    context::set(m_window.get());
-    input::poll_events();
+    context_t::set(m_window.get());
+    input_t::poll_events();
     if (m_window->closed())
     {
         m_ongoing_frame = false;
@@ -111,9 +112,9 @@ bool app::next_frame()
     return !m_window->closed() && !m_to_finish_next_frame;
 }
 
-void app::shutdown()
+template <typename Dim> void app<Dim>::shutdown()
 {
-    context::set(m_window.get());
+    context_t::set(m_window.get());
     if (m_ongoing_frame)
     {
         m_to_finish_next_frame = true;
@@ -135,26 +136,29 @@ void app::shutdown()
     m_terminated = true;
 }
 
-kit::time app::frame_time() const
+template <typename Dim> kit::time app<Dim>::frame_time() const
 {
     return m_frame_time;
 }
-const std::vector<kit::scope<layer>> &app::layers() const
+
+template <typename Dim> const std::vector<kit::scope<layer<Dim>>> &app<Dim>::layers() const
 {
     return m_layers;
 }
-std::uint32_t app::framerate_cap() const
+
+template <typename Dim> std::uint32_t app<Dim>::framerate_cap() const
 {
     const bool capped = m_min_frame_time.as<kit::time::nanoseconds, long long>() > 0;
     return capped ? (std::uint32_t)(1.f / m_min_frame_time.as<kit::time::seconds, float>()) : 0;
 }
-void app::limit_framerate(const std::uint32_t framerate)
+
+template <typename Dim> void app<Dim>::limit_framerate(const std::uint32_t framerate)
 {
     m_min_frame_time = kit::time::from<kit::time::seconds>(framerate > 0 ? (1.f / framerate) : 0.f);
 }
 
 #ifdef LYNX_ENABLE_IMGUI
-void app::imgui_init()
+template <typename Dim> void app<Dim>::imgui_init()
 {
     constexpr std::uint32_t pool_size = 1000;
     VkDescriptorPoolSize pool_sizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, pool_size},
@@ -212,7 +216,8 @@ void app::imgui_init()
 
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
-void app::imgui_begin_render()
+
+template <typename Dim> void app<Dim>::imgui_begin_render()
 {
     KIT_PERF_FUNCTION()
     ImGui::SetCurrentContext(m_imgui_context);
@@ -226,13 +231,15 @@ void app::imgui_begin_render()
     ImGui::NewFrame();
     ImGui::PushID(this);
 }
-void app::imgui_end_render()
+
+template <typename Dim> void app<Dim>::imgui_end_render()
 {
     KIT_PERF_FUNCTION()
     ImGui::PopID();
     ImGui::Render();
 }
-void app::imgui_submit_command(const VkCommandBuffer command_buffer)
+
+template <typename Dim> void app<Dim>::imgui_submit_command(const VkCommandBuffer command_buffer)
 {
     KIT_PERF_FUNCTION()
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
@@ -244,7 +251,8 @@ void app::imgui_submit_command(const VkCommandBuffer command_buffer)
         glfwMakeContextCurrent(current_context);
     }
 }
-void app::imgui_shutdown()
+
+template <typename Dim> void app<Dim>::imgui_shutdown()
 {
     ImGui::SetCurrentContext(m_imgui_context);
 #ifdef LYNX_ENABLE_IMPLOT

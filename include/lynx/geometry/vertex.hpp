@@ -2,7 +2,7 @@
 #define LYNX_VERTEX_HPP
 
 #include "lynx/drawing/color.hpp"
-#include "lynx/geometry/dimension.hpp"
+#include "lynx/internal/dimension.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

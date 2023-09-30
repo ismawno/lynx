@@ -6,6 +6,7 @@
 #include "lynx/drawing/model.hpp"
 #include "lynx/drawing/color.hpp"
 #include "lynx/geometry/vertex.hpp"
+#include "lynx/internal/context.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -15,85 +16,104 @@
 
 namespace lynx
 {
-class shape2D : public drawable2D
+template <typename Dim> class shape : public drawable<Dim>
 {
   public:
-    template <class... ModelArgs> shape2D(topology tplg, ModelArgs &&...args);
+    using transform_t = typename Dim::transform_t;
+    using model_t = typename Dim::model_t;
+    using window_t = typename Dim::window_t;
+    using context_t = context<Dim>;
+    using drawable_t = drawable<Dim>;
+
+    template <class... ModelArgs>
+    shape(topology tplg, ModelArgs &&...args)
+        : m_model(context_t::device(), std::forward<ModelArgs>(args)...), m_topology(tplg)
+    {
+    }
 
     const lynx::color &color() const;
     void color(const lynx::color &color);
+
+    transform_t transform{};
+
+  protected:
+    model_t m_model;
+    topology m_topology;
+    virtual void draw(window_t &win) const override;
+};
+
+class shape2D : public shape<dimension::two>
+{
+  public:
+    template <class... ModelArgs>
+    shape2D(topology tplg, ModelArgs &&...args)
+        : shape(tplg, std::forward<ModelArgs>(args)...),
+          m_outline_model(context_t::device(), std::forward<ModelArgs>(args)...)
+    {
+    }
 
     const lynx::color &outline_color() const;
     void outline_color(const lynx::color &color);
 
-    float outline_thickness() const;
-    void outline_thickness(float thickness);
-
-    kit::transform2D transform{};
-
-  protected:
-    model2D m_model;
+    float outline_thickness = 0.f;
 
   private:
-    mutable model2D m_outline_model;
-    float m_outline_thickness = 0.f;
+    mutable model_t m_outline_model;
 
-    topology m_topology;
-
-    void draw_outline_thickness(window2D &win) const;
-    void draw(window2D &win) const override;
+    void draw_outline_thickness(window_t &win) const;
+    void draw(window_t &win) const override;
 };
 
-class shape3D : public drawable3D
+using shape3D = shape<dimension::three>;
+
+template <typename Dim> class rect : public Dim::shape_t
 {
   public:
-    template <class... ModelArgs> shape3D(topology tplg, ModelArgs &&...args);
+    using vec_t = typename Dim::vec_t;
+    using shape_t = typename Dim::shape_t;
+    using shape_t::transform;
 
-    const lynx::color &color() const;
-    void color(const lynx::color &color);
-
-    kit::transform3D transform{};
-
-  protected:
-    model3D m_model;
-
-  private:
-    topology m_topology;
-    virtual void draw(window3D &win) const override;
+    rect(const vec_t &position = vec_t(0.f), const glm::vec2 &dimensions = {1.f, 1.f},
+         const lynx::color &color = lynx::color::white);
+    rect(const lynx::color &color);
 };
 
-class rect2D : public shape2D
+template <typename Dim> class ellipse : public Dim::shape_t
 {
   public:
-    rect2D(const glm::vec2 &position = {0.f, 0.f}, const glm::vec2 &dimensions = {1.f, 1.f},
-           const lynx::color &color = lynx::color::white);
-    rect2D(const lynx::color &color);
-};
-class ellipse2D : public shape2D
-{
-  public:
-    ellipse2D(float ra, float rb, const lynx::color &color = lynx::color::white, std::uint32_t partitions = 30);
-    ellipse2D(float radius = 1.f, const lynx::color &color = lynx::color::white, std::uint32_t partitions = 30);
-    ellipse2D(const lynx::color &color, std::uint32_t partitions = 30);
+    using vec_t = typename Dim::vec_t;
+    using shape_t = typename Dim::shape_t;
+    using shape_t::transform;
+
+    ellipse(float ra, float rb, const lynx::color &color = lynx::color::white, std::uint32_t partitions = 30);
+    ellipse(float radius = 1.f, const lynx::color &color = lynx::color::white, std::uint32_t partitions = 30);
+    ellipse(const lynx::color &color, std::uint32_t partitions = 30);
 
     float radius() const;
     void radius(float radius);
 };
-class polygon2D : public shape2D
+
+template <typename Dim> class polygon : public Dim::shape_t
 {
   public:
-    polygon2D(const std::vector<glm::vec2> &local_vertices = {{-1.f, 0.5f}, {1.f, 0.5f}, {0.f, -0.5f}},
-              const lynx::color &color = lynx::color::white);
-    polygon2D(const std::vector<vertex2D> &local_vertices, const lynx::color &center_color = lynx::color::white);
-    polygon2D(const lynx::color &color);
+    using vec_t = typename Dim::vec_t;
+    using vertex_t = vertex<Dim>;
+    using shape_t = typename Dim::shape_t;
 
-    const vertex2D &operator[](std::size_t index) const;
-    const vertex2D &vertex(std::size_t index) const;
+    using shape_t::transform;
 
-    void vertex(std::size_t index, const vertex2D &vertex);
-    void vertex(std::size_t index, const glm::vec2 &position);
+    polygon(const std::vector<vec_t> &local_vertices = {vec_t(0.f), vec_t(0.f), vec_t(0.f)},
+            const lynx::color &color = lynx::color::white);
+    polygon(const std::vector<vertex_t> &local_vertices, const lynx::color &center_color = lynx::color::white);
+    polygon(const lynx::color &color);
 
-    void update_vertices(const std::function<void(std::size_t, vertex2D &)> &for_each_fn);
+    const vertex_t &operator[](std::size_t index) const;
+    const vertex_t &vertex(std::size_t index) const;
+
+    void vertex(std::size_t index, const vertex_t &vertex);
+    void vertex(std::size_t index, const vec_t &position);
+
+    void update_vertices(const std::function<void(std::size_t, vertex_t &)> &for_each_fn);
     std::size_t size() const;
 
     const lynx::color &color(std::size_t index = 0) const; // APLICAR A POLYGON3D
@@ -101,48 +121,7 @@ class polygon2D : public shape2D
     void color(std::size_t index, const lynx::color &color);
 
   private:
-    std::size_t m_size;
-};
-
-class rect3D : public shape3D
-{
-  public:
-    rect3D(const glm::vec3 &position = glm::vec3(0.f), const glm::vec2 &dimensions = {1.f, 1.f},
-           const lynx::color &color = lynx::color::white);
-    rect3D(const lynx::color &color);
-};
-
-class ellipse3D : public shape3D
-{
-  public:
-    ellipse3D(float ra, float rb, const lynx::color &color = lynx::color::white, std::uint32_t partitions = 30);
-    ellipse3D(float radius = 1.f, const lynx::color &color = lynx::color::white, std::uint32_t partitions = 30);
-    ellipse3D(const lynx::color &color, std::uint32_t partitions = 30);
-
-    float radius() const;
-    void radius(float radius);
-};
-class polygon3D : public shape3D
-{
-    polygon3D(const std::vector<glm::vec3> &local_vertices = {{-1.f, 0.5f, 1.f}, {1.f, 0.5f, 1.f}, {0.f, -0.5f, 1.f}},
-              const lynx::color &color = lynx::color::white);
-    polygon3D(const std::vector<vertex3D> &local_vertices, const lynx::color &center_color = lynx::color::white);
-    polygon3D(const lynx::color &color);
-
-    const vertex3D &operator[](std::size_t index) const;
-    const vertex3D &vertex(std::size_t index) const;
-
-    void vertex(std::size_t index, const vertex3D &vertex);
-    void vertex(std::size_t index, const glm::vec3 &position);
-
-    void update_vertices(const std::function<void(std::size_t, vertex3D &)> &for_each_fn);
-    std::size_t size() const;
-
-    const lynx::color &color(std::size_t index = 0) const; // APLICAR A POLYGON3D
-    void color(const lynx::color &color);                  // Getter y setter para el center color
-    void color(std::size_t index, const lynx::color &color);
-
-  private:
+    using shape_t::m_model;
     std::size_t m_size;
 };
 

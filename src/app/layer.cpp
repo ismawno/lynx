@@ -5,18 +5,18 @@
 
 namespace lynx
 {
-layer::layer(const std::string &name) : kit::identifiable<std::string>(name)
+template <typename Dim> layer<Dim>::layer(const std::string &name) : kit::identifiable<std::string>(name)
 {
 }
 
-YAML::Node layer::encode() const
+template <typename Dim> YAML::Node layer<Dim>::encode() const
 {
     YAML::Node node;
     node["Enabled"] = enabled;
     return node;
 }
 
-bool layer::decode(const YAML::Node &node)
+template <typename Dim> bool layer<Dim>::decode(const YAML::Node &node)
 {
     if (!node.IsMap() || node.size() < 1)
         return false;

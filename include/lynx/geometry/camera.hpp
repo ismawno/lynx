@@ -2,7 +2,7 @@
 #define LYNX_CAMERA_HPP
 
 #include "kit/utility/transform.hpp"
-#include "lynx/geometry/dimension.hpp"
+#include "lynx/internal/dimension.hpp"
 
 namespace lynx
 {

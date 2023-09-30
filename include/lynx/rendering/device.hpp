@@ -8,7 +8,6 @@
 
 namespace lynx
 {
-class window;
 class device : kit::non_copyable
 {
   public:
@@ -28,7 +27,7 @@ class device : kit::non_copyable
         bool is_complete() const;
     };
 
-    explicit device(const window &win);
+    explicit device(GLFWwindow *window);
     ~device();
 
     VkCommandPool command_pool() const;

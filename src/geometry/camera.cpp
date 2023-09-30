@@ -22,7 +22,7 @@ template <typename Dim> void camera<Dim>::keep_aspect_ratio(const float aspect)
     transform.scale.x = aspect * transform.scale.y;
 }
 
-template <typename Dim> camera<Dim>::vec_t camera<Dim>::screen_to_world(const glm::vec2 &screen_pos) const
+template <typename Dim> typename camera<Dim>::vec_t camera<Dim>::screen_to_world(const glm::vec2 &screen_pos) const
 {
     const glm::vec4 pos4 = m_inv_projection * glm::vec4(screen_pos, 0.5f, 1.f);
     return vec_t(pos4) * pos4.w;

@@ -40,13 +40,14 @@ void destroy_debug_utils_messenger_EXT(VkInstance m_instance, VkDebugUtilsMessen
 }
 #endif
 
-device::device(const window &win)
+device::device(GLFWwindow *window)
 {
     create_instance();
 #ifdef DEBUG
     setup_debug_messenger();
 #endif
-    win.create_surface(m_instance, &m_surface);
+    KIT_CHECK_RETURN_VALUE(glfwCreateWindowSurface(m_instance, window, nullptr, &m_surface), VK_SUCCESS, CRITICAL,
+                           "Failed to create GLFW window surface")
     pick_physical_device();
     create_logical_device();
     create_command_pool();

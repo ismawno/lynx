@@ -68,10 +68,7 @@ VkResult swap_chain::acquire_next_image(std::uint32_t *image_index) const
 
 VkResult swap_chain::submit_command_buffers(const VkCommandBuffer *buffers, const std::uint32_t *image_index)
 {
-#ifndef LYNX_MULTITHREADED // Should actually disable multithreading but considering this poor amount of profiling I
-                           // prefer diabling the latter
     KIT_PERF_FUNCTION()
-#endif
     if (m_images_in_flight[*image_index] != VK_NULL_HANDLE)
         vkWaitForFences(m_device->vulkan_device(), 1, &m_images_in_flight[*image_index], VK_TRUE, UINT64_MAX);
 

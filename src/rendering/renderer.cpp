@@ -6,42 +6,40 @@
 
 namespace lynx
 {
-renderer::renderer(const kit::ref<const device> &dev, window &win) : m_window(win), m_device(dev)
+template <typename Dim>
+renderer<Dim>::renderer(const kit::ref<const device> &dev, window_t &win) : m_window(win), m_device(dev)
 {
     create_swap_chain();
     create_command_buffers();
 }
 
-renderer::~renderer()
+template <typename Dim> renderer<Dim>::~renderer()
 {
-#ifdef LYNX_MULTITHREADED
-    wait_for_queue_submission();
-#endif
     free_command_buffers();
 }
 
-bool renderer::frame_in_progress() const
+template <typename Dim> bool renderer<Dim>::frame_in_progress() const
 {
     return m_frame_started;
 }
-VkCommandBuffer renderer::current_command_buffer() const
+template <typename Dim> VkCommandBuffer renderer<Dim>::current_command_buffer() const
 {
     KIT_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve command buffer")
     return m_command_buffers[m_frame_index];
 }
 
-std::uint32_t renderer::frame_index() const
+template <typename Dim> std::uint32_t renderer<Dim>::frame_index() const
 {
     KIT_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve frame index")
     return m_frame_index;
 }
 
-const swap_chain &renderer::swap_chain() const
+template <typename Dim> const swap_chain &renderer<Dim>::swap_chain() const
 {
     return *m_swap_chain;
 }
 
-void renderer::create_swap_chain()
+template <typename Dim> void renderer<Dim>::create_swap_chain()
 {
     VkExtent2D ext = m_window.extent();
     while (ext.width == 0 || ext.height == 0)
@@ -55,7 +53,7 @@ void renderer::create_swap_chain()
     // create_pipeline(); // If render passes are not compatible
 }
 
-void renderer::create_command_buffers()
+template <typename Dim> void renderer<Dim>::create_command_buffers()
 {
     VkCommandBufferAllocateInfo alloc_info{};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -67,19 +65,15 @@ void renderer::create_command_buffers()
                            VK_SUCCESS, CRITICAL, "Failed to create command buffers")
 }
 
-void renderer::free_command_buffers()
+template <typename Dim> void renderer<Dim>::free_command_buffers()
 {
     vkFreeCommandBuffers(m_device->vulkan_device(), m_device->command_pool(), (std::uint32_t)m_command_buffers.size(),
                          m_command_buffers.data());
 }
 
-VkCommandBuffer renderer::begin_frame()
+template <typename Dim> VkCommandBuffer renderer<Dim>::begin_frame()
 {
     KIT_PERF_FUNCTION()
-#ifdef LYNX_MULTITHREADED
-    wait_for_queue_submission();
-#endif
-
     KIT_ASSERT_ERROR(!m_frame_started, "Cannot begin a new frame when there is already one in progress")
 
     const VkResult result = m_swap_chain->acquire_next_image(&m_image_index);
@@ -100,26 +94,9 @@ VkCommandBuffer renderer::begin_frame()
                            "Failed to begin command buffer")
     return m_command_buffers[m_frame_index];
 }
-void renderer::end_frame()
+template <typename Dim> void renderer<Dim>::end_frame()
 {
     KIT_PERF_FUNCTION()
-#ifdef LYNX_MULTITHREADED
-    m_end_frame_thread = std::thread(&renderer::end_frame_implementation, this);
-#else
-    end_frame_implementation();
-#endif
-}
-
-#ifdef LYNX_MULTITHREADED
-void renderer::wait_for_queue_submission() const
-{
-    if (m_end_frame_thread.joinable())
-        m_end_frame_thread.join();
-}
-#endif
-
-void renderer::end_frame_implementation()
-{
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
     KIT_CHECK_RETURN_VALUE(vkEndCommandBuffer(m_command_buffers[m_frame_index]), VK_SUCCESS, CRITICAL,
                            "Failed to end command buffer")
@@ -139,7 +116,8 @@ void renderer::end_frame_implementation()
     m_frame_index = (m_frame_index + 1) % swap_chain::MAX_FRAMES_IN_FLIGHT;
 }
 
-void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer, const color &clear_color)
+template <typename Dim>
+void renderer<Dim>::begin_swap_chain_render_pass(VkCommandBuffer command_buffer, const color &clear_color)
 {
     KIT_ASSERT_ERROR(m_frame_started, "Cannot begin render pass if a frame is not in progress")
     KIT_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
@@ -178,7 +156,7 @@ void renderer::begin_swap_chain_render_pass(VkCommandBuffer command_buffer, cons
     vkCmdSetViewport(m_command_buffers[m_frame_index], 0, 1, &viewport);
     vkCmdSetScissor(m_command_buffers[m_frame_index], 0, 1, &scissor);
 }
-void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
+template <typename Dim> void renderer<Dim>::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
 {
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end render pass if a frame is not in progress")
     KIT_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
@@ -188,11 +166,9 @@ void renderer::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
     vkCmdEndRenderPass(m_command_buffers[m_frame_index]);
 }
 
-void renderer::immediate_submission(const std::function<void(VkCommandBuffer)> &submission) const
+template <typename Dim>
+void renderer<Dim>::immediate_submission(const std::function<void(VkCommandBuffer)> &submission) const
 {
-#ifdef LYNX_MULTITHREADED
-    wait_for_queue_submission();
-#endif
     const VkCommandBuffer command_buffer = m_device->begin_single_time_commands();
     submission(command_buffer);
     m_device->end_single_time_commands(command_buffer);

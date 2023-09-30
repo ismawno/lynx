@@ -4,7 +4,8 @@
 
 namespace lynx
 {
-template <typename T> model::model(const kit::ref<const device> &dev, const std::vector<T> &vertices) : m_device(dev)
+template <typename Dim>
+model<Dim>::model(const kit::ref<const device> &dev, const std::vector<vertex_t> &vertices) : m_device(dev)
 {
     KIT_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
     create_vertex_buffer(vertices);
@@ -12,9 +13,9 @@ template <typename T> model::model(const kit::ref<const device> &dev, const std:
     m_host_index_buffer = nullptr;
 }
 
-template <typename T>
-model::model(const kit::ref<const device> &dev, const std::vector<T> &vertices,
-             const std::vector<std::uint32_t> &indices)
+template <typename Dim>
+model<Dim>::model(const kit::ref<const device> &dev, const std::vector<vertex_t> &vertices,
+                  const std::vector<std::uint32_t> &indices)
     : m_device(dev)
 {
     KIT_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
@@ -23,20 +24,30 @@ model::model(const kit::ref<const device> &dev, const std::vector<T> &vertices,
     create_index_buffer(indices);
 }
 
-template <typename T>
-model::model(const kit::ref<const device> &dev, const vertex_index_pair<T> &build)
+template <typename Dim>
+model<Dim>::model(const kit::ref<const device> &dev, const vertex_index_pair &build)
     : model(dev, build.vertices, build.indices)
 {
 }
 
-template <typename T> void model::copy(const model &other)
+template <typename Dim> model<Dim>::model(const model &other)
+{
+    copy(other);
+}
+template <typename Dim> model<Dim> &model<Dim>::operator=(const model &other)
+{
+    copy(other);
+    return *this;
+}
+
+template <typename Dim> void model<Dim>::copy(const model &other)
 {
     m_device = other.m_device;
-    std::vector<T> vertices;
+    std::vector<vertex_t> vertices;
     vertices.reserve(other.m_host_vertex_buffer->instance_count());
 
     for (std::size_t i = 0; i < other.m_host_vertex_buffer->instance_count(); i++)
-        vertices.push_back(other.read_vertex<T>(i));
+        vertices.push_back(other.read_vertex(i));
     create_vertex_buffer(vertices);
 
     if (!other.has_index_buffers())
@@ -55,7 +66,7 @@ template <typename T> void model::copy(const model &other)
 }
 
 #ifdef DEBUG
-model::~model()
+template <typename Dim> model<Dim>::~model()
 {
     KIT_ASSERT_CRITICAL(!to_be_rendered,
                         "Model has been destroyed before being rendered! Any drawable entity must remain alive until "
@@ -79,17 +90,17 @@ static void create_buffer(const kit::ref<const device> &dev, const std::vector<T
     device_buffer->write(*host_buffer);
 }
 
-template <typename T> void model::create_vertex_buffer(const std::vector<T> &vertices)
+template <typename Dim> void model<Dim>::create_vertex_buffer(const std::vector<vertex_t> &vertices)
 {
     create_buffer(m_device, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, m_device_vertex_buffer, m_host_vertex_buffer);
 }
 
-void model::create_index_buffer(const std::vector<std::uint32_t> &indices)
+template <typename Dim> void model<Dim>::create_index_buffer(const std::vector<std::uint32_t> &indices)
 {
     create_buffer(m_device, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, m_device_index_buffer, m_host_index_buffer);
 }
 
-void model::bind(VkCommandBuffer command_buffer) const
+template <typename Dim> void model<Dim>::bind(VkCommandBuffer command_buffer) const
 {
     const std::array<VkBuffer, 1> buffers = {m_device_vertex_buffer->vulkan_buffer()};
     const std::array<VkDeviceSize, 1> offsets = {0};
@@ -98,7 +109,7 @@ void model::bind(VkCommandBuffer command_buffer) const
     if (m_device_index_buffer)
         vkCmdBindIndexBuffer(command_buffer, m_device_index_buffer->vulkan_buffer(), 0, VK_INDEX_TYPE_UINT32);
 }
-void model::draw(VkCommandBuffer command_buffer) const
+template <typename Dim> void model<Dim>::draw(VkCommandBuffer command_buffer) const
 {
     if (has_index_buffers())
         vkCmdDrawIndexed(command_buffer, (std::uint32_t)m_device_index_buffer->instance_count(), 1, 0, 0, 0);
@@ -106,7 +117,7 @@ void model::draw(VkCommandBuffer command_buffer) const
         vkCmdDraw(command_buffer, (std::uint32_t)m_device_vertex_buffer->instance_count(), 1, 0, 0);
 }
 
-bool model::has_index_buffers() const
+template <typename Dim> bool model<Dim>::has_index_buffers() const
 {
     return m_device_index_buffer && m_host_index_buffer;
 }
@@ -124,34 +135,36 @@ static void update_buffer(const std::function<void(std::size_t, T &)> &for_each_
     device_buffer.write(host_buffer);
 }
 
-template <typename T> void model::update_vertex_buffer(const std::function<void(std::size_t, T &)> &for_each_fn)
+template <typename Dim>
+void model<Dim>::update_vertex_buffer(const std::function<void(std::size_t, vertex_t &)> &for_each_fn)
 {
     update_buffer(for_each_fn, *m_host_vertex_buffer, *m_device_vertex_buffer);
 }
-void model::update_index_buffer(const std::function<void(std::size_t, std::uint32_t &)> &for_each_fn)
+template <typename Dim>
+void model<Dim>::update_index_buffer(const std::function<void(std::size_t, std::uint32_t &)> &for_each_fn)
 {
     KIT_ASSERT_ERROR(has_index_buffers(), "Cannot update index buffer in a model that does not have index buffers")
     update_buffer(for_each_fn, *m_host_index_buffer, *m_device_index_buffer);
 }
 
-std::size_t model::vertices_count() const
+template <typename Dim> std::size_t model<Dim>::vertices_count() const
 {
     return m_host_vertex_buffer->instance_count();
 }
 
-std::size_t model::indices_count() const
+template <typename Dim> std::size_t model<Dim>::indices_count() const
 {
     return m_host_index_buffer ? m_host_index_buffer->instance_count() : 0;
 }
 
-template <typename T> void model::write_vertex(const std::size_t buffer_index, const T &vertex)
+template <typename Dim> void model<Dim>::write_vertex(const std::size_t buffer_index, const vertex_t &vertex)
 {
     m_host_vertex_buffer->write_at_index(&vertex, buffer_index);
     m_host_vertex_buffer->flush_at_index(buffer_index);
-    update_vertex_buffer<T>();
+    update_vertex_buffer();
 }
 
-void model::write_index(const std::size_t buffer_index, const std::uint32_t index)
+template <typename Dim> void model<Dim>::write_index(const std::size_t buffer_index, const std::uint32_t index)
 {
     KIT_ASSERT_ERROR(has_index_buffers(), "Cannot write to index buffer in a model that does not have index buffers")
     m_host_index_buffer->write_at_index(&index, buffer_index);
@@ -159,81 +172,56 @@ void model::write_index(const std::size_t buffer_index, const std::uint32_t inde
     update_index_buffer();
 }
 
-template <typename T> const T &model::read_vertex(const std::size_t buffer_index) const
+template <typename Dim> const vertex<Dim> &model<Dim>::read_vertex(const std::size_t buffer_index) const
 {
-    return m_host_vertex_buffer->read_at_index<T>(buffer_index);
+    return m_host_vertex_buffer->read_at_index<vertex_t>(buffer_index);
 }
 
-std::uint32_t model::read_index(const std::size_t buffer_index) const
+template <typename Dim> const vertex<Dim> &model<Dim>::operator[](const std::size_t index) const
+{
+    return read_vertex(index);
+}
+
+template <typename Dim> std::uint32_t model<Dim>::read_index(const std::size_t buffer_index) const
 {
     KIT_ASSERT_ERROR(has_index_buffers(), "Cannot write to index buffer in a model that does not have index buffers")
     return m_host_index_buffer->read_at_index<std::uint32_t>(buffer_index);
 }
 
-model2D::model2D(const kit::ref<const device> &dev, const std::vector<vertex2D> &vertices) : model(dev, vertices)
+template <typename Dim> typename model<Dim>::vertex_index_pair model<Dim>::rect(const color &color)
 {
+    if constexpr (std::is_same_v<Dim, dimension::two>)
+    {
+        const vertex_index_pair build = {
+            {{{-.5f, -.5f}, color}, {{.5f, .5f}, color}, {{-.5f, .5f}, color}, {{.5f, -.5f}, color}},
+            {0, 1, 2, 0, 3, 1}};
+        return build;
+    }
+    else
+    {
+        const vertex_index_pair build = {{{{-.5f, -.5f, .5f}, color},
+                                          {{.5f, .5f, .5f}, color},
+                                          {{-.5f, .5f, .5f}, color},
+                                          {{.5f, -.5f, .5f}, color}},
+                                         {0, 1, 2, 0, 3, 1}};
+        return build;
+    }
 }
 
-model2D::model2D(const kit::ref<const device> &dev, const std::vector<vertex2D> &vertices,
-                 const std::vector<std::uint32_t> &indices)
-    : model(dev, vertices, indices)
+template <typename Dim> std::vector<vertex<Dim>> model<Dim>::line(const color &color1, const color &color2)
 {
+    if constexpr (std::is_same_v<Dim, dimension::two>)
+        return {{{-1.f, 0.f}, color1}, {{1.f, 0.f}, color2}};
+    else
+        return {{{-1.f, 0.f, 0.f}, color1}, {{1.f, 0.f, 0.f}, color2}};
 }
-
-model2D::model2D(const kit::ref<const device> &dev, const vertex_index_pair &build) : model(dev, build)
-{
-}
-
-model2D::model2D(const model2D &other)
-{
-    copy<vertex2D>(other);
-}
-
-model2D &model2D::operator=(const model2D &other)
-{
-    copy<vertex2D>(other);
-    return *this;
-}
-
-void model2D::write_vertex(std::size_t buffer_index, const vertex2D &vertex)
-{
-    model::write_vertex(buffer_index, vertex);
-}
-
-const vertex2D &model2D::read_vertex(std::size_t buffer_index) const
-{
-    return model::read_vertex<vertex2D>(buffer_index);
-}
-
-void model2D::update_vertex_buffer(const std::function<void(std::size_t, vertex2D &)> &for_each_fn)
-{
-    model::update_vertex_buffer(for_each_fn);
-}
-
-const vertex2D &model2D::operator[](const std::size_t index) const
-{
-    return read_vertex(index);
-}
-
-model2D::vertex_index_pair model2D::rect(const color &color)
-{
-    const vertex_index_pair build = {
-        {{{-.5f, -.5f}, color}, {{.5f, .5f}, color}, {{-.5f, .5f}, color}, {{.5f, -.5f}, color}}, {0, 1, 2, 0, 3, 1}};
-    return build;
-}
-
-std::vector<vertex2D> model2D::line(const color &color1, const color &color2)
-{
-    return {{{-1.f, 0.f}, color1}, {{1.f, 0.f}, color2}};
-}
-
-template <typename VecType, typename ReturnType>
-static ReturnType circle_model(const std::uint32_t partitions, const color &color)
+template <typename Dim>
+typename model<Dim>::vertex_index_pair model<Dim>::circle(const std::uint32_t partitions, const color &color)
 {
     KIT_ASSERT_ERROR(partitions > 2, "Must at least have 3 partitions. Current: {0}", partitions)
 
-    ReturnType build;
-    build.vertices.emplace_back(VecType(0.f), color);
+    vertex_index_pair build;
+    build.vertices.emplace_back(vertex_t(0.f), color);
     build.indices.resize(3 * partitions);
     build.vertices.reserve(partitions);
 
@@ -241,24 +229,25 @@ static ReturnType circle_model(const std::uint32_t partitions, const color &colo
     for (std::uint32_t i = 0; i < partitions; i++)
     {
         const float angle = i * dangle;
-        if constexpr (std::is_same_v<VecType, glm::vec2>)
-            build.vertices.emplace_back(VecType(cosf(angle), sinf(angle)), color);
+        if constexpr (std::is_same_v<vertex_t, glm::vec2>)
+            build.vertices.emplace_back(vertex_t(cosf(angle), sinf(angle)), color);
         else
-            build.vertices.emplace_back(VecType(cosf(angle), sinf(angle), 0.f), color);
+            build.vertices.emplace_back(vertex_t(cosf(angle), sinf(angle), 0.f), color);
         build.indices[3 * i] = 0;
         build.indices[3 * i + 1] = i + 1;
         build.indices[3 * i + 2] = i + 2;
     }
     return build;
 }
-
-template <typename VertexType, typename ReturnType>
-static ReturnType polygon_model(const std::vector<VertexType> &local_vertices, const color &center_color)
+template <typename Dim>
+typename model<Dim>::vertex_index_pair model<Dim>::polygon(const std::vector<vertex_t> &local_vertices,
+                                                           const color &center_color)
 {
     KIT_ASSERT_ERROR(local_vertices.size() > 2, "Must at least have 3 vertices. Current: {0}", local_vertices.size())
-    ReturnType build;
+    vertex_index_pair build;
     build.vertices.reserve(local_vertices.size() + 1);
-    VertexType &center_vertex = build.vertices.emplace_back();
+
+    vertex_t &center_vertex = build.vertices.emplace_back();
     center_vertex.color = center_color;
 
     build.indices.resize(3 * local_vertices.size());
@@ -273,98 +262,15 @@ static ReturnType polygon_model(const std::vector<VertexType> &local_vertices, c
     build.indices.back() = 1;
     return build;
 }
-
-template <typename VertexType, typename VecType, typename ReturnType>
-static ReturnType polygon_model_from_vertex_positions(const std::vector<VecType> &local_vertices, const color &color)
+template <typename Dim>
+typename model<Dim>::vertex_index_pair model<Dim>::polygon(const std::vector<vec_t> &local_vertices, const color &color)
 {
-    std::vector<VertexType> colored_vertices;
+    std::vector<vertex_t> colored_vertices;
     colored_vertices.reserve(local_vertices.size());
 
-    for (const VecType &v : local_vertices)
+    for (const vertex_t &v : local_vertices)
         colored_vertices.emplace_back(v, color);
-    return polygon_model<VertexType, ReturnType>(colored_vertices, color);
-}
-
-model2D::vertex_index_pair model2D::circle(const std::uint32_t partitions, const color &color)
-{
-    return circle_model<glm::vec2, vertex_index_pair>(partitions, color);
-}
-
-model2D::vertex_index_pair model2D::polygon(const std::vector<vertex2D> &local_vertices, const color &color)
-{
-    return polygon_model<vertex2D, vertex_index_pair>(local_vertices, color);
-}
-
-model2D::vertex_index_pair model2D::polygon(const std::vector<glm::vec2> &local_vertices, const color &color)
-{
-    return polygon_model_from_vertex_positions<vertex2D, glm::vec2, vertex_index_pair>(local_vertices, color);
-}
-
-model3D::model3D(const kit::ref<const device> &dev, const std::vector<vertex3D> &vertices) : model(dev, vertices)
-{
-}
-
-model3D::model3D(const kit::ref<const device> &dev, const std::vector<vertex3D> &vertices,
-                 const std::vector<std::uint32_t> &indices)
-    : model(dev, vertices, indices)
-{
-}
-
-model3D::model3D(const kit::ref<const device> &dev, const vertex_index_pair &build) : model(dev, build)
-{
-}
-
-model3D::model3D(const model3D &other)
-{
-    copy<vertex3D>(other);
-}
-
-model3D &model3D::operator=(const model3D &other)
-{
-    copy<vertex3D>(other);
-    return *this;
-}
-
-void model3D::write_vertex(std::size_t buffer_index, const vertex3D &vertex)
-{
-    model::write_vertex(buffer_index, vertex);
-}
-const vertex3D &model3D::read_vertex(std::size_t buffer_index) const
-{
-    return model::read_vertex<vertex3D>(buffer_index);
-}
-
-void model3D::update_vertex_buffer(const std::function<void(std::size_t, vertex3D &)> &for_each_fn)
-{
-    model::update_vertex_buffer(for_each_fn);
-}
-
-const vertex3D &model3D::operator[](const std::size_t index) const
-{
-    return read_vertex(index);
-}
-
-model3D::vertex_index_pair model3D::rect(const color &color)
-{
-    const vertex_index_pair build = {
-        {{{-.5f, -.5f, .5f}, color}, {{.5f, .5f, .5f}, color}, {{-.5f, .5f, .5f}, color}, {{.5f, -.5f, .5f}, color}},
-        {0, 1, 2, 0, 3, 1}};
-    return build;
-}
-
-model3D::vertex_index_pair model3D::circle(const std::uint32_t partitions, const color &color)
-{
-    return circle_model<glm::vec3, vertex_index_pair>(partitions, color);
-}
-
-model3D::vertex_index_pair model3D::polygon(const std::vector<vertex3D> &local_vertices, const color &color)
-{
-    return polygon_model<vertex3D, vertex_index_pair>(local_vertices, color);
-}
-
-model3D::vertex_index_pair model3D::polygon(const std::vector<glm::vec3> &local_vertices, const color &color)
-{
-    return polygon_model_from_vertex_positions<vertex3D, glm::vec3, vertex_index_pair>(local_vertices, color);
+    return model::polygon(colored_vertices, color);
 }
 
 model3D::vertex_index_pair model3D::sphere(const std::uint32_t lat_partitions, const std::uint32_t lon_partitions,
@@ -445,11 +351,6 @@ model3D::vertex_index_pair model3D::cube(const color &color)
         },
         {0, 1, 2, 0, 3, 1, 4, 5, 6, 4, 7, 5, 0, 6, 2, 0, 4, 6, 3, 5, 1, 3, 7, 5, 2, 5, 1, 2, 6, 5, 0, 7, 3, 0, 4, 7}};
     return build;
-}
-
-std::vector<vertex3D> model3D::line(const color &color1, const color &color2)
-{
-    return {{{-1.f, 0.f, 0.f}, color1}, {{1.f, 0.f, 0.f}, color2}};
 }
 
 } // namespace lynx

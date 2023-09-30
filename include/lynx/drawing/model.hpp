@@ -3,6 +3,7 @@
 
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
+#include "lynx/internal/dimension.hpp"
 #include "lynx/drawing/color.hpp"
 #include "lynx/rendering/buffer.hpp"
 #include "lynx/geometry/vertex.hpp"
@@ -20,19 +21,26 @@ namespace lynx
 {
 class device;
 
-class model
+template <typename Dim> class model
 {
   public:
-    template <typename T> struct vertex_index_pair
+    using vertex_t = vertex<Dim>;
+    using vec_t = typename Dim::vec_t;
+
+    struct vertex_index_pair
     {
-        std::vector<T> vertices;
+        std::vector<vertex_t> vertices;
         std::vector<std::uint32_t> indices;
     };
 
-    template <typename T> model(const kit::ref<const device> &dev, const std::vector<T> &vertices);
-    template <typename T>
-    model(const kit::ref<const device> &dev, const std::vector<T> &vertices, const std::vector<std::uint32_t> &indices);
-    template <typename T> model(const kit::ref<const device> &dev, const vertex_index_pair<T> &build);
+    model(const kit::ref<const device> &dev, const std::vector<vertex_t> &vertices);
+
+    model(const kit::ref<const device> &dev, const std::vector<vertex_t> &vertices,
+          const std::vector<std::uint32_t> &indices);
+    model(const kit::ref<const device> &dev, const vertex_index_pair &build);
+
+    model(const model &other);
+    model &operator=(const model &other);
 
 #ifdef DEBUG
     virtual ~model();
@@ -45,17 +53,24 @@ class model
 
     bool has_index_buffers() const;
 
-    template <typename T> void write_vertex(std::size_t buffer_index, const T &vertex);
+    void write_vertex(std::size_t buffer_index, const vertex_t &vertex);
     void write_index(std::size_t buffer_index, std::uint32_t index);
 
-    template <typename T> const T &read_vertex(std::size_t buffer_index) const;
+    const vertex_t &read_vertex(std::size_t buffer_index) const;
     std::uint32_t read_index(std::size_t buffer_index) const;
+    const vertex_t &operator[](std::size_t index) const;
 
-    template <typename T> void update_vertex_buffer(const std::function<void(std::size_t, T &)> &for_each_fn = nullptr);
+    void update_vertex_buffer(const std::function<void(std::size_t, vertex_t &)> &for_each_fn = nullptr);
     void update_index_buffer(const std::function<void(std::size_t, std::uint32_t &)> &for_each_fn = nullptr);
 
     std::size_t vertices_count() const;
     std::size_t indices_count() const;
+
+    static vertex_index_pair rect(const color &color);
+    static std::vector<vertex_t> line(const color &color1, const color &color2);
+    static vertex_index_pair circle(std::uint32_t partitions, const color &color);
+    static vertex_index_pair polygon(const std::vector<vertex_t> &local_vertices, const color &center_color);
+    static vertex_index_pair polygon(const std::vector<vec_t> &local_vertices, const color &color);
 
 #ifdef DEBUG
     mutable bool to_be_rendered = false;
@@ -63,7 +78,7 @@ class model
 
   protected:
     model() = default;
-    template <typename T> void copy(const model &other);
+    void copy(const model &other);
 
   private:
     kit::ref<const device> m_device;
@@ -74,64 +89,19 @@ class model
     kit::scope<buffer> m_device_index_buffer;
     kit::scope<buffer> m_host_index_buffer;
 
-    template <typename T> void create_vertex_buffer(const std::vector<T> &vertices);
+    void create_vertex_buffer(const std::vector<vertex_t> &vertices);
     void create_index_buffer(const std::vector<std::uint32_t> &indices);
 };
 
-class model2D : public model
+using model2D = model<dimension::two>;
+
+class model3D : public model<dimension::three>
 {
   public:
-    using vertex_index_pair = model::vertex_index_pair<vertex2D>;
+    using model::model;
 
-    model2D(const kit::ref<const device> &dev, const std::vector<vertex2D> &vertices);
-    model2D(const kit::ref<const device> &dev, const std::vector<vertex2D> &vertices,
-            const std::vector<std::uint32_t> &indices);
-    model2D(const kit::ref<const device> &dev, const vertex_index_pair &build);
-
-    model2D(const model2D &other);
-    model2D &operator=(const model2D &other);
-
-    void write_vertex(std::size_t buffer_index, const vertex2D &vertex);
-    const vertex2D &read_vertex(std::size_t buffer_index) const;
-
-    void update_vertex_buffer(const std::function<void(std::size_t, vertex2D &)> &for_each_fn = nullptr);
-
-    const vertex2D &operator[](std::size_t index) const;
-
-    // create NGon. HACER STATIC UNORDERED MAP
-    static vertex_index_pair rect(const color &color);
-    static std::vector<vertex2D> line(const color &color1, const color &color2);
-    static vertex_index_pair circle(std::uint32_t partitions, const color &color);
-    static vertex_index_pair polygon(const std::vector<vertex2D> &local_vertices, const color &center_color);
-    static vertex_index_pair polygon(const std::vector<glm::vec2> &local_vertices, const color &color);
-};
-
-class model3D : public model
-{
-  public:
-    using vertex_index_pair = model::vertex_index_pair<vertex3D>;
-    model3D(const kit::ref<const device> &dev, const std::vector<vertex3D> &vertices);
-    model3D(const kit::ref<const device> &dev, const std::vector<vertex3D> &vertices,
-            const std::vector<std::uint32_t> &indices);
-    model3D(const kit::ref<const device> &dev, const vertex_index_pair &build);
-
-    model3D(const model3D &other);
-    model3D &operator=(const model3D &other);
-
-    void write_vertex(std::size_t buffer_index, const vertex3D &vertex);
-    const vertex3D &read_vertex(std::size_t buffer_index) const;
-
-    void update_vertex_buffer(const std::function<void(std::size_t, vertex3D &)> &for_each_fn = nullptr);
-
-    const vertex3D &operator[](std::size_t index) const;
-
-    static vertex_index_pair rect(const color &color);
-    static vertex_index_pair circle(std::uint32_t partitions, const color &color);
-    static vertex_index_pair polygon(const std::vector<vertex3D> &local_vertices, const color &center_color);
-    static vertex_index_pair polygon(const std::vector<glm::vec3> &local_vertices, const color &color);
     static vertex_index_pair sphere(std::uint32_t lat_partitions, std::uint32_t lon_partitions, const color &color);
     static vertex_index_pair cube(const color &color);
-    static std::vector<vertex3D> line(const color &color1, const color &color2);
 };
 } // namespace lynx
 

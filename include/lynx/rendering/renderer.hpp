@@ -3,21 +3,23 @@
 
 #include "lynx/rendering/swap_chain.hpp"
 #include "lynx/drawing/color.hpp"
+#include "lynx/internal/dimension.hpp"
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
 
 #include <vulkan/vulkan.hpp>
 #include <functional>
-#include <thread>
 
 namespace lynx
 {
-class window;
 class device;
-class renderer : kit::non_copyable
+
+template <typename Dim> class renderer : kit::non_copyable
 {
   public:
-    renderer(const kit::ref<const device> &dev, window &win);
+    using window_t = typename Dim::window_t;
+
+    renderer(const kit::ref<const device> &dev, window_t &win);
     ~renderer();
 
     VkCommandBuffer begin_frame();
@@ -33,12 +35,8 @@ class renderer : kit::non_copyable
     std::uint32_t frame_index() const;
     const swap_chain &swap_chain() const;
 
-#ifdef LYNX_MULTITHREADED
-    void wait_for_queue_submission() const;
-#endif
-
   private:
-    window &m_window;
+    window_t &m_window;
     kit::ref<const device> m_device;
     kit::scope<lynx::swap_chain> m_swap_chain;
     std::array<VkCommandBuffer, swap_chain::MAX_FRAMES_IN_FLIGHT> m_command_buffers;
@@ -47,15 +45,13 @@ class renderer : kit::non_copyable
     std::uint32_t m_frame_index = 0;
     bool m_frame_started = false;
 
-#ifdef LYNX_MULTITHREADED
-    mutable std::thread m_end_frame_thread;
-#endif
-
-    void end_frame_implementation();
     void create_command_buffers();
     void create_swap_chain();
     void free_command_buffers();
 };
+
+using renderer2D = renderer<dimension::two>;
+using renderer3D = renderer<dimension::three>;
 } // namespace lynx
 
 #endif

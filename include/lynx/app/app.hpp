@@ -3,7 +3,8 @@
 
 #include "lynx/app/window.hpp"
 #include "lynx/app/layer.hpp"
-#include "lynx/utility/context.hpp"
+#include "lynx/internal/context.hpp"
+#include "lynx/internal/dimension.hpp"
 #include "kit/profile/clock.hpp"
 #ifdef LYNX_ENABLE_IMGUI
 #include <imgui.h>
@@ -14,9 +15,15 @@
 
 namespace lynx
 {
-class app : kit::non_copyable
+template <typename Dim> class app : kit::non_copyable
 {
   public:
+    using window_t = typename Dim::window_t;
+    using layer_t = layer<Dim>;
+    using context_t = context<Dim>;
+    using input_t = input<Dim>;
+    using event_t = event<Dim>;
+
     app() = default;
     virtual ~app();
 
@@ -28,17 +35,17 @@ class app : kit::non_copyable
 
     kit::time frame_time() const;
 
-    const std::vector<kit::scope<layer>> &layers() const;
+    const std::vector<kit::scope<layer_t>> &layers() const;
 
     std::uint32_t framerate_cap() const;
     void limit_framerate(std::uint32_t framerate);
 
     template <typename T, class... Args> T *push_layer(Args &&...args)
     {
-        static_assert(std::is_base_of_v<layer, T>, "Type must inherit from layer class");
+        static_assert(std::is_base_of_v<layer_t, T>, "Type must inherit from layer class");
         KIT_ASSERT_ERROR(!m_terminated, "Cannot push layers to a terminated app")
 
-        context::set(m_window.get());
+        context_t::set(m_window.get());
         auto ly = kit::make_scope<T>(std::forward<Args>(args)...);
         T *ptr = ly.get();
 #ifdef DEBUG
@@ -53,19 +60,19 @@ class app : kit::non_copyable
         return ptr;
     }
 
-    template <typename T = layer> kit::scope<T> pop_layer(const std::string &name)
+    template <typename T = layer_t> kit::scope<T> pop_layer(const std::string &name)
     {
-        static_assert(std::is_base_of_v<layer, T>, "Type must inherit from layer class");
+        static_assert(std::is_base_of_v<layer_t, T>, "Type must inherit from layer class");
         KIT_ASSERT_ERROR(!m_terminated, "Cannot pop layers to a terminated app")
 
-        context::set(m_window.get());
+        context_t::set(m_window.get());
 
         for (auto it = m_layers.begin(); it != m_layers.end(); ++it)
             if ((*it)->id == name)
             {
                 (*it)->on_detach();
                 kit::scope<T> to_remove;
-                if constexpr (std::is_same_v<T, layer>)
+                if constexpr (std::is_same_v<T, layer_t>)
                     to_remove = std::move(*it);
                 else
                     to_remove = kit::scope<T>(dynamic_cast<T *>(it->release()));
@@ -78,23 +85,23 @@ class app : kit::non_copyable
 
     template <typename T> kit::scope<T> pop_layer(const T *ly)
     {
-        static_assert(std::is_base_of_v<layer, T>, "Type must inherit from layer class");
+        static_assert(std::is_base_of_v<layer_t, T>, "Type must inherit from layer class");
         return pop_layer(ly->id);
     }
 
-    template <typename T = lynx::window> const T *window() const
+    template <typename T = window_t> const T *window() const
     {
         return kit::const_get_casted_raw_ptr<T>(m_window);
     }
 
-    template <typename T = lynx::window> T *window()
+    template <typename T = window_t> T *window()
     {
         return kit::get_casted_raw_ptr<T>(m_window);
     }
 
     template <typename T, class... Args> T *set_window(Args &&...args)
     {
-        static_assert(std::is_base_of_v<lynx::window, T>, "Window type must inherit from window");
+        static_assert(std::is_base_of_v<window_t, T>, "Window type must inherit from window");
         auto win = kit::make_scope<T>(std::forward<Args>(args)...);
         T *ptr = win.get();
         m_window = std::move(win);
@@ -107,8 +114,8 @@ class app : kit::non_copyable
     bool m_to_finish_next_frame = false;
     bool m_ongoing_frame = false;
 
-    std::vector<kit::scope<layer>> m_layers;
-    kit::scope<lynx::window> m_window;
+    std::vector<kit::scope<layer_t>> m_layers;
+    kit::scope<window_t> m_window;
     kit::time m_frame_time;
     kit::time m_min_frame_time;
 
@@ -144,11 +151,11 @@ class app : kit::non_copyable
     virtual void on_late_shutdown()
     {
     }
-    virtual bool on_event(const event &ev)
+    virtual bool on_event(const event_t &ev)
     {
         return false;
     }
-    virtual void on_late_event(const event &ev)
+    virtual void on_late_event(const event_t &ev)
     {
     }
 
@@ -161,6 +168,9 @@ class app : kit::non_copyable
 
 #endif
 };
+
+using app2D = app<dimension::two>;
+using app3D = app<dimension::three>;
 
 } // namespace lynx
 

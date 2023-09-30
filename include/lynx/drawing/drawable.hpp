@@ -1,20 +1,14 @@
 #ifndef LYNX_DRAWABLE_HPP
 #define LYNX_DRAWABLE_HPP
 
+#include "lynx/internal/dimension.hpp"
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/mat4x4.hpp>
 
 namespace lynx
 {
-class window;
-class window2D;
-class window3D;
-
-class render_system2D;
-class render_system3D;
-
-class model;
 
 enum class topology
 {
@@ -25,35 +19,27 @@ enum class topology
     TRIANGLE_STRIP = 4
 };
 
-namespace drawable
-{
-void default_draw(window &win, const model *mdl, glm::mat4 transform, topology tplg);
-void default_draw_no_transform(window &win, const model *mdl, topology tplg);
-} // namespace drawable
-
-class drawable2D
+template <typename Dim> class drawable
 {
   public:
-    virtual ~drawable2D() = default;
+    using window_t = typename Dim::window_t;
+    using model_t = typename Dim::model_t;
+    using render_system_t = typename Dim::render_system_t;
 
-    virtual void draw(window2D &win) const = 0;
-    virtual void draw(render_system2D &rs) const
+    virtual ~drawable() = default;
+
+    virtual void draw(window_t &win) const = 0;
+    virtual void draw(render_system_t &rs) const
     {
         KIT_ERROR("To draw to an arbitrary render system, the draw render system method must be overriden")
     }
+
+    static void default_draw(window_t &win, const model_t *mdl, glm::mat4 transform, topology tplg);
+    static void default_draw_no_transform(window_t &win, const model_t *mdl, topology tplg);
 };
 
-class drawable3D
-{
-  public:
-    virtual ~drawable3D() = default;
-
-    virtual void draw(window3D &win) const = 0;
-    virtual void draw(render_system3D &rs) const
-    {
-        KIT_ERROR("To draw to an arbitrary render system, the draw render system method must be overriden")
-    }
-};
+using drawable2D = drawable<dimension::two>;
+using drawable3D = drawable<dimension::three>;
 } // namespace lynx
 
 #endif
