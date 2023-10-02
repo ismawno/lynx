@@ -24,8 +24,8 @@ class layer : public kit::identifiable<std::string>, public kit::toggleable, pub
 
     template <typename T = app_t> T *parent() const
     {
-        static_assert(std::is_base_of_v<T, app_t>, "Type must inherit from app class");
-        if constexpr (std::is_same_v<T, app_t>)
+        static_assert(std::is_base_of_v<app_t, T>, "Type must inherit from app class");
+        if constexpr (std::is_same_v<app_t, T>)
             return m_parent;
         else
             return dynamic_cast<T *>(m_parent);

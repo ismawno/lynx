@@ -78,6 +78,9 @@ template <typename Dim> class rect : public Dim::shape_t
     rect(const lynx::color &color);
 };
 
+using rect2D = rect<dimension::two>;
+using rect3D = rect<dimension::three>;
+
 template <typename Dim> class ellipse : public Dim::shape_t
 {
   public:
@@ -92,6 +95,9 @@ template <typename Dim> class ellipse : public Dim::shape_t
     float radius() const;
     void radius(float radius);
 };
+
+using ellipse2D = ellipse<dimension::two>;
+using ellipse3D = ellipse<dimension::three>;
 
 template <typename Dim> class polygon : public Dim::shape_t
 {
@@ -124,6 +130,9 @@ template <typename Dim> class polygon : public Dim::shape_t
     using shape_t::m_model;
     std::size_t m_size;
 };
+
+using polygon2D = polygon<dimension::two>;
+using polygon3D = polygon<dimension::three>;
 
 class ellipsoid3D : public shape3D
 {

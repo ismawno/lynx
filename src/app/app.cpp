@@ -136,6 +136,16 @@ template <typename Dim> void app<Dim>::shutdown()
     m_terminated = true;
 }
 
+template <typename Dim> const typename Dim::window_t *app<Dim>::window() const
+{
+    return m_window.get();
+}
+
+template <typename Dim> typename Dim::window_t *app<Dim>::window()
+{
+    return m_window.get();
+}
+
 template <typename Dim> kit::time app<Dim>::frame_time() const
 {
     return m_frame_time;

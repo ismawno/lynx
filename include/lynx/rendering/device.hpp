@@ -5,6 +5,7 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 #include "kit/interface/non_copyable.hpp"
+#include <GLFW/glfw3.h>
 
 namespace lynx
 {

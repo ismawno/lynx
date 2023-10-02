@@ -224,8 +224,8 @@ template <typename Dim> struct event
 using input2D = input<dimension::two>;
 using input3D = input<dimension::three>;
 
-using event2D = input<dimension::two>;
-using event3D = input<dimension::three>;
+using event2D = event<dimension::two>;
+using event3D = event<dimension::three>;
 
 } // namespace lynx
 

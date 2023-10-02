@@ -237,4 +237,7 @@ void window2D::clear_render_data()
     render_system2D::reset_z_offset_counter();
 }
 
+template class window<dimension::two>;
+template class window<dimension::three>;
+
 } // namespace lynx

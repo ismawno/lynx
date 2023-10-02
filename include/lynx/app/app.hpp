@@ -33,6 +33,9 @@ template <typename Dim> class app : kit::non_copyable
     bool next_frame();
     void shutdown();
 
+    const window_t *window() const;
+    window_t *window();
+
     kit::time frame_time() const;
 
     const std::vector<kit::scope<layer_t>> &layers() const;
@@ -87,25 +90,6 @@ template <typename Dim> class app : kit::non_copyable
     {
         static_assert(std::is_base_of_v<layer_t, T>, "Type must inherit from layer class");
         return pop_layer(ly->id);
-    }
-
-    template <typename T = window_t> const T *window() const
-    {
-        return kit::const_get_casted_raw_ptr<T>(m_window);
-    }
-
-    template <typename T = window_t> T *window()
-    {
-        return kit::get_casted_raw_ptr<T>(m_window);
-    }
-
-    template <typename T, class... Args> T *set_window(Args &&...args)
-    {
-        static_assert(std::is_base_of_v<window_t, T>, "Window type must inherit from window");
-        auto win = kit::make_scope<T>(std::forward<Args>(args)...);
-        T *ptr = win.get();
-        m_window = std::move(win);
-        return ptr;
     }
 
   private:
