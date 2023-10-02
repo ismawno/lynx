@@ -31,7 +31,7 @@ template <typename Dim> class window : kit::non_copyable, public kit::nameable
     using camera_t = typename Dim::camera_t;
     using vertex_t = vertex<Dim>;
     using drawable_t = drawable<Dim>;
-    using render_system_t = typename Dim::render_system_t;
+    using render_system_t = render_system<Dim>;
     using renderer_t = renderer<Dim>;
     using event_t = event<Dim>;
     using transform_t = typename Dim::transform_t;
@@ -39,7 +39,7 @@ template <typename Dim> class window : kit::non_copyable, public kit::nameable
     using input_t = input<Dim>;
 
     window(std::uint32_t width, std::uint32_t height, const char *name);
-    virtual ~window();
+    ~window();
 
     std::uint32_t screen_width() const;
     std::uint32_t screen_height() const;
@@ -150,7 +150,7 @@ template <typename Dim> class window : kit::non_copyable, public kit::nameable
 
   protected:
     bool m_maintain_camera_aspect_ratio = false;
-    virtual void clear_render_data();
+    void clear_render_data();
 
   private:
     std::uint32_t m_width, m_height;

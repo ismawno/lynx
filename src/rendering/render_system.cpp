@@ -88,6 +88,12 @@ typename render_system<Dim>::render_data render_system<Dim>::create_render_data(
 #ifdef DEBUG
     mdl->to_be_rendered = true;
 #endif
+
+    if constexpr (std::is_same_v<Dim, dimension::two>)
+    {
+        const float z_offset = 1.f - ++s_z_offset_counter2D * std::numeric_limits<float>::epsilon();
+        mdl_transform[3][2] = z_offset;
+    }
     return {mdl, mdl_transform, unowned};
 }
 
@@ -150,46 +156,51 @@ template <typename Dim> void render_system<Dim>::draw(const drawable_t &drawable
     drawable.draw(*this);
 }
 
-render_system2D::render_data render_system2D::create_render_data(const model_t *mdl, glm::mat4 &mdl_transform,
-                                                                 const bool unowned) const
-{
-    const float z_offset = 1.f - ++s_z_offset_counter * std::numeric_limits<float>::epsilon();
-    mdl_transform[3][2] = z_offset;
-    return render_system::create_render_data(mdl, mdl_transform, unowned);
-}
-
-void render_system2D::reset_z_offset_counter()
-{
-    s_z_offset_counter = 0;
-}
-
 template <typename Dim> void point_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
-    Dim::render_system_t::pipeline_config(config);
+    render_system<Dim>::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
 }
 
 template <typename Dim> void line_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
-    Dim::render_system_t::pipeline_config(config);
+    render_system<Dim>::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 }
 
 template <typename Dim> void line_strip_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
-    Dim::render_system_t::pipeline_config(config);
+    render_system<Dim>::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
 }
 
 template <typename Dim> void triangle_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
-    Dim::render_system_t::pipeline_config(config);
+    render_system<Dim>::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 }
 
 template <typename Dim> void triangle_strip_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
-    Dim::render_system_t::pipeline_config(config);
+    render_system<Dim>::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
 }
+
+template class render_system<dimension::two>;
+template class render_system<dimension::three>;
+
+template class point_render_system<dimension::two>;
+template class point_render_system<dimension::three>;
+
+template class line_render_system<dimension::two>;
+template class line_render_system<dimension::three>;
+
+template class line_strip_render_system<dimension::two>;
+template class line_strip_render_system<dimension::three>;
+
+template class triangle_render_system<dimension::two>;
+template class triangle_render_system<dimension::three>;
+
+template class triangle_strip_render_system<dimension::two>;
+template class triangle_strip_render_system<dimension::three>;
 } // namespace lynx

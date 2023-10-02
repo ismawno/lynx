@@ -33,7 +33,6 @@ template <typename Dim> class camera
 };
 
 using camera2D = camera<dimension::two>;
-
 class camera3D : public camera<dimension::three>
 {
   public:

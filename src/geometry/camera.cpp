@@ -212,4 +212,7 @@ void perspective3D::update_transformation_matrices()
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
 }
+
+template class camera<dimension::two>;
+template class camera<dimension::three>;
 } // namespace lynx

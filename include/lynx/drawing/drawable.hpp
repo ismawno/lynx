@@ -24,7 +24,7 @@ template <typename Dim> class drawable
   public:
     using window_t = window<Dim>;
     using model_t = typename Dim::model_t;
-    using render_system_t = typename Dim::render_system_t;
+    using render_system_t = render_system<Dim>;
 
     virtual ~drawable() = default;
 

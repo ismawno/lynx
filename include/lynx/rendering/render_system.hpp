@@ -43,7 +43,7 @@ template <typename Dim> class render_system
     void init(const kit::ref<const device> &dev, VkRenderPass render_pass);
     void render(VkCommandBuffer command_buffer, const camera_t &cam) const;
 
-    virtual render_data create_render_data(const model_t *mdl, glm::mat4 &transform, bool unowned = false) const;
+    render_data create_render_data(const model_t *mdl, glm::mat4 &transform, bool unowned = false) const;
     void push_render_data(const render_data &rdata);
     void clear_render_data();
 
@@ -64,41 +64,35 @@ template <typename Dim> class render_system
     kit::scope<pipeline> m_pipeline;
     VkPipelineLayout m_pipeline_layout;
     std::vector<render_data> m_render_data;
+
+    static inline std::uint32_t s_z_offset_counter2D = 0;
+    template <typename T> friend class window;
 };
 
-class render_system2D : public render_system<dimension::two>
-{
-  public:
-    render_data create_render_data(const model_t *mdl, glm::mat4 &transform, bool unowned = false) const override;
-    static void reset_z_offset_counter();
-
-  private:
-    static inline std::uint32_t s_z_offset_counter = 0;
-};
-
+using render_system2D = render_system<dimension::three>;
 using render_system3D = render_system<dimension::three>;
 
-template <typename Dim> class point_render_system : public Dim::render_system_t
+template <typename Dim> class point_render_system : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <typename Dim> class line_render_system : public Dim::render_system_t
+template <typename Dim> class line_render_system : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <typename Dim> class line_strip_render_system : public Dim::render_system_t
+template <typename Dim> class line_strip_render_system : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <typename Dim> class triangle_render_system : public Dim::render_system_t
+template <typename Dim> class triangle_render_system : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <typename Dim> class triangle_strip_render_system : public Dim::render_system_t
+template <typename Dim> class triangle_strip_render_system : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
