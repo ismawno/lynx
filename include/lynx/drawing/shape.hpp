@@ -21,7 +21,7 @@ template <typename Dim> class shape : public drawable<Dim>
   public:
     using transform_t = typename Dim::transform_t;
     using model_t = typename Dim::model_t;
-    using window_t = typename Dim::window_t;
+    using window_t = window<Dim>;
     using context_t = context<Dim>;
     using drawable_t = drawable<Dim>;
 

@@ -10,7 +10,7 @@ template <typename Dim> bool context<Dim>::valid()
     return s_window != nullptr;
 }
 
-template <typename Dim> typename Dim::window_t *context<Dim>::window()
+template <typename Dim> window<Dim> *context<Dim>::window()
 {
     KIT_ASSERT_ERROR(valid(), "Currento context is not valid")
     return s_window;

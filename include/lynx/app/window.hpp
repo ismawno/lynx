@@ -169,11 +169,7 @@ template <typename Dim> class window : kit::non_copyable, public kit::nameable
     void render(VkCommandBuffer command_buffer) const;
 };
 
-class window2D : public window<dimension::two>
-{
-    void clear_render_data() override;
-};
-
+using window2D = window<dimension::two>;
 using window3D = window<dimension::three>;
 
 } // namespace lynx

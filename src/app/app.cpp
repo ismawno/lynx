@@ -136,12 +136,12 @@ template <typename Dim> void app<Dim>::shutdown()
     m_terminated = true;
 }
 
-template <typename Dim> const typename Dim::window_t *app<Dim>::window() const
+template <typename Dim> const window<Dim> *app<Dim>::window() const
 {
     return m_window.get();
 }
 
-template <typename Dim> typename Dim::window_t *app<Dim>::window()
+template <typename Dim> window<Dim> *app<Dim>::window()
 {
     return m_window.get();
 }

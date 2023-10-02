@@ -18,7 +18,7 @@ namespace lynx
 template <typename Dim> class app : kit::non_copyable
 {
   public:
-    using window_t = typename Dim::window_t;
+    using window_t = window<Dim>;
     using layer_t = layer<Dim>;
     using context_t = context<Dim>;
     using input_t = input<Dim>;

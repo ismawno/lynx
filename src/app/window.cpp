@@ -43,7 +43,7 @@ template <typename Dim> void window<Dim>::init()
 
     context_t::set(this);
     m_device = kit::make_ref<lynx::device>(m_window);
-    m_renderer = kit::make_scope<lynx::renderer>(m_device, *this);
+    m_renderer = kit::make_scope<renderer_t>(m_device, *this);
 }
 
 template <typename Dim> bool window<Dim>::display(const std::function<void(VkCommandBuffer)> &submission)
@@ -105,6 +105,8 @@ template <typename Dim> void window<Dim>::clear_render_data()
     KIT_PERF_FUNCTION()
     for (const auto &sys : m_render_systems)
         sys->clear_render_data();
+    if constexpr (std::is_same_v<Dim, dimension::two>)
+        render_system_t::reset_z_offset_counter();
 }
 
 template <typename Dim> bool window<Dim>::was_resized() const
@@ -176,13 +178,13 @@ template <typename Dim> const kit::ref<const lynx::device> &window<Dim>::device(
 template <typename Dim>
 void window<Dim>::draw(const std::vector<vertex_t> &vertices, const topology tplg, const transform_t &transform)
 {
-    render_system_from_topology<render_system2D>(tplg)->draw(vertices, transform);
+    render_system_from_topology<render_system_t>(tplg)->draw(vertices, transform);
 }
 template <typename Dim>
 void window<Dim>::draw(const std::vector<vertex_t> &vertices, const std::vector<std::uint32_t> &indices,
                        const topology tplg, const transform_t &transform)
 {
-    render_system_from_topology<render_system2D>(tplg)->draw(vertices, indices, transform);
+    render_system_from_topology<render_system_t>(tplg)->draw(vertices, indices, transform);
 }
 template <typename Dim> void window<Dim>::draw(const drawable_t &drawable)
 {
@@ -229,12 +231,6 @@ template <typename Dim> VkExtent2D window<Dim>::extent() const
 template <typename Dim> bool window<Dim>::should_close() const
 {
     return !m_window || glfwWindowShouldClose(m_window);
-}
-
-void window2D::clear_render_data()
-{
-    window<dimension::two>::clear_render_data();
-    render_system2D::reset_z_offset_counter();
 }
 
 template class window<dimension::two>;

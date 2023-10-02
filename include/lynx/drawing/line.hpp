@@ -38,7 +38,7 @@ template <typename Dim> class thin_line : public line<Dim>
 {
   public:
     using vec_t = typename Dim::vec_t;
-    using window_t = typename Dim::window_t;
+    using window_t = window<Dim>;
     using transform_t = typename Dim::transform_t;
     using model_t = typename Dim::model_t;
     using context_t = context<Dim>;
@@ -82,7 +82,7 @@ template <typename Dim> class line_strip : public drawable<Dim>
 {
   public:
     using vec_t = typename Dim::vec_t;
-    using window_t = typename Dim::window_t;
+    using window_t = window<Dim>;
     using model_t = typename Dim::model_t;
     using vertex_t = vertex<Dim>;
     using context_t = context<Dim>;

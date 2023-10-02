@@ -17,7 +17,7 @@ class device;
 template <typename Dim> class renderer : kit::non_copyable
 {
   public:
-    using window_t = typename Dim::window_t;
+    using window_t = window<Dim>;
 
     renderer(const kit::ref<const device> &dev, window_t &win);
     ~renderer();

@@ -12,7 +12,7 @@ class device;
 template <typename Dim> class context
 {
   public:
-    using window_t = typename Dim::window_t;
+    using window_t = window<Dim>;
 
     static bool valid();
     static window_t *window();

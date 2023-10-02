@@ -18,7 +18,7 @@ template <typename Dim> class input
 {
   public:
     input() = delete;
-    using window_t = typename Dim::window_t;
+    using window_t = window<Dim>;
     using event_t = event<Dim>;
     using context_t = context<Dim>;
 
