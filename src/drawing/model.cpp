@@ -221,7 +221,7 @@ typename model<Dim>::vertex_index_pair model<Dim>::circle(const std::uint32_t pa
     KIT_ASSERT_ERROR(partitions > 2, "Must at least have 3 partitions. Current: {0}", partitions)
 
     vertex_index_pair build;
-    build.vertices.emplace_back(vertex_t(0.f), color);
+    build.vertices.emplace_back(vec_t(0.f), color);
     build.indices.resize(3 * partitions);
     build.vertices.reserve(partitions);
 
@@ -229,10 +229,10 @@ typename model<Dim>::vertex_index_pair model<Dim>::circle(const std::uint32_t pa
     for (std::uint32_t i = 0; i < partitions; i++)
     {
         const float angle = i * dangle;
-        if constexpr (std::is_same_v<vertex_t, glm::vec2>)
-            build.vertices.emplace_back(vertex_t(cosf(angle), sinf(angle)), color);
+        if constexpr (std::is_same_v<vec_t, glm::vec2>)
+            build.vertices.emplace_back(vec_t(cosf(angle), sinf(angle)), color);
         else
-            build.vertices.emplace_back(vertex_t(cosf(angle), sinf(angle), 0.f), color);
+            build.vertices.emplace_back(vec_t(cosf(angle), sinf(angle), 0.f), color);
         build.indices[3 * i] = 0;
         build.indices[3 * i + 1] = i + 1;
         build.indices[3 * i + 2] = i + 2;
@@ -268,7 +268,7 @@ typename model<Dim>::vertex_index_pair model<Dim>::polygon(const std::vector<vec
     std::vector<vertex_t> colored_vertices;
     colored_vertices.reserve(local_vertices.size());
 
-    for (const vertex_t &v : local_vertices)
+    for (const vec_t &v : local_vertices)
         colored_vertices.emplace_back(v, color);
     return model::polygon(colored_vertices, color);
 }
@@ -352,5 +352,8 @@ model3D::vertex_index_pair model3D::cube(const color &color)
         {0, 1, 2, 0, 3, 1, 4, 5, 6, 4, 7, 5, 0, 6, 2, 0, 4, 6, 3, 5, 1, 3, 7, 5, 2, 5, 1, 2, 6, 5, 0, 7, 3, 0, 4, 7}};
     return build;
 }
+
+template class model<dimension::two>;
+template class model<dimension::three>;
 
 } // namespace lynx

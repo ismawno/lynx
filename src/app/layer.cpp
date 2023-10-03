@@ -23,6 +23,9 @@ template <typename Dim> bool layer<Dim>::decode(const YAML::Node &node)
     enabled = node["Enabled"].as<bool>();
     return true;
 }
+
+template class layer<dimension::two>;
+template class layer<dimension::three>;
 } // namespace lynx
 
 #endif

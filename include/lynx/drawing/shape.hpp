@@ -24,6 +24,7 @@ template <typename Dim> class shape : public drawable<Dim>
     using window_t = window<Dim>;
     using context_t = context<Dim>;
     using drawable_t = drawable<Dim>;
+    using vertex_t = vertex<Dim>;
 
     template <class... ModelArgs>
     shape(topology tplg, ModelArgs &&...args)
@@ -123,8 +124,11 @@ template <typename Dim> class polygon : public Dim::shape_t
     std::size_t size() const;
 
     const lynx::color &color(std::size_t index = 0) const; // APLICAR A POLYGON3D
-    void color(const lynx::color &color);                  // Getter y setter para el center color
+    void color(const lynx::color &color);                  // Bc it overwrites base
     void color(std::size_t index, const lynx::color &color);
+
+    const lynx::color &center_color() const;
+    void center_color(const lynx::color &color);
 
   private:
     using shape_t::m_model;

@@ -12,7 +12,7 @@ template <typename Dim> const color &shape<Dim>::color() const
 }
 template <typename Dim> void shape<Dim>::color(const lynx::color &color)
 {
-    const auto feach = [&color](std::size_t, vertex2D &vtx) { vtx.color = color; };
+    const auto feach = [&color](std::size_t, vertex_t &vtx) { vtx.color = color; };
     m_model.update_vertex_buffer(feach);
 }
 
@@ -71,7 +71,7 @@ rect<Dim>::rect(const vec_t &position, const glm::vec2 &dimensions, const lynx::
 }
 
 template <typename Dim>
-rect<Dim>::rect(const lynx::color &color) : shape2D(topology::TRIANGLE_LIST, shape_t::model_t::rect(color))
+rect<Dim>::rect(const lynx::color &color) : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::rect(color))
 {
 }
 
@@ -163,12 +163,12 @@ void polygon<Dim>::update_vertices(const std::function<void(std::size_t, vertex_
 
 template <typename Dim> const lynx::color &polygon<Dim>::color(std::size_t index) const
 {
-    return m_model.read_vertex(index).color;
+    return m_model.read_vertex(index + 1).color;
 }
 
 template <typename Dim> void polygon<Dim>::color(const lynx::color &color)
 {
-    shape2D::color(color);
+    shape_t::color(color);
 }
 
 template <typename Dim> void polygon<Dim>::color(std::size_t index, const lynx::color &color)
@@ -179,6 +179,18 @@ template <typename Dim> void polygon<Dim>::color(std::size_t index, const lynx::
     vertex_t v = m_model.read_vertex(index + 1);
     v.color = color;
     m_model.write_vertex(index + 1, v);
+}
+
+template <typename Dim> const lynx::color &polygon<Dim>::center_color() const
+{
+    return m_model.read_vertex(0).color;
+}
+
+template <typename Dim> void polygon<Dim>::center_color(const lynx::color &color)
+{
+    vertex_t v = m_model.read_vertex(0);
+    v.color = color;
+    m_model.write_vertex(0, v); //+1 to account for center vertex
 }
 
 template <typename Dim> std::size_t polygon<Dim>::size() const
@@ -224,4 +236,16 @@ cube3D::cube3D(const glm::vec3 &position, const glm::vec3 &dimensions, const lyn
 cube3D::cube3D(const lynx::color &color) : shape3D(topology::TRIANGLE_LIST, model3D::cube(color))
 {
 }
+
+template class shape<dimension::two>;
+template class shape<dimension::three>;
+
+template class rect<dimension::two>;
+template class rect<dimension::three>;
+
+template class ellipse<dimension::two>;
+template class ellipse<dimension::three>;
+
+template class polygon<dimension::two>;
+template class polygon<dimension::three>;
 } // namespace lynx

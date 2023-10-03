@@ -279,4 +279,7 @@ template <typename Dim> void app<Dim>::imgui_shutdown()
 }
 #endif
 
+template class app<dimension::two>;
+template class app<dimension::three>;
+
 } // namespace lynx

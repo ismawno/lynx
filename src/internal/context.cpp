@@ -22,8 +22,11 @@ template <typename Dim> const kit::ref<const device> &context<Dim>::device()
     return s_window->device();
 }
 
-template <typename Dim> void context<Dim>::set(const window_t *window)
+template <typename Dim> void context<Dim>::set(window_t *window)
 {
-    return s_window = window;
+    s_window = window;
 }
+
+template class context<dimension::two>;
+template class context<dimension::three>;
 } // namespace lynx

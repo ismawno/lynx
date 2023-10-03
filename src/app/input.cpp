@@ -12,8 +12,8 @@ template <typename Dim> void input<Dim>::poll_events()
 
 template <typename Dim> bool input<Dim>::key_pressed(const key kc)
 {
-    const window_t *win = context_t::current()->window();
-    KIT_ASSERT_ERROR(context_t::current()->valid(), "Trying to get input feedback with a non valid current context")
+    const window_t *win = context_t::window();
+    KIT_ASSERT_ERROR(context_t::valid(), "Trying to get input feedback with a non valid current context")
     if (!win)
         return false;
     return key_pressed(*win, kc);
@@ -25,8 +25,8 @@ template <typename Dim> bool input<Dim>::key_pressed(const window_t &win, const 
 
 template <typename Dim> bool input<Dim>::mouse_button_pressed(const mouse btn)
 {
-    const window_t *win = context_t::current()->window();
-    KIT_ASSERT_ERROR(context_t::current()->valid(), "Trying to get input feedback with a non valid current context")
+    const window_t *win = context_t::window();
+    KIT_ASSERT_ERROR(context_t::valid(), "Trying to get input feedback with a non valid current context")
     if (!win)
         return false;
     return mouse_button_pressed(*win, btn);
@@ -39,8 +39,8 @@ template <typename Dim> bool input<Dim>::mouse_button_pressed(const window_t &wi
 template <typename Dim> glm::vec2 input<Dim>::mouse_position()
 {
     static glm::vec2 screen_mouse{0.f};
-    const window_t *win = context_t::current()->window();
-    KIT_ASSERT_ERROR(context_t::current()->valid(), "Trying to get input feedback with a non valid current context")
+    const window_t *win = context_t::window();
+    KIT_ASSERT_ERROR(context_t::valid(), "Trying to get input feedback with a non valid current context")
     if (!win)
         return screen_mouse;
 
@@ -133,4 +133,7 @@ template <typename Dim> void input<Dim>::install_callbacks(window_t *win)
     glfwSetMouseButtonCallback(win->glfw_window(), mouse_button_callback<Dim>);
     glfwSetScrollCallback(win->glfw_window(), scroll_callback<Dim>);
 }
+
+template class input<dimension::two>;
+template class input<dimension::three>;
 } // namespace lynx

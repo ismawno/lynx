@@ -17,4 +17,7 @@ template <typename Dim> void drawable<Dim>::default_draw_no_transform(window_t &
 {
     default_draw(win, mdl, glm::mat4(1.f), tplg);
 }
+
+template class drawable<dimension::two>;
+template class drawable<dimension::three>;
 } // namespace lynx

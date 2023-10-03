@@ -17,7 +17,7 @@ template <typename Dim> class context
     static bool valid();
     static window_t *window();
     static const kit::ref<const device> &device();
-    static void set(const window_t *win);
+    static void set(window_t *win);
 
   private:
     static inline window_t *s_window = nullptr;

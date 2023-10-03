@@ -24,7 +24,10 @@ template <typename Dim> class app : kit::non_copyable
     using input_t = input<Dim>;
     using event_t = event<Dim>;
 
-    app() = default;
+    template <class... WindowArgs> app(WindowArgs &&...args)
+    {
+        m_window = kit::make_scope<window_t>(std::forward<WindowArgs>(args)...);
+    }
     virtual ~app();
 
     void run();

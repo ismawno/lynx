@@ -20,4 +20,7 @@ template <typename Dim> std::vector<VkVertexInputAttributeDescription> vertex<Di
         return {{0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex3D, position)},
                 {1, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(vertex3D, color)}};
 }
+
+template struct vertex<dimension::two>;
+template struct vertex<dimension::three>;
 } // namespace lynx

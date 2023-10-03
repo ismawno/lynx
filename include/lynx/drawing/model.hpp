@@ -94,7 +94,6 @@ template <typename Dim> class model
 };
 
 using model2D = model<dimension::two>;
-
 class model3D : public model<dimension::three>
 {
   public:

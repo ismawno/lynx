@@ -8,8 +8,7 @@ namespace lynx
 {
 template <typename Dim>
 thin_line<Dim>::thin_line(const vec_t &p1, const vec_t &p2, const lynx::color &color1, const lynx::color &color2)
-    : m_p1(p1), m_p2(p2), m_transform(as_transform()),
-      m_model(context_t::current()->device(), model_t::line(color1, color2))
+    : m_p1(p1), m_p2(p2), m_transform(as_transform()), m_model(context_t::device(), model_t::line(color1, color2))
 {
 }
 template <typename Dim>
@@ -100,11 +99,11 @@ static std::vector<T2> to_vertex_array(const std::vector<T1> &points, const colo
 
 template <typename Dim>
 line_strip<Dim>::line_strip(const std::vector<vec_t> &points, const lynx::color &color)
-    : m_model(context_t::current()->device(), to_vertex_array<vec_t, vertex_t>(points, color))
+    : m_model(context_t::device(), to_vertex_array<vec_t, vertex_t>(points, color))
 {
 }
 template <typename Dim>
-line_strip<Dim>::line_strip(const std::vector<vertex_t> &points) : m_model(context_t::current()->device(), points)
+line_strip<Dim>::line_strip(const std::vector<vertex_t> &points) : m_model(context_t::device(), points)
 {
 }
 
@@ -168,4 +167,10 @@ template <typename Dim> void line_strip<Dim>::color(std::size_t index, const lyn
     v.color = color;
     m_model.write_vertex(index, v);
 }
+
+template class thin_line<dimension::two>;
+template class thin_line<dimension::three>;
+
+template class line_strip<dimension::two>;
+template class line_strip<dimension::three>;
 } // namespace lynx

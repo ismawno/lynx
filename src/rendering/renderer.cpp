@@ -173,4 +173,7 @@ void renderer<Dim>::immediate_submission(const std::function<void(VkCommandBuffe
     submission(command_buffer);
     m_device->end_single_time_commands(command_buffer);
 }
+
+template class renderer<dimension::two>;
+template class renderer<dimension::three>;
 } // namespace lynx
