@@ -56,30 +56,24 @@ template <typename Dim> void thin_line<Dim>::p2(const vec_t &p2)
 }
 template <typename Dim> const color &thin_line<Dim>::color1() const
 {
-    return m_model.read_vertex(0).color;
+    return m_model.vertex(0).color;
 }
 template <typename Dim> const color &thin_line<Dim>::color2() const
 {
-    return m_model.read_vertex(1).color;
+    return m_model.vertex(1).color;
 }
 template <typename Dim> const color &thin_line<Dim>::color() const
 {
-    return m_model.read_vertex(0).color;
+    return m_model.vertex(0).color;
 }
 
-template <typename T> void update_vertex_color(const std::size_t index, T &model, const color &color)
-{
-    auto vertex = model[index];
-    vertex.color = color;
-    model.write_vertex(index, vertex);
-}
 template <typename Dim> void thin_line<Dim>::color1(const lynx::color &color1)
 {
-    update_vertex_color(0, m_model, color1);
+    m_model.vertex_data()[0].color = color1;
 }
 template <typename Dim> void thin_line<Dim>::color2(const lynx::color &color2)
 {
-    update_vertex_color(1, m_model, color2);
+    m_model.vertex_data()[1].color = color2;
 }
 template <typename Dim> void thin_line<Dim>::color(const lynx::color &color)
 {
@@ -119,53 +113,28 @@ template <typename Dim> void line_strip<Dim>::draw(window_t &win) const
 
 template <typename Dim> const vertex<Dim> &line_strip<Dim>::operator[](const std::size_t index) const
 {
-    return point(index);
-}
-template <typename Dim> const vertex<Dim> &line_strip<Dim>::point(const std::size_t index) const
-{
-    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
-                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
-    return m_model.read_vertex(index);
+    KIT_ASSERT_ERROR(index < m_model.vertex_count(), "Index exceeds model's vertices count! Index: {0}, vertices: {1}",
+                     index, m_model.vertex_count())
+    return m_model.vertex(index);
 }
 
-template <typename Dim> void line_strip<Dim>::point(const std::size_t index, const vertex_t &vertex)
+template <typename Dim> vertex<Dim> &line_strip<Dim>::operator[](const std::size_t index)
 {
-    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
-                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
-    m_model.write_vertex(index, vertex);
-}
-template <typename Dim> void line_strip<Dim>::point(const std::size_t index, const vec_t &position)
-{
-    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
-                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
-    vertex_t v = m_model.read_vertex(index);
-    v.position = position;
-    m_model.write_vertex(index, v);
+    KIT_ASSERT_ERROR(index < m_model.vertex_count(), "Index exceeds model's vertices count! Index: {0}, vertices: {1}",
+                     index, m_model.vertex_count())
+    return m_model.vertex_data()[index];
 }
 
-template <typename Dim>
-void line_strip<Dim>::update_points(const std::function<void(std::size_t, vertex_t &)> &for_each_fn)
+template <typename Dim> const color &line_strip<Dim>::color() const
 {
-    m_model.update_vertex_buffer(for_each_fn);
-}
-
-template <typename Dim> const color &line_strip<Dim>::color(const std::size_t index) const
-{
-    return m_model.read_vertex(index).color;
+    return m_model.vertex(0).color;
 }
 
 template <typename Dim> void line_strip<Dim>::color(const lynx::color &color)
 {
-    const auto feach = [&color](std::size_t, vertex_t &vtx) { vtx.color = color; };
-    m_model.update_vertex_buffer(feach);
-}
-template <typename Dim> void line_strip<Dim>::color(std::size_t index, const lynx::color &color)
-{
-    KIT_ASSERT_ERROR(index < m_model.vertices_count(),
-                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index, m_model.vertices_count())
-    vertex_t v = m_model.read_vertex(index);
-    v.color = color;
-    m_model.write_vertex(index, v);
+    vertex_t *vdata = m_model.vertex_data();
+    for (std::size_t i = 0; i < m_model.vertex_count(); i++)
+        vdata[i].color = color;
 }
 
 template class thin_line<dimension::two>;

@@ -8,9 +8,13 @@ template <typename Dim>
 model<Dim>::model(const kit::ref<const device> &dev, const std::vector<vertex_t> &vertices) : m_device(dev)
 {
     KIT_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
-    create_vertex_buffer(vertices);
-    m_device_index_buffer = nullptr;
-    m_host_index_buffer = nullptr;
+    m_vertex_buffer = kit::make_scope<vertex_buffer_t>(
+        m_device, vertices.size(), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+    m_vertex_data = m_vertex_buffer->map();
+    for (std::size_t i = 0; i < vertices.size(); i++)
+        m_vertex_data[i] = vertices[i];
+    m_index_buffer = nullptr;
 }
 
 template <typename Dim>
@@ -20,8 +24,19 @@ model<Dim>::model(const kit::ref<const device> &dev, const std::vector<vertex_t>
 {
     KIT_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
     KIT_ASSERT_ERROR(!indices.empty(), "If specified, indices must not be empty")
-    create_vertex_buffer(vertices);
-    create_index_buffer(indices);
+    m_vertex_buffer = kit::make_scope<vertex_buffer_t>(
+        m_device, vertices.size(), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+    m_vertex_data = m_vertex_buffer->map();
+    for (std::size_t i = 0; i < vertices.size(); i++)
+        m_vertex_data[i] = vertices[i];
+
+    m_index_buffer = kit::make_scope<index_buffer>(
+        m_device, indices.size(), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+    m_index_data = m_index_buffer->map();
+    for (std::size_t i = 0; i < indices.size(); i++)
+        m_index_data[i] = indices[i];
 }
 
 template <typename Dim>
@@ -34,6 +49,7 @@ template <typename Dim> model<Dim>::model(const model &other)
 {
     copy(other);
 }
+
 template <typename Dim> model<Dim> &model<Dim>::operator=(const model &other)
 {
     copy(other);
@@ -43,26 +59,11 @@ template <typename Dim> model<Dim> &model<Dim>::operator=(const model &other)
 template <typename Dim> void model<Dim>::copy(const model &other)
 {
     m_device = other.m_device;
-    std::vector<vertex_t> vertices;
-    vertices.reserve(other.m_host_vertex_buffer->instance_count());
+    m_vertex_buffer = kit::make_scope<vertex_buffer_t>(*other.m_vertex_buffer);
+    m_index_buffer = other.has_index_buffers() ? kit::make_scope<index_buffer>(*other.m_index_buffer) : nullptr;
 
-    for (std::size_t i = 0; i < other.m_host_vertex_buffer->instance_count(); i++)
-        vertices.push_back(other.read_vertex(i));
-    create_vertex_buffer(vertices);
-
-    if (!other.has_index_buffers())
-    {
-        m_device_index_buffer = nullptr;
-        m_host_index_buffer = nullptr;
-        return;
-    }
-
-    std::vector<std::uint32_t> indices;
-    indices.reserve(other.m_host_index_buffer->instance_count());
-
-    for (std::size_t i = 0; i < other.m_host_index_buffer->instance_count(); i++)
-        indices.push_back(other.read_index(i));
-    create_index_buffer(indices);
+    m_vertex_data = m_vertex_buffer->data();
+    m_index_data = other.has_index_buffers() ? m_index_buffer->data() : nullptr;
 }
 
 #ifdef DEBUG
@@ -74,118 +75,74 @@ template <typename Dim> model<Dim>::~model()
 }
 #endif
 
-template <typename T>
-static void create_buffer(const kit::ref<const device> &dev, const std::vector<T> &data, VkBufferUsageFlags usage,
-                          kit::scope<buffer> &device_buffer, kit::scope<buffer> &host_buffer)
-{
-    host_buffer =
-        kit::make_scope<buffer>(dev, sizeof(T), data.size(), (VkBufferUsageFlags)VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                (VkMemoryPropertyFlags)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
-    host_buffer->map();
-    host_buffer->write((void *)data.data());
-    host_buffer->flush();
-
-    device_buffer = kit::make_scope<buffer>(dev, sizeof(T), data.size(), usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-                                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    device_buffer->write(*host_buffer);
-}
-
-template <typename Dim> void model<Dim>::create_vertex_buffer(const std::vector<vertex_t> &vertices)
-{
-    create_buffer(m_device, vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, m_device_vertex_buffer, m_host_vertex_buffer);
-}
-
-template <typename Dim> void model<Dim>::create_index_buffer(const std::vector<std::uint32_t> &indices)
-{
-    create_buffer(m_device, indices, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, m_device_index_buffer, m_host_index_buffer);
-}
-
 template <typename Dim> void model<Dim>::bind(VkCommandBuffer command_buffer) const
 {
-    const std::array<VkBuffer, 1> buffers = {m_device_vertex_buffer->vulkan_buffer()};
+    const std::array<VkBuffer, 1> buffers = {m_vertex_buffer->vulkan_buffer()};
     const std::array<VkDeviceSize, 1> offsets = {0};
     vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers.data(), offsets.data());
 
-    if (m_device_index_buffer)
-        vkCmdBindIndexBuffer(command_buffer, m_device_index_buffer->vulkan_buffer(), 0, VK_INDEX_TYPE_UINT32);
+    if (m_index_buffer)
+        vkCmdBindIndexBuffer(command_buffer, m_index_buffer->vulkan_buffer(), 0, VK_INDEX_TYPE_UINT32);
 }
 template <typename Dim> void model<Dim>::draw(VkCommandBuffer command_buffer) const
 {
     if (has_index_buffers())
-        vkCmdDrawIndexed(command_buffer, (std::uint32_t)m_device_index_buffer->instance_count(), 1, 0, 0, 0);
+        vkCmdDrawIndexed(command_buffer, (std::uint32_t)m_index_buffer->size(), 1, 0, 0, 0);
     else
-        vkCmdDraw(command_buffer, (std::uint32_t)m_device_vertex_buffer->instance_count(), 1, 0, 0);
+        vkCmdDraw(command_buffer, (std::uint32_t)m_vertex_buffer->size(), 1, 0, 0);
 }
 
 template <typename Dim> bool model<Dim>::has_index_buffers() const
 {
-    return m_device_index_buffer && m_host_index_buffer;
+    return m_index_data && m_index_buffer;
 }
 
-template <typename T>
-static void update_buffer(const std::function<void(std::size_t, T &)> &for_each_fn, buffer &host_buffer,
-                          buffer &device_buffer)
+template <typename Dim> const vertex<Dim> *model<Dim>::vertex_data() const
 {
-    if (for_each_fn)
-    {
-        for (std::size_t i = 0; i < host_buffer.instance_count(); i++)
-            for_each_fn(i, host_buffer.read_at_index<T>(i));
-        host_buffer.flush();
-    }
-    device_buffer.write(host_buffer);
+    return m_vertex_data;
+}
+template <typename Dim> vertex<Dim> *model<Dim>::vertex_data()
+{
+    return m_vertex_data;
 }
 
-template <typename Dim>
-void model<Dim>::update_vertex_buffer(const std::function<void(std::size_t, vertex_t &)> &for_each_fn)
+template <typename Dim> const std::uint32_t *model<Dim>::index_data() const
 {
-    update_buffer(for_each_fn, *m_host_vertex_buffer, *m_device_vertex_buffer);
+    KIT_ASSERT_ERROR(has_index_buffers(), "Current model does not contain an index buffer!")
+    return m_index_data;
 }
-template <typename Dim>
-void model<Dim>::update_index_buffer(const std::function<void(std::size_t, std::uint32_t &)> &for_each_fn)
+template <typename Dim> std::uint32_t *model<Dim>::index_data()
 {
-    KIT_ASSERT_ERROR(has_index_buffers(), "Cannot update index buffer in a model that does not have index buffers")
-    update_buffer(for_each_fn, *m_host_index_buffer, *m_device_index_buffer);
-}
-
-template <typename Dim> std::size_t model<Dim>::vertices_count() const
-{
-    return m_host_vertex_buffer->instance_count();
+    KIT_ASSERT_ERROR(has_index_buffers(), "Current model does not contain an index buffer!")
+    return m_index_data;
 }
 
-template <typename Dim> std::size_t model<Dim>::indices_count() const
+template <typename Dim> const vertex<Dim> &model<Dim>::vertex(const std::size_t index) const
 {
-    return m_host_index_buffer ? m_host_index_buffer->instance_count() : 0;
+    return m_vertex_data[index];
+}
+template <typename Dim> void model<Dim>::vertex(const std::size_t index, const vertex_t &vtx)
+{
+    m_vertex_data[index] = vtx;
 }
 
-template <typename Dim> void model<Dim>::write_vertex(const std::size_t buffer_index, const vertex_t &vertex)
+template <typename Dim> std::uint32_t model<Dim>::index(const std::size_t index) const
 {
-    m_host_vertex_buffer->write_at_index(&vertex, buffer_index);
-    m_host_vertex_buffer->flush_at_index(buffer_index);
-    update_vertex_buffer();
+    return m_index_data[index];
+}
+template <typename Dim> void model<Dim>::index(const std::size_t index, const std::uint32_t idx)
+{
+    m_index_data[index] = idx;
 }
 
-template <typename Dim> void model<Dim>::write_index(const std::size_t buffer_index, const std::uint32_t index)
+template <typename Dim> std::size_t model<Dim>::vertex_count() const
 {
-    KIT_ASSERT_ERROR(has_index_buffers(), "Cannot write to index buffer in a model that does not have index buffers")
-    m_host_index_buffer->write_at_index(&index, buffer_index);
-    m_host_index_buffer->flush_at_index(buffer_index);
-    update_index_buffer();
+    return m_vertex_buffer->size();
 }
 
-template <typename Dim> const vertex<Dim> &model<Dim>::read_vertex(const std::size_t buffer_index) const
+template <typename Dim> std::size_t model<Dim>::index_count() const
 {
-    return m_host_vertex_buffer->read_at_index<vertex_t>(buffer_index);
-}
-
-template <typename Dim> const vertex<Dim> &model<Dim>::operator[](const std::size_t index) const
-{
-    return read_vertex(index);
-}
-
-template <typename Dim> std::uint32_t model<Dim>::read_index(const std::size_t buffer_index) const
-{
-    KIT_ASSERT_ERROR(has_index_buffers(), "Cannot write to index buffer in a model that does not have index buffers")
-    return m_host_index_buffer->read_at_index<std::uint32_t>(buffer_index);
+    return m_index_buffer ? m_index_buffer->size() : 0;
 }
 
 template <typename Dim> typename model<Dim>::vertex_index_pair model<Dim>::rect(const color &color)

@@ -5,7 +5,8 @@
 #include "kit/memory/scope.hpp"
 #include "lynx/internal/dimension.hpp"
 #include "lynx/drawing/color.hpp"
-#include "lynx/rendering/buffer.hpp"
+#include "lynx/buffer/vertex_buffer.hpp"
+#include "lynx/buffer/index_buffer.hpp"
 #include "lynx/geometry/vertex.hpp"
 
 #include <functional>
@@ -25,6 +26,7 @@ template <typename Dim> class model
 {
   public:
     using vertex_t = vertex<Dim>;
+    using vertex_buffer_t = vertex_buffer<Dim>;
     using vec_t = typename Dim::vec_t;
 
     struct vertex_index_pair
@@ -53,18 +55,20 @@ template <typename Dim> class model
 
     bool has_index_buffers() const;
 
-    void write_vertex(std::size_t buffer_index, const vertex_t &vertex);
-    void write_index(std::size_t buffer_index, std::uint32_t index);
+    const vertex_t *vertex_data() const;
+    vertex_t *vertex_data();
 
-    const vertex_t &read_vertex(std::size_t buffer_index) const;
-    std::uint32_t read_index(std::size_t buffer_index) const;
-    const vertex_t &operator[](std::size_t index) const;
+    const std::uint32_t *index_data() const;
+    std::uint32_t *index_data();
 
-    void update_vertex_buffer(const std::function<void(std::size_t, vertex_t &)> &for_each_fn = nullptr);
-    void update_index_buffer(const std::function<void(std::size_t, std::uint32_t &)> &for_each_fn = nullptr);
+    const vertex_t &vertex(std::size_t index) const;
+    void vertex(std::size_t index, const vertex_t &vtx);
 
-    std::size_t vertices_count() const;
-    std::size_t indices_count() const;
+    std::uint32_t index(std::size_t index) const;
+    void index(std::size_t index, std::uint32_t idx);
+
+    std::size_t vertex_count() const;
+    std::size_t index_count() const;
 
     static vertex_index_pair rect(const color &color);
     static std::vector<vertex_t> line(const color &color1, const color &color2);
@@ -78,19 +82,17 @@ template <typename Dim> class model
 
   protected:
     model() = default;
-    void copy(const model &other);
 
   private:
     kit::ref<const device> m_device;
 
-    kit::scope<buffer> m_device_vertex_buffer;
-    kit::scope<buffer> m_host_vertex_buffer;
+    kit::scope<vertex_buffer_t> m_vertex_buffer;
+    kit::scope<index_buffer> m_index_buffer;
 
-    kit::scope<buffer> m_device_index_buffer;
-    kit::scope<buffer> m_host_index_buffer;
+    vertex_t *m_vertex_data = nullptr;
+    std::uint32_t *m_index_data = nullptr;
 
-    void create_vertex_buffer(const std::vector<vertex_t> &vertices);
-    void create_index_buffer(const std::vector<std::uint32_t> &indices);
+    void copy(const model &other);
 };
 
 using model2D = model<dimension::two>;

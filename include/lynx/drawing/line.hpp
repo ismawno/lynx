@@ -95,16 +95,10 @@ template <typename Dim> class line_strip : public drawable<Dim>
     void draw(window_t &win) const override;
 
     const vertex_t &operator[](std::size_t index) const;
-    const vertex_t &point(std::size_t index) const;
+    vertex_t &operator[](std::size_t index);
 
-    void point(std::size_t index, const vertex_t &vertex);
-    void point(std::size_t index, const vec_t &position);
-
-    void update_points(const std::function<void(std::size_t, vertex_t &)> &for_each_fn);
-
-    const color &color(std::size_t index = 0) const;
+    const color &color() const;
     void color(const lynx::color &color);
-    void color(std::size_t index, const lynx::color &color);
 
   private:
     model_t m_model;

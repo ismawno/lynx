@@ -8,12 +8,13 @@ namespace lynx
 {
 template <typename Dim> const color &shape<Dim>::color() const
 {
-    return m_model.read_vertex(0).color;
+    return m_model.vertex(0).color;
 }
 template <typename Dim> void shape<Dim>::color(const lynx::color &color)
 {
-    const auto feach = [&color](std::size_t, vertex_t &vtx) { vtx.color = color; };
-    m_model.update_vertex_buffer(feach);
+    vertex_t *vdata = m_model.vertex_data();
+    for (std::size_t i = 0; i < m_model.vertex_count(); i++)
+        vdata[i].color = color;
 }
 
 template <typename Dim> void shape<Dim>::draw(window_t &win) const
@@ -23,12 +24,13 @@ template <typename Dim> void shape<Dim>::draw(window_t &win) const
 
 const color &shape2D::outline_color() const
 {
-    return m_outline_model.read_vertex(0).color;
+    return m_outline_model.vertex(0).color;
 }
 void shape2D::outline_color(const lynx::color &color)
 {
-    const auto feach = [&color](std::size_t, vertex2D &vtx) { vtx.color = color; };
-    m_outline_model.update_vertex_buffer(feach);
+    vertex2D *vdata = m_outline_model.vertex_data();
+    for (std::size_t i = 0; i < m_outline_model.vertex_count(); i++)
+        vdata[i].color = color;
 }
 
 void shape2D::draw_outline_thickness(window_t &win) const
@@ -36,9 +38,9 @@ void shape2D::draw_outline_thickness(window_t &win) const
     kit::transform2D outline_transform = transform;
     glm::vec2 mm{FLT_MAX}, mx{-FLT_MAX};
 
-    for (std::size_t i = 0; i < m_outline_model.vertices_count(); i++)
+    for (std::size_t i = 0; i < m_outline_model.vertex_count(); i++)
     {
-        const glm::vec2 vertex = m_outline_model.read_vertex(i).position;
+        const glm::vec2 &vertex = m_outline_model.vertex(i).position;
         mm.x = glm::min(mm.x, vertex.x);
         mm.y = glm::min(mm.y, vertex.y);
         mx.x = glm::max(mx.x, vertex.x);
@@ -127,70 +129,27 @@ polygon<Dim>::polygon(const lynx::color &color) : polygon({vec_t(0.f), vec_t(0.f
 
 template <typename Dim> const vertex<Dim> &polygon<Dim>::operator[](const std::size_t index) const
 {
-    return vertex(index);
-}
-
-template <typename Dim> const vertex<Dim> &polygon<Dim>::vertex(const std::size_t index) const
-{
-    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
+    KIT_ASSERT_ERROR(index < m_model.vertex_count() - 1,
                      "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
-                     m_model.vertices_count() - 1)
-    return m_model.read_vertex(index + 1); // +1 to account for center vertex
+                     m_model.vertex_count() - 1)
+    return m_model.vertex(index + 1); // +1 to account for center vertex
 }
-
-template <typename Dim> void polygon<Dim>::vertex(std::size_t index, const vertex_t &vertex)
+template <typename Dim> vertex<Dim> &polygon<Dim>::operator[](const std::size_t index)
 {
-    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
+    KIT_ASSERT_ERROR(index < m_model.vertex_count() - 1,
                      "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
-                     m_model.vertices_count() - 1)
-    m_model.write_vertex(index + 1, vertex);
-}
-template <typename Dim> void polygon<Dim>::vertex(const std::size_t index, const vec_t &vertex)
-{
-    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
-                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
-                     m_model.vertices_count() - 1)
-    vertex_t v = m_model.read_vertex(index + 1);
-    v.position = vertex;
-    m_model.write_vertex(index + 1, v); //+1 to account for center vertex
-}
-
-template <typename Dim>
-void polygon<Dim>::update_vertices(const std::function<void(std::size_t, vertex_t &)> &for_each_fn)
-{
-    m_model.update_vertex_buffer(for_each_fn);
-}
-
-template <typename Dim> const lynx::color &polygon<Dim>::color(std::size_t index) const
-{
-    return m_model.read_vertex(index + 1).color;
-}
-
-template <typename Dim> void polygon<Dim>::color(const lynx::color &color)
-{
-    shape_t::color(color);
-}
-
-template <typename Dim> void polygon<Dim>::color(std::size_t index, const lynx::color &color)
-{
-    KIT_ASSERT_ERROR(index < m_model.vertices_count() - 1,
-                     "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
-                     m_model.vertices_count() - 1)
-    vertex_t v = m_model.read_vertex(index + 1);
-    v.color = color;
-    m_model.write_vertex(index + 1, v);
+                     m_model.vertex_count() - 1)
+    return m_model.vertex_data()[index + 1]; // +1 to account for center vertex
 }
 
 template <typename Dim> const lynx::color &polygon<Dim>::center_color() const
 {
-    return m_model.read_vertex(0).color;
+    return m_model.vertex(0).color;
 }
 
 template <typename Dim> void polygon<Dim>::center_color(const lynx::color &color)
 {
-    vertex_t v = m_model.read_vertex(0);
-    v.color = color;
-    m_model.write_vertex(0, v); //+1 to account for center vertex
+    m_model.vertex_data()[0].color = color;
 }
 
 template <typename Dim> std::size_t polygon<Dim>::size() const

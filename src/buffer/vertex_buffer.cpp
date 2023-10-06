@@ -6,7 +6,7 @@ namespace lynx
 template <typename Dim>
 vertex_buffer<Dim>::vertex_buffer(const kit::ref<const device> &dev, std::size_t size,
                                   const VkMemoryPropertyFlags properties, const VkBufferUsageFlags additional_usage)
-    : tight_buffer<vertex_t>(dev, size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | additional_usage, properties)
+    : tight_buffer<vertex_t>(dev, size, properties, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | additional_usage)
 {
 }
 

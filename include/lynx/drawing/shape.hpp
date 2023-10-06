@@ -115,17 +115,9 @@ template <typename Dim> class polygon : public Dim::shape_t
     polygon(const lynx::color &color);
 
     const vertex_t &operator[](std::size_t index) const;
-    const vertex_t &vertex(std::size_t index) const;
+    vertex_t &operator[](std::size_t index);
 
-    void vertex(std::size_t index, const vertex_t &vertex);
-    void vertex(std::size_t index, const vec_t &position);
-
-    void update_vertices(const std::function<void(std::size_t, vertex_t &)> &for_each_fn);
     std::size_t size() const;
-
-    const lynx::color &color(std::size_t index = 0) const; // APLICAR A POLYGON3D
-    void color(const lynx::color &color);                  // Bc it overwrites base
-    void color(std::size_t index, const lynx::color &color);
 
     const lynx::color &center_color() const;
     void center_color(const lynx::color &color);

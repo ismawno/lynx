@@ -21,10 +21,15 @@ template <typename T> class tight_buffer
     T *map(std::size_t index_offset = 0, std::size_t map_size = SIZE_T_MAX, VkMemoryMapFlags flags = 0);
     bool unmap();
 
+    const T *data() const;
+    T *data();
+
     void flush(std::size_t index_offset = 0, std::size_t flush_size = SIZE_T_MAX);
     void transfer(const tight_buffer &src_buffer);
 
+    VkBuffer vulkan_buffer() const;
     std::size_t size() const;
+    bool mapped() const;
 
   private:
     kit::ref<const device> m_device;
