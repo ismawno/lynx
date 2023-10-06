@@ -22,6 +22,9 @@ template <typename T> class tight_buffer
     bool unmap();
 
     void flush(std::size_t index_offset = 0, std::size_t flush_size = SIZE_T_MAX);
+    void transfer(const tight_buffer &src_buffer);
+
+    std::size_t size() const;
 
   private:
     kit::ref<const device> m_device;

@@ -73,6 +73,23 @@ template <typename T> void tight_buffer<T>::flush(std::size_t index_offset, std:
                            "Failed to flush memory. size: {0}, offset: {1}", flush_size, index_offset)
 }
 
+template <typename T> void tight_buffer<T>::transfer(const tight_buffer &src_buffer)
+{
+    KIT_ASSERT_ERROR(m_size >= src_buffer.m_size,
+                     "Destination buffer size must be at least equal to the src buffer size")
+    KIT_ASSERT_ERROR(m_usage & VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                     "Destintaion buffer must have the VK_BUFFER_USAGE_TRANSFER_DST_BIT flag enabled")
+    KIT_ASSERT_ERROR(src_buffer.m_usage & VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                     "Source buffer must have the VK_BUFFER_USAGE_TRANSFER_SRC_BIT flag enabled")
+
+    m_device->copy_buffer(m_buffer, src_buffer.m_buffer, src_buffer.m_size * sizeof(T));
+}
+
+template <typename T> std::size_t tight_buffer<T>::size() const
+{
+    return m_size;
+}
+
 template <typename T> void tight_buffer<T>::cleanup()
 {
     vkDeviceWaitIdle(m_device->vulkan_device());
