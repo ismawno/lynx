@@ -40,14 +40,14 @@ template <typename Dim> bool app<Dim>::next_frame()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     KIT_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
-    KIT_PERF_SCOPE("--Frame--")
+    KIT_PERF_SCOPE("LYNX:Frame")
 
     if (m_min_frame_time > m_frame_time)
     {
         kit::time::sleep(m_min_frame_time - m_frame_time);
         m_frame_time = m_min_frame_time;
     }
-    kit::clock frame_clock;
+    const kit::clock frame_clock;
     m_ongoing_frame = true;
 
     context_t::set(m_window.get());
@@ -70,12 +70,15 @@ template <typename Dim> bool app<Dim>::next_frame()
     const float delta_time = m_frame_time.as<kit::time::seconds, float>();
 
     {
-        KIT_PERF_SCOPE("--On update--")
+        KIT_PERF_SCOPE("LYNX:On-update") // MARK PERF SCOPES WITH LYNX/PPX-APP WHATEVER
+        const kit::clock update_clock;
+
         on_update(delta_time);
         for (const auto &ly : m_layers)
             if (ly->enabled)
                 ly->on_update(delta_time);
         on_late_update(delta_time);
+        m_update_time = update_clock.elapsed();
     }
 
 #ifdef LYNX_ENABLE_IMGUI
@@ -83,12 +86,15 @@ template <typename Dim> bool app<Dim>::next_frame()
 #endif
 
     {
-        KIT_PERF_SCOPE("--On render--")
+        KIT_PERF_SCOPE("LYNX:On-render")
+        const kit::clock render_clock;
+
         on_render(delta_time);
         for (const auto &ly : m_layers)
             if (ly->enabled)
                 ly->on_render(delta_time);
         on_late_render(delta_time);
+        m_render_time = render_clock.elapsed();
     }
 
 #ifdef LYNX_ENABLE_IMGUI
@@ -149,6 +155,14 @@ template <typename Dim> window<Dim> *app<Dim>::window()
 template <typename Dim> kit::time app<Dim>::frame_time() const
 {
     return m_frame_time;
+}
+template <typename Dim> kit::time app<Dim>::update_time() const
+{
+    return m_update_time;
+}
+template <typename Dim> kit::time app<Dim>::render_time() const
+{
+    return m_render_time;
 }
 
 template <typename Dim> const std::vector<kit::scope<layer<Dim>>> &app<Dim>::layers() const

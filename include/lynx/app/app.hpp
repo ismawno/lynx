@@ -40,6 +40,8 @@ template <typename Dim> class app : kit::non_copyable
     window_t *window();
 
     kit::time frame_time() const;
+    kit::time update_time() const;
+    kit::time render_time() const;
 
     const std::vector<kit::scope<layer_t>> &layers() const;
 
@@ -104,6 +106,9 @@ template <typename Dim> class app : kit::non_copyable
     std::vector<kit::scope<layer_t>> m_layers;
     kit::scope<window_t> m_window;
     kit::time m_frame_time;
+    kit::time m_update_time;
+    kit::time m_render_time;
+
     kit::time m_min_frame_time;
 
 #ifdef LYNX_ENABLE_IMGUI
