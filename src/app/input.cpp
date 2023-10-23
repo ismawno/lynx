@@ -23,6 +23,19 @@ template <typename Dim> bool input<Dim>::key_pressed(const window_t &win, const 
     return glfwGetKey(win.glfw_window(), (int)kc) == GLFW_PRESS;
 }
 
+template <typename Dim> bool input<Dim>::key_released(const key kc)
+{
+    const window_t *win = context_t::window();
+    KIT_ASSERT_ERROR(context_t::valid(), "Trying to get input feedback with a non valid current context")
+    if (!win)
+        return false;
+    return key_released(*win, kc);
+}
+template <typename Dim> bool input<Dim>::key_released(const window_t &win, const key kc)
+{
+    return glfwGetKey(win.glfw_window(), (int)kc) == GLFW_RELEASE;
+}
+
 template <typename Dim> bool input<Dim>::mouse_button_pressed(const mouse btn)
 {
     const window_t *win = context_t::window();

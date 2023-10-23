@@ -168,6 +168,9 @@ template <typename Dim> class input
     static bool key_pressed(key kc);
     static bool key_pressed(const window_t &win, key kc);
 
+    static bool key_released(key kc);
+    static bool key_released(const window_t &win, key kc);
+
     static bool mouse_button_pressed(mouse btn);
     static bool mouse_button_pressed(const window_t &win, mouse btn);
 
