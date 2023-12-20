@@ -1,5 +1,4 @@
-#ifndef LYNX_DRAWABLE_HPP
-#define LYNX_DRAWABLE_HPP
+#pragma once
 
 #include "lynx/internal/dimension.hpp"
 
@@ -41,5 +40,3 @@ template <typename Dim> class drawable
 using drawable2D = drawable<dimension::two>;
 using drawable3D = drawable<dimension::three>;
 } // namespace lynx
-
-#endif

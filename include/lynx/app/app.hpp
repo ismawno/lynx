@@ -1,5 +1,4 @@
-#ifndef LYNX_APP_HPP
-#define LYNX_APP_HPP
+#pragma once
 
 #include "lynx/app/window.hpp"
 #include "lynx/app/layer.hpp"
@@ -165,5 +164,3 @@ using app2D = app<dimension::two>;
 using app3D = app<dimension::three>;
 
 } // namespace lynx
-
-#endif

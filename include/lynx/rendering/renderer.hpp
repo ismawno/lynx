@@ -1,5 +1,4 @@
-#ifndef LYNX_RENDERER_HPP
-#define LYNX_RENDERER_HPP
+#pragma once
 
 #include "lynx/rendering/swap_chain.hpp"
 #include "lynx/drawing/color.hpp"
@@ -53,5 +52,3 @@ template <typename Dim> class renderer : kit::non_copyable
 using renderer2D = renderer<dimension::two>;
 using renderer3D = renderer<dimension::three>;
 } // namespace lynx
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef LYNX_LAYER_HPP
-#define LYNX_LAYER_HPP
+#pragma once
 
 #include "lynx/app/input.hpp"
 #include "lynx/internal/dimension.hpp"
@@ -71,5 +70,3 @@ class layer : public kit::identifiable<std::string>, public kit::toggleable, pub
 using layer2D = layer<dimension::two>;
 using layer3D = layer<dimension::three>;
 } // namespace lynx
-
-#endif

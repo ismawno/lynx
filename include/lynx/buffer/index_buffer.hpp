@@ -1,5 +1,4 @@
-#ifndef LYNX_INDEX_BUFFER_HPP
-#define LYNX_INDEX_BUFFER_HPP
+#pragma once
 
 #include "lynx/buffer/tight_buffer.hpp"
 
@@ -12,5 +11,3 @@ class index_buffer : public tight_buffer<std::uint32_t>
                  VkBufferUsageFlags additional_usage = 0);
 };
 } // namespace lynx
-
-#endif

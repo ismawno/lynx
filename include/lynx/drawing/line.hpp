@@ -1,5 +1,4 @@
-#ifndef LYNX_LINES_HPP
-#define LYNX_LINES_HPP
+#pragma once
 
 #include "lynx/drawing/drawable.hpp"
 #include "lynx/drawing/model.hpp"
@@ -108,5 +107,3 @@ using line_strip2D = line_strip<dimension::two>;
 using line_strip3D = line_strip<dimension::three>;
 
 } // namespace lynx
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef LYNX_TIGHT_BUFFER_HPP
-#define LYNX_TIGHT_BUFFER_HPP
+#pragma once
 
 #include "kit/memory/ref.hpp"
 
@@ -45,5 +44,3 @@ template <typename T> class tight_buffer
     void cleanup();
 };
 } // namespace lynx
-
-#endif

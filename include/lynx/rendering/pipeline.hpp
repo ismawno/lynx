@@ -1,5 +1,4 @@
-#ifndef LYNX_PIPELINE_HPP
-#define LYNX_PIPELINE_HPP
+#pragma once
 
 #include "kit/interface/non_copyable.hpp"
 #include "lynx/rendering/device.hpp"
@@ -55,5 +54,3 @@ class pipeline : kit::non_copyable
     void create_shader_module(const std::vector<char> &code, VkShaderModule *shader_module) const;
 };
 } // namespace lynx
-
-#endif

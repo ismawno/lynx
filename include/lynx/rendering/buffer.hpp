@@ -1,5 +1,4 @@
-#ifndef LYNX_BUFFER_HPP
-#define LYNX_BUFFER_HPP
+#pragma once
 
 #include "kit/memory/ref.hpp"
 
@@ -71,5 +70,3 @@ class buffer : kit::non_copyable
     VkMappedMemoryRange mapped_memory_range(VkDeviceSize size, VkDeviceSize offset);
 };
 } // namespace lynx
-
-#endif

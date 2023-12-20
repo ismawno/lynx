@@ -1,5 +1,4 @@
-#ifndef LYNX_WINDOW_HPP
-#define LYNX_WINDOW_HPP
+#pragma once
 
 #include "lynx/rendering/render_system.hpp"
 #include "lynx/rendering/renderer.hpp"
@@ -173,5 +172,3 @@ using window2D = window<dimension::two>;
 using window3D = window<dimension::three>;
 
 } // namespace lynx
-
-#endif

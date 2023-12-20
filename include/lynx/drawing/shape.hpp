@@ -1,5 +1,4 @@
-#ifndef LYNX_SHAPE_HPP
-#define LYNX_SHAPE_HPP
+#pragma once
 
 #include "lynx/drawing/drawable.hpp"
 #include "kit/utility/transform.hpp"
@@ -150,5 +149,3 @@ class cube3D : public shape3D
     cube3D(const lynx::color &color);
 };
 } // namespace lynx
-
-#endif

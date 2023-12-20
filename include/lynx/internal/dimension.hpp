@@ -1,5 +1,4 @@
-#ifndef LYNX_DIMENSION_HPP
-#define LYNX_DIMENSION_HPP
+#pragma once
 
 #include "kit/utility/transform.hpp"
 
@@ -41,4 +40,3 @@ struct three
     using model_t = model3D;
 };
 } // namespace lynx::dimension
-#endif

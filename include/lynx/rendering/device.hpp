@@ -1,5 +1,4 @@
-#ifndef LYNX_DEVICE_HPP
-#define LYNX_DEVICE_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -99,5 +98,3 @@ class device : kit::non_copyable
 };
 
 } // namespace lynx
-
-#endif

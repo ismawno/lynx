@@ -1,5 +1,4 @@
-#ifndef LYNX_COLOR_HPP
-#define LYNX_COLOR_HPP
+#pragma once
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -52,5 +51,3 @@ struct color
     static const color transparent;
 };
 } // namespace lynx
-
-#endif

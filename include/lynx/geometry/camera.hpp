@@ -1,5 +1,4 @@
-#ifndef LYNX_CAMERA_HPP
-#define LYNX_CAMERA_HPP
+#pragma once
 
 #include "kit/utility/transform.hpp"
 #include "lynx/internal/dimension.hpp"
@@ -101,5 +100,3 @@ class perspective3D : public camera3D
 };
 
 } // namespace lynx
-
-#endif

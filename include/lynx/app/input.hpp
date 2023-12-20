@@ -1,5 +1,4 @@
-#ifndef LYNX_INPUT_HPP
-#define LYNX_INPUT_HPP
+#pragma once
 
 #include "lynx/internal/dimension.hpp"
 #include "lynx/internal/context.hpp"
@@ -231,5 +230,3 @@ using event2D = event<dimension::two>;
 using event3D = event<dimension::three>;
 
 } // namespace lynx
-
-#endif

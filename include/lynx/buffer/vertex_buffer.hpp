@@ -1,5 +1,4 @@
-#ifndef LYNX_VERTEX_BUFFER_HPP
-#define LYNX_VERTEX_BUFFER_HPP
+#pragma once
 
 #include "lynx/buffer/tight_buffer.hpp"
 #include "lynx/geometry/vertex.hpp"
@@ -18,5 +17,3 @@ template <typename Dim> class vertex_buffer : public tight_buffer<vertex<Dim>>
 using vertex_buffer2D = vertex_buffer<dimension::two>;
 using vertex_buffer3D = vertex_buffer<dimension::three>;
 } // namespace lynx
-
-#endif

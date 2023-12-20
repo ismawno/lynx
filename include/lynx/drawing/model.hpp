@@ -1,5 +1,4 @@
-#ifndef LYNX_MODEL_HPP
-#define LYNX_MODEL_HPP
+#pragma once
 
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
@@ -105,5 +104,3 @@ class model3D : public model<dimension::three>
     static vertex_index_pair cube(const color &color);
 };
 } // namespace lynx
-
-#endif

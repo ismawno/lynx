@@ -1,5 +1,4 @@
-#ifndef LYNX_CONTEXT_HPP
-#define LYNX_CONTEXT_HPP
+#pragma once
 
 #include "lynx/internal/dimension.hpp"
 #include "kit/memory/ref.hpp"
@@ -26,5 +25,3 @@ template <typename Dim> class context
 using context2D = context<dimension::two>;
 using context3D = context<dimension::three>;
 } // namespace lynx
-
-#endif

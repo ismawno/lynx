@@ -1,5 +1,4 @@
-#ifndef LYNX_RENDER_SYSTEM_HPP
-#define LYNX_RENDER_SYSTEM_HPP
+#pragma once
 
 #include "lynx/rendering/pipeline.hpp"
 #include "lynx/drawing/model.hpp"
@@ -112,5 +111,3 @@ using triangle_render_system3D = triangle_render_system<dimension::three>;
 using triangle_strip_render_system2D = triangle_strip_render_system<dimension::two>;
 using triangle_strip_render_system3D = triangle_strip_render_system<dimension::three>;
 } // namespace lynx
-
-#endif

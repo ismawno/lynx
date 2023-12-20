@@ -1,5 +1,4 @@
-#ifndef LYNX_SWAP_CHAIN_HPP
-#define LYNX_SWAP_CHAIN_HPP
+#pragma once
 
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
@@ -79,5 +78,3 @@ class swap_chain : kit::non_copyable
 };
 
 } // namespace lynx
-
-#endif

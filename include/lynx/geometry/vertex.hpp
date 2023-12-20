@@ -1,5 +1,4 @@
-#ifndef LYNX_VERTEX_HPP
-#define LYNX_VERTEX_HPP
+#pragma once
 
 #include "lynx/drawing/color.hpp"
 #include "lynx/internal/dimension.hpp"
@@ -30,5 +29,3 @@ template <typename Dim> struct vertex
 using vertex2D = vertex<dimension::two>;
 using vertex3D = vertex<dimension::three>;
 } // namespace lynx
-
-#endif
