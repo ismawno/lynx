@@ -19,7 +19,8 @@ filter "system:macosx"
       "-Wextra",
       "-Wpedantic",
       "-Wconversion",
-      "-Wno-unused-parameter"
+      "-Wno-unused-parameter",
+      "-Wno-sign-conversion"
    }
 filter {}
 
