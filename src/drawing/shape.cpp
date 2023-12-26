@@ -35,7 +35,7 @@ void shape2D::outline_color(const lynx::color &color)
 
 void shape2D::draw_outline_thickness(window_t &win) const
 {
-    kit::transform2D outline_transform = transform;
+    kit::transform2D<float> outline_transform = transform;
     glm::vec2 mm{FLT_MAX}, mx{-FLT_MAX};
 
     for (std::size_t i = 0; i < m_outline_model.vertex_count(); i++)
@@ -48,7 +48,8 @@ void shape2D::draw_outline_thickness(window_t &win) const
     }
 
     outline_transform.origin = 0.5f * (mx + mm);
-    outline_transform.position += kit::transform2D::rotation_matrix(transform.rotation) * outline_transform.origin;
+    outline_transform.position +=
+        kit::transform2D<float>::rotation_matrix(transform.rotation) * outline_transform.origin;
     outline_transform.scale = transform.scale + (2.f * outline_thickness) / (mx - mm);
     drawable::default_draw(win, &m_outline_model, outline_transform.center_scale_rotate_translate4(), m_topology);
 }

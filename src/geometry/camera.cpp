@@ -46,7 +46,7 @@ void camera3D::point_towards(const glm::vec3 &direction)
 {
     const float roty = atan2f(direction.x, direction.z);
     const float rotx = -atan2f(direction.y, direction.z * cosf(roty) + direction.x * sinf(roty));
-    transform.rotation = kit::transform3D::YX(roty, rotx);
+    transform.rotation = kit::transform3D<float>::YX(roty, rotx);
 }
 void camera3D::point_to(const glm::vec3 &position)
 {

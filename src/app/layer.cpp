@@ -9,21 +9,6 @@ template <typename Dim> layer<Dim>::layer(const std::string &name) : kit::identi
 {
 }
 
-template <typename Dim> YAML::Node layer<Dim>::encode() const
-{
-    YAML::Node node;
-    node["Enabled"] = enabled;
-    return node;
-}
-
-template <typename Dim> bool layer<Dim>::decode(const YAML::Node &node)
-{
-    if (!node.IsMap() || node.size() < 1)
-        return false;
-    enabled = node["Enabled"].as<bool>();
-    return true;
-}
-
 template class layer<dimension::two>;
 template class layer<dimension::three>;
 } // namespace lynx

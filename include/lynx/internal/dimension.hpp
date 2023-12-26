@@ -26,7 +26,7 @@ namespace lynx::dimension
 struct two
 {
     using vec_t = glm::vec2;
-    using transform_t = kit::transform2D;
+    using transform_t = kit::transform2D<float>;
     using camera_t = camera<two>;
     using shape_t = shape2D;
     using model_t = model<two>;
@@ -34,7 +34,7 @@ struct two
 struct three
 {
     using vec_t = glm::vec3;
-    using transform_t = kit::transform3D;
+    using transform_t = kit::transform3D<float>;
     using camera_t = camera3D;
     using shape_t = shape<three>;
     using model_t = model3D;
