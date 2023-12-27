@@ -4,6 +4,7 @@
 #include "lynx/internal/dimension.hpp"
 #include "kit/interface/identifiable.hpp"
 #include "kit/interface/toggleable.hpp"
+#include "kit/serialization/yaml/serializer.hpp"
 
 #include <functional>
 #include <vulkan/vulkan.hpp>
@@ -11,7 +12,11 @@
 namespace lynx
 {
 template <typename Dim> class app;
-template <typename Dim> class layer : public kit::identifiable<std::string>, public kit::toggleable
+template <typename Dim>
+class layer : public kit::identifiable<std::string>,
+              public kit::toggleable,
+              public kit::yaml::serializable,
+              public kit::yaml::deserializable
 {
   public:
     using app_t = app<Dim>;
@@ -28,6 +33,11 @@ template <typename Dim> class layer : public kit::identifiable<std::string>, pub
         else
             return dynamic_cast<T *>(m_parent);
     }
+
+#ifdef KIT_USE_YAML_CPP
+    virtual YAML::Node encode() const override;
+    virtual bool decode(const YAML::Node &node) override;
+#endif
 
   private:
     app_t *m_parent = nullptr;

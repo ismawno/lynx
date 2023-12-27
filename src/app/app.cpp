@@ -1,6 +1,7 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/app/app.hpp"
 #include "lynx/geometry/camera.hpp"
+#include "lynx/serialization/serialization.hpp"
 #include "kit/profile/perf.hpp"
 
 namespace lynx
@@ -290,6 +291,17 @@ template <typename Dim> void app<Dim>::imgui_shutdown()
     ImPlot::DestroyContext(m_implot_context);
 #endif
     ImGui::DestroyContext(m_imgui_context);
+}
+#endif
+
+#ifdef KIT_USE_YAML_CPP
+template <typename Dim> YAML::Node app<Dim>::encode() const
+{
+    return kit::yaml::codec<app<Dim>>::encode(*this);
+}
+template <typename Dim> bool app<Dim>::decode(const YAML::Node &node)
+{
+    return kit::yaml::codec<app<Dim>>::decode(node, *this);
 }
 #endif
 

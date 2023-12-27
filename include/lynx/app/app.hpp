@@ -5,6 +5,8 @@
 #include "lynx/internal/context.hpp"
 #include "lynx/internal/dimension.hpp"
 #include "kit/profile/clock.hpp"
+#include "kit/serialization/yaml/serializer.hpp"
+
 #ifdef LYNX_ENABLE_IMGUI
 #include <imgui.h>
 #ifdef LYNX_ENABLE_IMPLOT
@@ -14,7 +16,7 @@
 
 namespace lynx
 {
-template <typename Dim> class app : kit::non_copyable
+template <typename Dim> class app : kit::non_copyable, public kit::yaml::serializable, public kit::yaml::deserializable
 {
   public:
     using window_t = window<Dim>;
@@ -95,6 +97,11 @@ template <typename Dim> class app : kit::non_copyable
         static_assert(std::is_base_of_v<layer_t, T>, "Type must inherit from layer class");
         return pop_layer(ly->id);
     }
+
+#ifdef KIT_USE_YAML_CPP
+    virtual YAML::Node encode() const override;
+    virtual bool decode(const YAML::Node &node) override;
+#endif
 
   private:
     bool m_started = false;
