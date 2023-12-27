@@ -1,6 +1,7 @@
 #pragma once
 #ifdef KIT_USE_YAML_CPP
 
+#include "kit/serialization/yaml/codec.hpp"
 #include "lynx/app/app.hpp"
 
 template <typename Dim> struct kit::yaml::codec<lynx::layer<Dim>>
