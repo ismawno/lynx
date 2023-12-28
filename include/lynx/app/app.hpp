@@ -44,7 +44,20 @@ template <typename Dim> class app : kit::non_copyable, public kit::yaml::seriali
     kit::time update_time() const;
     kit::time render_time() const;
 
-    const std::vector<kit::scope<layer_t>> &layers() const;
+    auto begin() const
+    {
+        return m_layers.begin();
+    }
+    auto end() const
+    {
+        return m_layers.end();
+    }
+
+    const layer_t &operator[](std::size_t index) const;
+    layer_t &operator[](std::size_t index);
+
+    const layer_t *operator[](const std::string &name) const;
+    layer_t *operator[](const std::string &name);
 
     std::uint32_t framerate_cap() const;
     void limit_framerate(std::uint32_t framerate);

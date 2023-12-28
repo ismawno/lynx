@@ -27,7 +27,7 @@ template <typename Dim> struct kit::yaml::codec<lynx::app<Dim>>
     static YAML::Node encode(const lynx::app<Dim> &app)
     {
         YAML::Node node;
-        for (const auto &layer : app.layers())
+        for (const auto &layer : app)
             node[layer->id] = *layer;
         return node;
     }
@@ -36,7 +36,7 @@ template <typename Dim> struct kit::yaml::codec<lynx::app<Dim>>
         if (!node.IsMap())
             return false;
 
-        for (const auto &layer : app.layers())
+        for (const auto &layer : app)
             node[layer->id].template as<lynx::layer<Dim>>(*layer);
 
         return true;

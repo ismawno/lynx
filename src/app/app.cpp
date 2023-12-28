@@ -166,9 +166,28 @@ template <typename Dim> kit::time app<Dim>::render_time() const
     return m_render_time;
 }
 
-template <typename Dim> const std::vector<kit::scope<layer<Dim>>> &app<Dim>::layers() const
+template <typename Dim> const layer<Dim> &app<Dim>::operator[](std::size_t index) const
 {
-    return m_layers;
+    return *m_layers[index];
+}
+template <typename Dim> layer<Dim> &app<Dim>::operator[](std::size_t index)
+{
+    return *m_layers[index];
+}
+
+template <typename Dim> const layer<Dim> *app<Dim>::operator[](const std::string &name) const
+{
+    for (const auto &l : m_layers)
+        if (l->id == name)
+            return l.get();
+    return nullptr;
+}
+template <typename Dim> layer<Dim> *app<Dim>::operator[](const std::string &name)
+{
+    for (const auto &l : m_layers)
+        if (l->id == name)
+            return l.get();
+    return nullptr;
 }
 
 template <typename Dim> std::uint32_t app<Dim>::framerate_cap() const
