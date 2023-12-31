@@ -1,5 +1,3 @@
-#ifdef KIT_USE_YAML_CPP
-
 #include "lynx/serialization/serialization.hpp"
 #include "lynx/internal/pch.hpp"
 #include "lynx/app/layer.hpp"
@@ -24,5 +22,3 @@ template <typename Dim> bool layer<Dim>::decode(const YAML::Node &node)
 template class layer<dimension::two>;
 template class layer<dimension::three>;
 } // namespace lynx
-
-#endif
