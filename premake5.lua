@@ -47,4 +47,4 @@ includedirs {
    "%{wks.location}/vendor/yaml-cpp/include"
 }
 filter "system:windows"
-   includedirs "%{VULKAN_SDK}/include"
+   includedirs "%{VULKAN_SDK}/Include"
