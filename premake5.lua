@@ -35,10 +35,6 @@ files {
    "include/**.hpp"
 }
 
-filter "kind:not ConsoleApp"
-   removefiles "src/main.cpp"
-filter {}
-
 includedirs {
    "include",
    "%{wks.location}/cpp-kit/include",
