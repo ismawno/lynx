@@ -146,39 +146,12 @@ perspective3D::perspective3D(const float aspect, const float fovy, const glm::ma
 }
 perspective3D::perspective3D(const glm::vec3 &position, const float aspect, const float fovy, const glm::mat3 &rotation,
                              const float near, const float far)
-    : m_near(near), m_far(far), m_fov(fovy), m_half_tan_fovy(tanf(0.5f * fovy)), m_aspect(aspect)
+    : near(near), far(far), fov(fovy), m_aspect(aspect)
 {
     transform.position = position;
     transform.rotation = rotation;
     KIT_ASSERT_ERROR(aspect > 0.0f, "Aspect ratio must be greater than 0");
-    KIT_ASSERT_ERROR(m_fov > 0.0f, "The tangent of the field of view must be greater than 0");
-}
-
-float perspective3D::near() const
-{
-    return m_near;
-}
-float perspective3D::far() const
-{
-    return m_far;
-}
-float perspective3D::fov() const
-{
-    return m_fov;
-}
-
-void perspective3D::near(const float near)
-{
-    m_near = near;
-}
-void perspective3D::far(const float far)
-{
-    m_far = far;
-}
-void perspective3D::fov(const float fovy)
-{
-    m_fov = fovy;
-    m_half_tan_fovy = tanf(0.5f * fovy);
+    KIT_ASSERT_ERROR(fov > 0.0f, "The tangent of the field of view must be greater than 0");
 }
 
 void perspective3D::keep_aspect_ratio(const float aspect)
@@ -191,20 +164,21 @@ void perspective3D::update_transformation_matrices()
     KIT_PERF_FUNCTION()
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
+    const float half_tan_fovy = tanf(0.5f * fov);
 
     glm::mat4 perspective = glm::mat4{0.0f};
-    perspective[0][0] = 1.f / (m_aspect * m_half_tan_fovy);
-    perspective[1][1] = 1.f / m_half_tan_fovy;
-    perspective[2][2] = m_far / (m_far - m_near);
+    perspective[0][0] = 1.f / (m_aspect * half_tan_fovy);
+    perspective[1][1] = 1.f / half_tan_fovy;
+    perspective[2][2] = far / (far - near);
     perspective[2][3] = 1.f;
-    perspective[3][2] = m_far * m_near / (m_near - m_far);
+    perspective[3][2] = far * near / (near - far);
 
     glm::mat4 inv_perspective = glm::mat4{0.0f};
-    inv_perspective[0][0] = m_aspect * m_half_tan_fovy;
-    inv_perspective[1][1] = m_half_tan_fovy;
-    inv_perspective[3][3] = 1.f / m_near;
+    inv_perspective[0][0] = m_aspect * half_tan_fovy;
+    inv_perspective[1][1] = half_tan_fovy;
+    inv_perspective[3][3] = 1.f / near;
     inv_perspective[3][2] = 1.f;
-    inv_perspective[2][3] = (m_near - m_far) / (m_far * m_near);
+    inv_perspective[2][3] = (near - far) / (far * near);
 
     m_projection = perspective * transform.inverse_scale_center_rotate_translate4();
     m_inv_projection = transform.scale_center_rotate_translate4() * inv_perspective;

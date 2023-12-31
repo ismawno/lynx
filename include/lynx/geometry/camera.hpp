@@ -3,6 +3,11 @@
 #include "kit/utility/transform.hpp"
 #include "lynx/internal/dimension.hpp"
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#undef near
+#undef far
+#endif
+
 namespace lynx
 {
 template <typename Dim> class camera
@@ -80,22 +85,14 @@ class perspective3D : public camera3D
     perspective3D(const glm::vec3 &position, float aspect, float fovy, const glm::mat3 &rotation = glm::mat3(1.f),
                   float near = 0.1f, float far = 10.f);
 
-    float near() const;
-    float far() const;
-    float fov() const;
-
-    void near(float near);
-    void far(float far);
-    void fov(float fovy);
+    float near;
+    float far;
+    float fov;
 
     void keep_aspect_ratio(float aspect) override;
     void update_transformation_matrices() override;
 
   private:
-    float m_near;
-    float m_far;
-    float m_fov;
-    float m_half_tan_fovy;
     float m_aspect;
 };
 
