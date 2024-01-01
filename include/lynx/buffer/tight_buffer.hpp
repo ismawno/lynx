@@ -32,7 +32,7 @@ template <typename T> class tight_buffer
 
   private:
     kit::ref<const device> m_device;
-    T *m_mapped_data;
+    T *m_mapped_data = nullptr;
 
     VkBuffer m_buffer = VK_NULL_HANDLE;
     VkDeviceMemory m_memory = VK_NULL_HANDLE;
