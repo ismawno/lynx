@@ -19,7 +19,7 @@ def main() -> None:
     shader_folder = Path(__file__).parent.parent / "shaders"
     subprocess.run(
         [
-            "glsl.exe",
+            "glslc.exe",
             str(shader_folder / "shader2D.vert"),
             "-o",
             str(shader_folder / "bin" / "shader2d.vert.spv"),
@@ -28,7 +28,7 @@ def main() -> None:
     )
     subprocess.run(
         [
-            "glsl.exe",
+            "glslc.exe",
             str(shader_folder / "shader2D.frag"),
             "-o",
             str(shader_folder / "bin" / "shader2d.frag.spv"),
