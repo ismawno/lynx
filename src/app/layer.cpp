@@ -1,5 +1,5 @@
-#include "lynx/serialization/serialization.hpp"
 #include "lynx/internal/pch.hpp"
+#include "lynx/serialization/serialization.hpp"
 #include "lynx/app/layer.hpp"
 
 namespace lynx

@@ -10,6 +10,11 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#undef DELETE
+#undef MOUSE_MOVED
+#endif
+
 namespace lynx
 {
 template <typename Dim> struct event;
