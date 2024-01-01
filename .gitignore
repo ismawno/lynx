@@ -3,6 +3,7 @@
 
 # Build folders
 **/build
+__pycache__/
 
 # Makefiles
 **/Makefile
