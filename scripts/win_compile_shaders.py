@@ -17,7 +17,7 @@ def main() -> None:
     os.environ["PATH"] += f"{os.pathsep}{vulkan_bin_folder}"
 
     shader_folder = Path(__file__).parent.parent / "shaders"
-    (shader_folder / "bin").mkdir()
+    (shader_folder / "bin").mkdir(exist_ok=True)
 
     for shader in ["vert", "frag"]:
         for dim in ["2D", "3D"]:
