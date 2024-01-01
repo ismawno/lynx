@@ -106,7 +106,7 @@ template <typename Dim> void window<Dim>::clear_render_data()
     for (const auto &sys : m_render_systems)
         sys->clear_render_data();
     if constexpr (std::is_same_v<Dim, dimension::two>)
-        render_system_t::s_z_offset_counter2D = 0.f;
+        render_system_t::s_z_offset_counter2D = 0;
 }
 
 template <typename Dim> bool window<Dim>::was_resized() const

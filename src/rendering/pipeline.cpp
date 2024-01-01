@@ -30,7 +30,7 @@ static std::vector<char> read_file(const char *path)
     std::ifstream file{path, std::ios::ate | std::ios::binary};
     KIT_ASSERT_ERROR(file.is_open(), "File at path {0} not found", path)
 
-    const long file_size = file.tellg();
+    const auto file_size = file.tellg();
     std::vector<char> buffer((std::size_t)file_size);
 
     file.seekg(0);
