@@ -17,13 +17,13 @@ template <typename T> class tight_buffer
     tight_buffer(const tight_buffer &other);
     tight_buffer &operator=(const tight_buffer &other);
 
-    T *map(std::size_t index_offset = 0, std::size_t map_size = SIZE_T_MAX, VkMemoryMapFlags flags = 0);
+    T *map(std::size_t index_offset = 0, std::size_t map_size = SIZE_MAX, VkMemoryMapFlags flags = 0);
     bool unmap();
 
     const T *data() const;
     T *data();
 
-    void flush(std::size_t index_offset = 0, std::size_t flush_size = SIZE_T_MAX);
+    void flush(std::size_t index_offset = 0, std::size_t flush_size = SIZE_MAX);
     void transfer(const tight_buffer &src_buffer);
 
     VkBuffer vulkan_buffer() const;

@@ -55,7 +55,7 @@ template <typename T> T *tight_buffer<T>::map(std::size_t index_offset, std::siz
     if (m_mapped_data)
         unmap();
 
-    const VkDeviceSize size = map_size == SIZE_T_MAX ? VK_WHOLE_SIZE : (map_size * sizeof(T));
+    const VkDeviceSize size = map_size == SIZE_MAX ? VK_WHOLE_SIZE : (map_size * sizeof(T));
     KIT_CHECK_RETURN_VALUE(
         vkMapMemory(m_device->vulkan_device(), m_memory, index_offset, size, flags, (void **)&m_mapped_data),
         VK_SUCCESS, CRITICAL, "Failed to map memory");
@@ -86,7 +86,7 @@ template <typename T> T *tight_buffer<T>::data()
 
 template <typename T> void tight_buffer<T>::flush(std::size_t index_offset, std::size_t flush_size)
 {
-    const VkDeviceSize size = flush_size == SIZE_T_MAX ? VK_WHOLE_SIZE : (flush_size * sizeof(T));
+    const VkDeviceSize size = flush_size == SIZE_MAX ? VK_WHOLE_SIZE : (flush_size * sizeof(T));
 
     VkMappedMemoryRange mapped_range{};
     mapped_range.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
