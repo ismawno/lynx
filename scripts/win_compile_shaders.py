@@ -13,6 +13,9 @@ def main() -> None:
         raise VulkanNotInstalledError(
             "Vulkan is not installed, or 'VULKAN_SDK' environment variable is not set"
         )
+    vulkan_bin_folder = Path(os.getenv("VULKAN_SDK")) / "Bin"
+    os.environ["PATH"] += f"{os.pathsep}{vulkan_bin_folder}"
+
     shader_folder = Path(__file__).parent.parent / "shaders"
     (shader_folder / "bin").mkdir()
 
