@@ -8,8 +8,13 @@ namespace lynx
 #ifdef DEBUG
 static constexpr std::array<const char *const, 1> s_validation_layers = {"VK_LAYER_KHRONOS_validation"};
 #endif
+#ifdef __APPLE__
 static constexpr std::array<const char *const, 2> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
                                                                          "VK_KHR_portability_subset"};
+#else
+static constexpr std::array<const char *const, 1> s_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+#endif
+
 #ifdef DEBUG
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT,
                                                      VkDebugUtilsMessageTypeFlagsEXT,
@@ -205,7 +210,7 @@ bool device::is_device_suitable(const VkPhysicalDevice device) const
     bool swap_chain_adequate = false;
     if (extensions_supported)
     {
-        swap_chain_support_details swap_chain_support = query_swap_chain_support(device);
+        const swap_chain_support_details swap_chain_support = query_swap_chain_support(device);
         swap_chain_adequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
     }
 
