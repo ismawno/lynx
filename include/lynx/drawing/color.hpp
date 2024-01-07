@@ -22,6 +22,8 @@ struct color
     color(const color &rgb, float a);
     color(const color &rgb, std::uint32_t a);
 
+    glm::vec4 normalized;
+
     std::uint32_t r() const;
     std::uint32_t g() const;
     std::uint32_t b() const;
@@ -35,7 +37,7 @@ struct color
     const float *ptr() const;
     float *ptr();
 
-    glm::vec4 normalized;
+    static color lerp(const color &c1, const color &c2, float t);
 
     static const color red;
     static const color green;

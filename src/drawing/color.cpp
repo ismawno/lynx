@@ -121,4 +121,19 @@ float *color::ptr()
 {
     return glm::value_ptr(normalized);
 }
+
+static float lerp(const float a, const float b, const float t)
+{
+    return a + (b - a) * t;
+}
+
+color color::lerp(const color &c1, const color &c2, float t)
+{
+    KIT_ASSERT_ERROR(t >= 0.f && t <= 1.f, "t must lie in [0, 1]")
+    const float r = ::lynx::lerp(c1.normalized.r, c2.normalized.r, t);
+    const float g = ::lynx::lerp(c1.normalized.g, c2.normalized.g, t);
+    const float b = ::lynx::lerp(c1.normalized.b, c2.normalized.b, t);
+    const float a = ::lynx::lerp(c1.normalized.a, c2.normalized.a, t);
+    return color{r, g, b, a};
+}
 } // namespace lynx
