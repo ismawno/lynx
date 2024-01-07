@@ -5,6 +5,7 @@
 #include <glm/vec4.hpp>
 #include <glm/vec3.hpp>
 #include <cstdint>
+#include <array>
 
 namespace lynx
 {
@@ -37,8 +38,6 @@ struct color
     const float *ptr() const;
     float *ptr();
 
-    static color lerp(const color &c1, const color &c2, float t);
-
     static const color red;
     static const color green;
     static const color blue;
@@ -51,5 +50,45 @@ struct color
     static const color purple;
     static const color white;
     static const color transparent;
+};
+
+template <std::size_t N> class gradient
+{
+    static_assert(N > 1, "N must be greater that one");
+
+  public:
+    template <class... Args> gradient(Args &&...args) : m_colors({std::forward<Args>(args)...})
+    {
+    }
+
+    color evaluate(const float t) const
+    {
+        KIT_ASSERT_ERROR(t >= 0.f && t <= 1.f, "t must lie in [0, 1]")
+        const float dx = 1.f / (float)(N - 1);
+        for (std::size_t i = 0; i < N - 1; i++)
+        {
+            const float mm = i * dx;
+            const float mx = (i + 1) * dx;
+            if (t >= mm && t <= mx)
+            {
+                const float mt = map(t, mm, mx, 0.f, 1.f);
+                return lerp(mt, i);
+            }
+        }
+        return color{};
+    }
+
+  private:
+    std::array<color, N> m_colors;
+
+    color lerp(const float t, const std::size_t idx) const
+    {
+        return color{m_colors[idx].normalized + (m_colors[idx + 1].normalized - m_colors[idx].normalized) * t};
+    }
+
+    static float map(const float x, const float mm1, const float mx1, const float mm2, const float mx2)
+    {
+        return mm2 + (x - mm1) * (mx2 - mm2) / (mx1 - mm1);
+    }
 };
 } // namespace lynx
