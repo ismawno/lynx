@@ -168,10 +168,12 @@ template <typename Dim> kit::time app<Dim>::render_time() const
 
 template <typename Dim> const layer<Dim> &app<Dim>::operator[](std::size_t index) const
 {
+    KIT_ASSERT_ERROR(index < m_layers.size(), "Index exceeds container size: {0}", index)
     return *m_layers[index];
 }
 template <typename Dim> layer<Dim> &app<Dim>::operator[](std::size_t index)
 {
+    KIT_ASSERT_ERROR(index < m_layers.size(), "Index exceeds container size: {0}", index)
     return *m_layers[index];
 }
 
