@@ -11,8 +11,8 @@
 
 namespace lynx
 {
-template <typename Dim> class app;
-template <typename Dim>
+template <Dimension Dim> class app;
+template <Dimension Dim>
 class layer : public kit::identifiable<std::string>,
               public kit::toggleable,
               public kit::yaml::serializable,
@@ -68,7 +68,7 @@ class layer : public kit::identifiable<std::string>,
     {
     }
 
-    template <typename T> friend class app;
+    template <Dimension T> friend class app;
 };
 
 using layer2D = layer<dimension::two>;

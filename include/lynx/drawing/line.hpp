@@ -16,7 +16,7 @@
 
 namespace lynx
 {
-template <typename Dim> class line : public drawable<Dim>
+template <Dimension Dim> class line : public drawable<Dim>
 {
   public:
     using vec_t = typename Dim::vec_t;
@@ -33,7 +33,7 @@ template <typename Dim> class line : public drawable<Dim>
 using line2D = line<dimension::two>;
 using line3D = line<dimension::three>;
 
-template <typename Dim> class thin_line : public line<Dim>
+template <Dimension Dim> class thin_line : public line<Dim>
 {
   public:
     using vec_t = typename Dim::vec_t;
@@ -77,7 +77,7 @@ template <typename Dim> class thin_line : public line<Dim>
 using thin_line2D = thin_line<dimension::two>;
 using thin_line3D = thin_line<dimension::three>;
 
-template <typename Dim> class line_strip : public drawable<Dim>
+template <Dimension Dim> class line_strip : public drawable<Dim>
 {
   public:
     using vec_t = typename Dim::vec_t;

@@ -8,7 +8,7 @@ namespace lynx
 {
 class device;
 
-template <typename Dim> class context
+template <Dimension Dim> class context
 {
   public:
     using window_t = window<Dim>;

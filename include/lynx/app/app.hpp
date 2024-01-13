@@ -16,7 +16,7 @@
 
 namespace lynx
 {
-template <typename Dim> class app : kit::non_copyable, public kit::yaml::serializable, public kit::yaml::deserializable
+template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serializable, public kit::yaml::deserializable
 {
   public:
     using window_t = window<Dim>;

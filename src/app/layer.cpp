@@ -4,16 +4,16 @@
 
 namespace lynx
 {
-template <typename Dim> layer<Dim>::layer(const std::string &name) : kit::identifiable<std::string>(name)
+template <Dimension Dim> layer<Dim>::layer(const std::string &name) : kit::identifiable<std::string>(name)
 {
 }
 
 #ifdef KIT_USE_YAML_CPP
-template <typename Dim> YAML::Node layer<Dim>::encode() const
+template <Dimension Dim> YAML::Node layer<Dim>::encode() const
 {
     return kit::yaml::codec<layer<Dim>>::encode(*this);
 }
-template <typename Dim> bool layer<Dim>::decode(const YAML::Node &node)
+template <Dimension Dim> bool layer<Dim>::decode(const YAML::Node &node)
 {
     return kit::yaml::codec<layer<Dim>>::decode(node, *this);
 }

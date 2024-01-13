@@ -6,18 +6,18 @@
 
 namespace lynx
 {
-template <typename Dim> const color &shape<Dim>::color() const
+template <Dimension Dim> const color &shape<Dim>::color() const
 {
     return m_model.vertex(0).color;
 }
-template <typename Dim> void shape<Dim>::color(const lynx::color &color)
+template <Dimension Dim> void shape<Dim>::color(const lynx::color &color)
 {
     vertex_t *vdata = m_model.vertex_data();
     for (std::size_t i = 0; i < m_model.vertex_count(); i++)
         vdata[i].color = color;
 }
 
-template <typename Dim> void shape<Dim>::draw(window_t &win) const
+template <Dimension Dim> void shape<Dim>::draw(window_t &win) const
 {
     drawable_t::default_draw(win, &m_model, transform.center_scale_rotate_translate4(), m_topology);
 }
@@ -62,7 +62,7 @@ void shape2D::draw(window_t &win) const
     shape::draw(win);
 }
 
-template <typename Dim>
+template <Dimension Dim>
 rect<Dim>::rect(const vec_t &position, const glm::vec2 &dimensions, const lynx::color &color)
     : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::rect(color))
 {
@@ -73,12 +73,12 @@ rect<Dim>::rect(const vec_t &position, const glm::vec2 &dimensions, const lynx::
         transform.scale = vec_t(dimensions, 1.f);
 }
 
-template <typename Dim>
+template <Dimension Dim>
 rect<Dim>::rect(const lynx::color &color) : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::rect(color))
 {
 }
 
-template <typename Dim>
+template <Dimension Dim>
 ellipse<Dim>::ellipse(const float ra, const float rb, const lynx::color &color, const std::uint32_t partitions)
     : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::circle(partitions, color))
 {
@@ -87,19 +87,19 @@ ellipse<Dim>::ellipse(const float ra, const float rb, const lynx::color &color, 
     else
         transform.scale = {ra, rb, 1.f};
 }
-template <typename Dim>
+template <Dimension Dim>
 ellipse<Dim>::ellipse(const float radius, const lynx::color &color, const std::uint32_t partitions)
     : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::circle(partitions, color))
 {
     transform.scale = vec_t(radius);
 }
-template <typename Dim>
+template <Dimension Dim>
 ellipse<Dim>::ellipse(const lynx::color &color, const std::uint32_t partitions)
     : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::circle(partitions, color))
 {
 }
 
-template <typename Dim> float ellipse<Dim>::radius() const
+template <Dimension Dim> float ellipse<Dim>::radius() const
 {
     if constexpr (std::is_same_v<Dim, dimension::two>)
         return 0.5f * (transform.scale.x + transform.scale.y);
@@ -107,35 +107,35 @@ template <typename Dim> float ellipse<Dim>::radius() const
         return (transform.scale.x + transform.scale.y + transform.scale.z) / 3.f;
 }
 
-template <typename Dim> void ellipse<Dim>::radius(const float radius)
+template <Dimension Dim> void ellipse<Dim>::radius(const float radius)
 {
     transform.scale = vec_t(radius);
 }
 
-template <typename Dim>
+template <Dimension Dim>
 polygon<Dim>::polygon(const std::vector<vec_t> &local_vertices, const lynx::color &color)
     : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::polygon(local_vertices, color)), m_size(local_vertices.size())
 {
 }
-template <typename Dim>
+template <Dimension Dim>
 polygon<Dim>::polygon(const std::vector<vertex_t> &local_vertices, const lynx::color &center_color)
     : shape_t(topology::TRIANGLE_LIST, shape_t::model_t::polygon(local_vertices, center_color)),
       m_size(local_vertices.size())
 {
 }
-template <typename Dim>
+template <Dimension Dim>
 polygon<Dim>::polygon(const lynx::color &color) : polygon({vec_t(0.f), vec_t(0.f), vec_t(0.f)}, color)
 {
 }
 
-template <typename Dim> const vertex<Dim> &polygon<Dim>::operator[](const std::size_t index) const
+template <Dimension Dim> const vertex<Dim> &polygon<Dim>::operator[](const std::size_t index) const
 {
     KIT_ASSERT_ERROR(index < m_model.vertex_count() - 1,
                      "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
                      m_model.vertex_count() - 1)
     return m_model.vertex(index + 1); // +1 to account for center vertex
 }
-template <typename Dim> vertex<Dim> &polygon<Dim>::operator[](const std::size_t index)
+template <Dimension Dim> vertex<Dim> &polygon<Dim>::operator[](const std::size_t index)
 {
     KIT_ASSERT_ERROR(index < m_model.vertex_count() - 1,
                      "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
@@ -143,17 +143,17 @@ template <typename Dim> vertex<Dim> &polygon<Dim>::operator[](const std::size_t 
     return m_model.vertex_data()[index + 1]; // +1 to account for center vertex
 }
 
-template <typename Dim> const lynx::color &polygon<Dim>::center_color() const
+template <Dimension Dim> const lynx::color &polygon<Dim>::center_color() const
 {
     return m_model.vertex(0).color;
 }
 
-template <typename Dim> void polygon<Dim>::center_color(const lynx::color &color)
+template <Dimension Dim> void polygon<Dim>::center_color(const lynx::color &color)
 {
     m_model.vertex_data()[0].color = color;
 }
 
-template <typename Dim> std::size_t polygon<Dim>::size() const
+template <Dimension Dim> std::size_t polygon<Dim>::size() const
 {
     return m_size;
 }

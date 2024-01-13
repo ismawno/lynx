@@ -24,7 +24,7 @@ namespace lynx
 {
 class device;
 
-template <typename Dim> class window : kit::non_copyable, public kit::nameable
+template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
 {
   public:
     using camera_t = typename Dim::camera_t;

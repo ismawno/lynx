@@ -5,7 +5,7 @@
 
 namespace lynx
 {
-template <typename Dim> class vertex_buffer : public tight_buffer<vertex<Dim>>
+template <Dimension Dim> class vertex_buffer : public tight_buffer<vertex<Dim>>
 {
   public:
     using vertex_t = vertex<Dim>;

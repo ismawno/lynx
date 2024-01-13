@@ -4,31 +4,31 @@
 
 namespace lynx
 {
-template <typename Dim> const glm::mat4 &camera<Dim>::projection() const
+template <Dimension Dim> const glm::mat4 &camera<Dim>::projection() const
 {
     return m_projection;
 }
-template <typename Dim> const glm::mat4 &camera<Dim>::inverse_projection() const
+template <Dimension Dim> const glm::mat4 &camera<Dim>::inverse_projection() const
 {
     return m_inv_projection;
 }
-template <typename Dim> void camera<Dim>::flip_y_axis()
+template <Dimension Dim> void camera<Dim>::flip_y_axis()
 {
     m_y_flipped = !m_y_flipped;
 }
 
-template <typename Dim> void camera<Dim>::keep_aspect_ratio(const float aspect)
+template <Dimension Dim> void camera<Dim>::keep_aspect_ratio(const float aspect)
 {
     transform.scale.x = aspect * transform.scale.y;
 }
 
-template <typename Dim> typename camera<Dim>::vec_t camera<Dim>::screen_to_world(const glm::vec2 &screen_pos) const
+template <Dimension Dim> typename camera<Dim>::vec_t camera<Dim>::screen_to_world(const glm::vec2 &screen_pos) const
 {
     const glm::vec4 pos4 = m_inv_projection * glm::vec4(screen_pos, 0.5f, 1.f);
     return vec_t(pos4) * pos4.w;
 }
 
-template <typename Dim> glm::vec2 camera<Dim>::world_to_screen(const vec_t &world_pos) const
+template <Dimension Dim> glm::vec2 camera<Dim>::world_to_screen(const vec_t &world_pos) const
 {
     if constexpr (std::is_same_v<Dim, dimension::two>)
     {

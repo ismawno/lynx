@@ -21,7 +21,7 @@ namespace lynx
 {
 class device;
 
-template <typename Dim> class model
+template <Dimension Dim> class model
 {
   public:
     using vertex_t = vertex<Dim>;

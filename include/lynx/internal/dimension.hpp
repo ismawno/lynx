@@ -7,13 +7,22 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
+namespace lynx::dimension
+{
+struct two;
+struct three;
+} // namespace lynx::dimension
+
 namespace lynx
 {
-template <typename Dim> class camera;
-template <typename Dim> class window;
-template <typename Dim> class render_system;
-template <typename Dim> class model;
-template <typename Dim> class shape;
+template <typename Dim>
+concept Dimension = std::is_same_v<Dim, dimension::two> || std::is_same_v<Dim, dimension::three>;
+
+template <Dimension Dim> class camera;
+template <Dimension Dim> class window;
+template <Dimension Dim> class render_system;
+template <Dimension Dim> class model;
+template <Dimension Dim> class shape;
 
 class shape2D;
 class model3D;

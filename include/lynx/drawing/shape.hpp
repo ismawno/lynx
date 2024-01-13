@@ -15,7 +15,7 @@
 
 namespace lynx
 {
-template <typename Dim> class shape : public drawable<Dim>
+template <Dimension Dim> class shape : public drawable<Dim>
 {
   public:
     using transform_t = typename Dim::transform_t;
@@ -66,7 +66,7 @@ class shape2D : public shape<dimension::two>
 
 using shape3D = shape<dimension::three>;
 
-template <typename Dim> class rect : public Dim::shape_t
+template <Dimension Dim> class rect : public Dim::shape_t
 {
   public:
     using vec_t = typename Dim::vec_t;
@@ -81,7 +81,7 @@ template <typename Dim> class rect : public Dim::shape_t
 using rect2D = rect<dimension::two>;
 using rect3D = rect<dimension::three>;
 
-template <typename Dim> class ellipse : public Dim::shape_t
+template <Dimension Dim> class ellipse : public Dim::shape_t
 {
   public:
     using vec_t = typename Dim::vec_t;
@@ -99,7 +99,7 @@ template <typename Dim> class ellipse : public Dim::shape_t
 using ellipse2D = ellipse<dimension::two>;
 using ellipse3D = ellipse<dimension::three>;
 
-template <typename Dim> class polygon : public Dim::shape_t
+template <Dimension Dim> class polygon : public Dim::shape_t
 {
   public:
     using vec_t = typename Dim::vec_t;

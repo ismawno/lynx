@@ -3,15 +3,15 @@
 
 namespace lynx
 {
-template <typename Dim>
+template <Dimension Dim>
 vertex<Dim>::vertex(const vec_t &position, const lynx::color &pcolor) : position(position), color(pcolor)
 {
 }
-template <typename Dim> std::vector<VkVertexInputBindingDescription> vertex<Dim>::binding_descriptions()
+template <Dimension Dim> std::vector<VkVertexInputBindingDescription> vertex<Dim>::binding_descriptions()
 {
     return {{0, sizeof(vertex), VK_VERTEX_INPUT_RATE_VERTEX}};
 }
-template <typename Dim> std::vector<VkVertexInputAttributeDescription> vertex<Dim>::attribute_descriptions()
+template <Dimension Dim> std::vector<VkVertexInputAttributeDescription> vertex<Dim>::attribute_descriptions()
 {
     if constexpr (std::is_same_v<Dim, dimension::two>)
         return {{0, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(vertex, position)},

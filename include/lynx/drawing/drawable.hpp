@@ -18,7 +18,7 @@ enum class topology
     TRIANGLE_STRIP = 4
 };
 
-template <typename Dim> class drawable
+template <Dimension Dim> class drawable
 {
   public:
     using window_t = window<Dim>;

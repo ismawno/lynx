@@ -4,7 +4,7 @@
 #include "kit/serialization/yaml/codec.hpp"
 #include "lynx/app/app.hpp"
 
-template <typename Dim> struct kit::yaml::codec<lynx::layer<Dim>>
+template <lynx::Dimension Dim> struct kit::yaml::codec<lynx::layer<Dim>>
 {
     static YAML::Node encode(const lynx::layer<Dim> &layer)
     {
@@ -22,7 +22,7 @@ template <typename Dim> struct kit::yaml::codec<lynx::layer<Dim>>
     }
 };
 
-template <typename Dim> struct kit::yaml::codec<lynx::app<Dim>>
+template <lynx::Dimension Dim> struct kit::yaml::codec<lynx::app<Dim>>
 {
     static YAML::Node encode(const lynx::app<Dim> &app)
     {

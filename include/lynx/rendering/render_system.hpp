@@ -18,7 +18,7 @@ struct push_constant_data
     glm::mat4 projection{1.f};
 };
 
-template <typename Dim> class render_system
+template <Dimension Dim> class render_system
 {
   public:
     using vertex_t = vertex<Dim>;
@@ -62,33 +62,33 @@ template <typename Dim> class render_system
     std::vector<render_data> m_render_data;
 
     static inline std::uint32_t s_z_offset_counter2D = 0;
-    template <typename T> friend class window;
+    template <Dimension T> friend class window;
 };
 
 using render_system2D = render_system<dimension::three>;
 using render_system3D = render_system<dimension::three>;
 
-template <typename Dim> class point_render_system : public render_system<Dim>
+template <Dimension Dim> class point_render_system : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <typename Dim> class line_render_system : public render_system<Dim>
+template <Dimension Dim> class line_render_system : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <typename Dim> class line_strip_render_system : public render_system<Dim>
+template <Dimension Dim> class line_strip_render_system : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <typename Dim> class triangle_render_system : public render_system<Dim>
+template <Dimension Dim> class triangle_render_system : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <typename Dim> class triangle_strip_render_system : public render_system<Dim>
+template <Dimension Dim> class triangle_strip_render_system : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };

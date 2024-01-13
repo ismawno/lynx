@@ -13,7 +13,7 @@
 
 namespace lynx
 {
-template <typename Dim> struct vertex
+template <Dimension Dim> struct vertex
 {
     using vec_t = typename Dim::vec_t;
     vertex() = default;

@@ -5,12 +5,12 @@
 
 namespace lynx
 {
-template <typename Dim> void input<Dim>::poll_events()
+template <Dimension Dim> void input<Dim>::poll_events()
 {
     glfwPollEvents();
 }
 
-template <typename Dim> bool input<Dim>::key_pressed(const key kc)
+template <Dimension Dim> bool input<Dim>::key_pressed(const key kc)
 {
     const window_t *win = context_t::window();
     KIT_ASSERT_ERROR(context_t::valid(), "Trying to get input feedback with a non valid current context")
@@ -18,12 +18,12 @@ template <typename Dim> bool input<Dim>::key_pressed(const key kc)
         return false;
     return key_pressed(*win, kc);
 }
-template <typename Dim> bool input<Dim>::key_pressed(const window_t &win, const key kc)
+template <Dimension Dim> bool input<Dim>::key_pressed(const window_t &win, const key kc)
 {
     return glfwGetKey(win.glfw_window(), (int)kc) == GLFW_PRESS;
 }
 
-template <typename Dim> bool input<Dim>::key_released(const key kc)
+template <Dimension Dim> bool input<Dim>::key_released(const key kc)
 {
     const window_t *win = context_t::window();
     KIT_ASSERT_ERROR(context_t::valid(), "Trying to get input feedback with a non valid current context")
@@ -31,12 +31,12 @@ template <typename Dim> bool input<Dim>::key_released(const key kc)
         return false;
     return key_released(*win, kc);
 }
-template <typename Dim> bool input<Dim>::key_released(const window_t &win, const key kc)
+template <Dimension Dim> bool input<Dim>::key_released(const window_t &win, const key kc)
 {
     return glfwGetKey(win.glfw_window(), (int)kc) == GLFW_RELEASE;
 }
 
-template <typename Dim> bool input<Dim>::mouse_button_pressed(const mouse btn)
+template <Dimension Dim> bool input<Dim>::mouse_button_pressed(const mouse btn)
 {
     const window_t *win = context_t::window();
     KIT_ASSERT_ERROR(context_t::valid(), "Trying to get input feedback with a non valid current context")
@@ -44,12 +44,12 @@ template <typename Dim> bool input<Dim>::mouse_button_pressed(const mouse btn)
         return false;
     return mouse_button_pressed(*win, btn);
 }
-template <typename Dim> bool input<Dim>::mouse_button_pressed(const window_t &win, const mouse btn)
+template <Dimension Dim> bool input<Dim>::mouse_button_pressed(const window_t &win, const mouse btn)
 {
     return glfwGetMouseButton(win.glfw_window(), (int)btn);
 }
 
-template <typename Dim> glm::vec2 input<Dim>::mouse_position()
+template <Dimension Dim> glm::vec2 input<Dim>::mouse_position()
 {
     static glm::vec2 screen_mouse{0.f};
     const window_t *win = context_t::window();
@@ -64,7 +64,7 @@ template <typename Dim> glm::vec2 input<Dim>::mouse_position()
     return screen_mouse;
 }
 
-template <typename Dim> const char *input<Dim>::key_name(const key kc)
+template <Dimension Dim> const char *input<Dim>::key_name(const key kc)
 {
     return glfwGetKeyName((int)kc, 0);
 }
@@ -74,7 +74,7 @@ template <typename T> static T *from_glfw(GLFWwindow *win)
     return (T *)glfwGetWindowUserPointer(win);
 }
 
-template <typename Dim> static void window_resize_callback(GLFWwindow *gwindow, const int width, const int height)
+template <Dimension Dim> static void window_resize_callback(GLFWwindow *gwindow, const int width, const int height)
 {
     event<Dim> ev;
     ev.type = event<Dim>::WINDOW_RESIZED;
@@ -91,7 +91,7 @@ template <typename Dim> static void window_resize_callback(GLFWwindow *gwindow, 
     win->push_event(ev);
 }
 
-template <typename Dim>
+template <Dimension Dim>
 static void key_callback(GLFWwindow *gwindow, const int key, const int scancode, const int action, const int mods)
 {
     event<Dim> ev;
@@ -113,7 +113,7 @@ static void key_callback(GLFWwindow *gwindow, const int key, const int scancode,
     from_glfw<window<Dim>>(gwindow)->push_event(ev);
 }
 
-template <typename Dim> static void cursor_position_callback(GLFWwindow *gwindow, const double xpos, const double ypos)
+template <Dimension Dim> static void cursor_position_callback(GLFWwindow *gwindow, const double xpos, const double ypos)
 {
     event<Dim> ev;
     ev.type = event<Dim>::MOUSE_MOVED;
@@ -121,7 +121,7 @@ template <typename Dim> static void cursor_position_callback(GLFWwindow *gwindow
     from_glfw<window<Dim>>(gwindow)->push_event(ev);
 }
 
-template <typename Dim>
+template <Dimension Dim>
 static void mouse_button_callback(GLFWwindow *gwindow, const int button, const int action, const int mods)
 {
     event<Dim> ev;
@@ -130,7 +130,7 @@ static void mouse_button_callback(GLFWwindow *gwindow, const int button, const i
     from_glfw<window<Dim>>(gwindow)->push_event(ev);
 }
 
-template <typename Dim> static void scroll_callback(GLFWwindow *gwindow, double xoffset, double yoffset)
+template <Dimension Dim> static void scroll_callback(GLFWwindow *gwindow, double xoffset, double yoffset)
 {
     event<Dim> ev;
     ev.type = event<Dim>::SCROLLED;
@@ -138,7 +138,7 @@ template <typename Dim> static void scroll_callback(GLFWwindow *gwindow, double 
     from_glfw<window<Dim>>(gwindow)->push_event(ev);
 }
 
-template <typename Dim> void input<Dim>::install_callbacks(window_t *win)
+template <Dimension Dim> void input<Dim>::install_callbacks(window_t *win)
 {
     glfwSetWindowSizeCallback(win->glfw_window(), window_resize_callback<Dim>);
     glfwSetKeyCallback(win->glfw_window(), key_callback<Dim>);

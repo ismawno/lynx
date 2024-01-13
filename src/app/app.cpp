@@ -7,13 +7,13 @@
 namespace lynx
 {
 
-template <typename Dim> app<Dim>::~app()
+template <Dimension Dim> app<Dim>::~app()
 {
     if (!m_terminated)
         shutdown();
 }
 
-template <typename Dim> void app<Dim>::run()
+template <Dimension Dim> void app<Dim>::run()
 {
     start();
     while (next_frame())
@@ -21,7 +21,7 @@ template <typename Dim> void app<Dim>::run()
     shutdown();
 }
 
-template <typename Dim> void app<Dim>::start()
+template <Dimension Dim> void app<Dim>::start()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot call start on a terminated app")
     KIT_ASSERT_ERROR(!m_started, "Cannot call start on a started app")
@@ -37,7 +37,7 @@ template <typename Dim> void app<Dim>::start()
     on_late_start();
 }
 
-template <typename Dim> bool app<Dim>::next_frame()
+template <Dimension Dim> bool app<Dim>::next_frame()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     KIT_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
@@ -119,7 +119,7 @@ template <typename Dim> bool app<Dim>::next_frame()
     return !m_window->closed() && !m_to_finish_next_frame;
 }
 
-template <typename Dim> void app<Dim>::shutdown()
+template <Dimension Dim> void app<Dim>::shutdown()
 {
     context_t::set(m_window.get());
     if (m_ongoing_frame)
@@ -143,48 +143,48 @@ template <typename Dim> void app<Dim>::shutdown()
     m_terminated = true;
 }
 
-template <typename Dim> const window<Dim> *app<Dim>::window() const
+template <Dimension Dim> const window<Dim> *app<Dim>::window() const
 {
     return m_window.get();
 }
 
-template <typename Dim> window<Dim> *app<Dim>::window()
+template <Dimension Dim> window<Dim> *app<Dim>::window()
 {
     return m_window.get();
 }
 
-template <typename Dim> kit::time app<Dim>::frame_time() const
+template <Dimension Dim> kit::time app<Dim>::frame_time() const
 {
     return m_frame_time;
 }
-template <typename Dim> kit::time app<Dim>::update_time() const
+template <Dimension Dim> kit::time app<Dim>::update_time() const
 {
     return m_update_time;
 }
-template <typename Dim> kit::time app<Dim>::render_time() const
+template <Dimension Dim> kit::time app<Dim>::render_time() const
 {
     return m_render_time;
 }
 
-template <typename Dim> const layer<Dim> &app<Dim>::operator[](std::size_t index) const
+template <Dimension Dim> const layer<Dim> &app<Dim>::operator[](std::size_t index) const
 {
     KIT_ASSERT_ERROR(index < m_layers.size(), "Index exceeds container size: {0}", index)
     return *m_layers[index];
 }
-template <typename Dim> layer<Dim> &app<Dim>::operator[](std::size_t index)
+template <Dimension Dim> layer<Dim> &app<Dim>::operator[](std::size_t index)
 {
     KIT_ASSERT_ERROR(index < m_layers.size(), "Index exceeds container size: {0}", index)
     return *m_layers[index];
 }
 
-template <typename Dim> const layer<Dim> *app<Dim>::operator[](const std::string &name) const
+template <Dimension Dim> const layer<Dim> *app<Dim>::operator[](const std::string &name) const
 {
     for (const auto &l : m_layers)
         if (l->id == name)
             return l.get();
     return nullptr;
 }
-template <typename Dim> layer<Dim> *app<Dim>::operator[](const std::string &name)
+template <Dimension Dim> layer<Dim> *app<Dim>::operator[](const std::string &name)
 {
     for (const auto &l : m_layers)
         if (l->id == name)
@@ -192,19 +192,19 @@ template <typename Dim> layer<Dim> *app<Dim>::operator[](const std::string &name
     return nullptr;
 }
 
-template <typename Dim> std::uint32_t app<Dim>::framerate_cap() const
+template <Dimension Dim> std::uint32_t app<Dim>::framerate_cap() const
 {
     const bool capped = m_min_frame_time.as<kit::time::nanoseconds, long long>() > 0;
     return capped ? (std::uint32_t)(1.f / m_min_frame_time.as<kit::time::seconds, float>()) : 0;
 }
 
-template <typename Dim> void app<Dim>::limit_framerate(const std::uint32_t framerate)
+template <Dimension Dim> void app<Dim>::limit_framerate(const std::uint32_t framerate)
 {
     m_min_frame_time = kit::time::from<kit::time::seconds>(framerate > 0 ? (1.f / framerate) : 0.f);
 }
 
 #ifdef LYNX_ENABLE_IMGUI
-template <typename Dim> void app<Dim>::imgui_init()
+template <Dimension Dim> void app<Dim>::imgui_init()
 {
     constexpr std::uint32_t pool_size = 1000;
     VkDescriptorPoolSize pool_sizes[11] = {{VK_DESCRIPTOR_TYPE_SAMPLER, pool_size},
@@ -263,7 +263,7 @@ template <typename Dim> void app<Dim>::imgui_init()
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
-template <typename Dim> void app<Dim>::imgui_begin_render()
+template <Dimension Dim> void app<Dim>::imgui_begin_render()
 {
     KIT_PERF_FUNCTION()
     ImGui::SetCurrentContext(m_imgui_context);
@@ -278,14 +278,14 @@ template <typename Dim> void app<Dim>::imgui_begin_render()
     ImGui::PushID(this);
 }
 
-template <typename Dim> void app<Dim>::imgui_end_render()
+template <Dimension Dim> void app<Dim>::imgui_end_render()
 {
     KIT_PERF_FUNCTION()
     ImGui::PopID();
     ImGui::Render();
 }
 
-template <typename Dim> void app<Dim>::imgui_submit_command(const VkCommandBuffer command_buffer)
+template <Dimension Dim> void app<Dim>::imgui_submit_command(const VkCommandBuffer command_buffer)
 {
     KIT_PERF_FUNCTION()
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
@@ -298,7 +298,7 @@ template <typename Dim> void app<Dim>::imgui_submit_command(const VkCommandBuffe
     }
 }
 
-template <typename Dim> void app<Dim>::imgui_shutdown()
+template <Dimension Dim> void app<Dim>::imgui_shutdown()
 {
     ImGui::SetCurrentContext(m_imgui_context);
 #ifdef LYNX_ENABLE_IMPLOT
@@ -316,11 +316,11 @@ template <typename Dim> void app<Dim>::imgui_shutdown()
 #endif
 
 #ifdef KIT_USE_YAML_CPP
-template <typename Dim> YAML::Node app<Dim>::encode() const
+template <Dimension Dim> YAML::Node app<Dim>::encode() const
 {
     return kit::yaml::codec<app<Dim>>::encode(*this);
 }
-template <typename Dim> bool app<Dim>::decode(const YAML::Node &node)
+template <Dimension Dim> bool app<Dim>::decode(const YAML::Node &node)
 {
     return kit::yaml::codec<app<Dim>>::decode(node, *this);
 }

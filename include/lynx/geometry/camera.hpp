@@ -10,7 +10,7 @@
 
 namespace lynx
 {
-template <typename Dim> class camera
+template <Dimension Dim> class camera
 {
   public:
     using vec_t = typename Dim::vec_t;

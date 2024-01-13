@@ -4,7 +4,7 @@
 
 namespace lynx
 {
-template <typename Dim>
+template <Dimension Dim>
 model<Dim>::model(const kit::ref<const device> &dev, const std::vector<vertex_t> &vertices) : m_device(dev)
 {
     KIT_ASSERT_ERROR(!vertices.empty(), "Cannot create a model with no vertices")
@@ -17,7 +17,7 @@ model<Dim>::model(const kit::ref<const device> &dev, const std::vector<vertex_t>
     m_index_buffer = nullptr;
 }
 
-template <typename Dim>
+template <Dimension Dim>
 model<Dim>::model(const kit::ref<const device> &dev, const std::vector<vertex_t> &vertices,
                   const std::vector<std::uint32_t> &indices)
     : m_device(dev)
@@ -39,24 +39,24 @@ model<Dim>::model(const kit::ref<const device> &dev, const std::vector<vertex_t>
         m_index_data[i] = indices[i];
 }
 
-template <typename Dim>
+template <Dimension Dim>
 model<Dim>::model(const kit::ref<const device> &dev, const vertex_index_pair &build)
     : model(dev, build.vertices, build.indices)
 {
 }
 
-template <typename Dim> model<Dim>::model(const model &other)
+template <Dimension Dim> model<Dim>::model(const model &other)
 {
     copy(other);
 }
 
-template <typename Dim> model<Dim> &model<Dim>::operator=(const model &other)
+template <Dimension Dim> model<Dim> &model<Dim>::operator=(const model &other)
 {
     copy(other);
     return *this;
 }
 
-template <typename Dim> void model<Dim>::copy(const model &other)
+template <Dimension Dim> void model<Dim>::copy(const model &other)
 {
     m_device = other.m_device;
     m_vertex_buffer = kit::make_scope<vertex_buffer_t>(*other.m_vertex_buffer);
@@ -67,7 +67,7 @@ template <typename Dim> void model<Dim>::copy(const model &other)
 }
 
 #ifdef DEBUG
-template <typename Dim> model<Dim>::~model()
+template <Dimension Dim> model<Dim>::~model()
 {
     KIT_ASSERT_CRITICAL(!to_be_rendered,
                         "Model has been destroyed before being rendered! Any drawable entity must remain alive until "
@@ -75,7 +75,7 @@ template <typename Dim> model<Dim>::~model()
 }
 #endif
 
-template <typename Dim> void model<Dim>::bind(VkCommandBuffer command_buffer) const
+template <Dimension Dim> void model<Dim>::bind(VkCommandBuffer command_buffer) const
 {
     const std::array<VkBuffer, 1> buffers = {m_vertex_buffer->vulkan_buffer()};
     const std::array<VkDeviceSize, 1> offsets = {0};
@@ -84,7 +84,7 @@ template <typename Dim> void model<Dim>::bind(VkCommandBuffer command_buffer) co
     if (m_index_buffer)
         vkCmdBindIndexBuffer(command_buffer, m_index_buffer->vulkan_buffer(), 0, VK_INDEX_TYPE_UINT32);
 }
-template <typename Dim> void model<Dim>::draw(VkCommandBuffer command_buffer) const
+template <Dimension Dim> void model<Dim>::draw(VkCommandBuffer command_buffer) const
 {
     if (has_index_buffers())
         vkCmdDrawIndexed(command_buffer, (std::uint32_t)m_index_buffer->size(), 1, 0, 0, 0);
@@ -92,60 +92,60 @@ template <typename Dim> void model<Dim>::draw(VkCommandBuffer command_buffer) co
         vkCmdDraw(command_buffer, (std::uint32_t)m_vertex_buffer->size(), 1, 0, 0);
 }
 
-template <typename Dim> bool model<Dim>::has_index_buffers() const
+template <Dimension Dim> bool model<Dim>::has_index_buffers() const
 {
     return m_index_data && m_index_buffer;
 }
 
-template <typename Dim> const vertex<Dim> *model<Dim>::vertex_data() const
+template <Dimension Dim> const vertex<Dim> *model<Dim>::vertex_data() const
 {
     return m_vertex_data;
 }
-template <typename Dim> vertex<Dim> *model<Dim>::vertex_data()
+template <Dimension Dim> vertex<Dim> *model<Dim>::vertex_data()
 {
     return m_vertex_data;
 }
 
-template <typename Dim> const std::uint32_t *model<Dim>::index_data() const
+template <Dimension Dim> const std::uint32_t *model<Dim>::index_data() const
 {
     KIT_ASSERT_ERROR(has_index_buffers(), "Current model does not contain an index buffer!")
     return m_index_data;
 }
-template <typename Dim> std::uint32_t *model<Dim>::index_data()
+template <Dimension Dim> std::uint32_t *model<Dim>::index_data()
 {
     KIT_ASSERT_ERROR(has_index_buffers(), "Current model does not contain an index buffer!")
     return m_index_data;
 }
 
-template <typename Dim> const vertex<Dim> &model<Dim>::vertex(const std::size_t index) const
+template <Dimension Dim> const vertex<Dim> &model<Dim>::vertex(const std::size_t index) const
 {
     return m_vertex_data[index];
 }
-template <typename Dim> void model<Dim>::vertex(const std::size_t index, const vertex_t &vtx)
+template <Dimension Dim> void model<Dim>::vertex(const std::size_t index, const vertex_t &vtx)
 {
     m_vertex_data[index] = vtx;
 }
 
-template <typename Dim> std::uint32_t model<Dim>::index(const std::size_t index) const
+template <Dimension Dim> std::uint32_t model<Dim>::index(const std::size_t index) const
 {
     return m_index_data[index];
 }
-template <typename Dim> void model<Dim>::index(const std::size_t index, const std::uint32_t idx)
+template <Dimension Dim> void model<Dim>::index(const std::size_t index, const std::uint32_t idx)
 {
     m_index_data[index] = idx;
 }
 
-template <typename Dim> std::size_t model<Dim>::vertex_count() const
+template <Dimension Dim> std::size_t model<Dim>::vertex_count() const
 {
     return m_vertex_buffer->size();
 }
 
-template <typename Dim> std::size_t model<Dim>::index_count() const
+template <Dimension Dim> std::size_t model<Dim>::index_count() const
 {
     return m_index_buffer ? m_index_buffer->size() : 0;
 }
 
-template <typename Dim> typename model<Dim>::vertex_index_pair model<Dim>::rect(const color &color)
+template <Dimension Dim> typename model<Dim>::vertex_index_pair model<Dim>::rect(const color &color)
 {
     if constexpr (std::is_same_v<Dim, dimension::two>)
     {
@@ -165,14 +165,14 @@ template <typename Dim> typename model<Dim>::vertex_index_pair model<Dim>::rect(
     }
 }
 
-template <typename Dim> std::vector<vertex<Dim>> model<Dim>::line(const color &color1, const color &color2)
+template <Dimension Dim> std::vector<vertex<Dim>> model<Dim>::line(const color &color1, const color &color2)
 {
     if constexpr (std::is_same_v<Dim, dimension::two>)
         return {{{-1.f, 0.f}, color1}, {{1.f, 0.f}, color2}};
     else
         return {{{-1.f, 0.f, 0.f}, color1}, {{1.f, 0.f, 0.f}, color2}};
 }
-template <typename Dim>
+template <Dimension Dim>
 typename model<Dim>::vertex_index_pair model<Dim>::circle(const std::uint32_t partitions, const color &color)
 {
     KIT_ASSERT_ERROR(partitions > 2, "Must at least have 3 partitions. Current: {0}", partitions)
@@ -196,7 +196,7 @@ typename model<Dim>::vertex_index_pair model<Dim>::circle(const std::uint32_t pa
     }
     return build;
 }
-template <typename Dim>
+template <Dimension Dim>
 typename model<Dim>::vertex_index_pair model<Dim>::polygon(const std::vector<vertex_t> &local_vertices,
                                                            const color &center_color)
 {
@@ -219,7 +219,7 @@ typename model<Dim>::vertex_index_pair model<Dim>::polygon(const std::vector<ver
     build.indices.back() = 1;
     return build;
 }
-template <typename Dim>
+template <Dimension Dim>
 typename model<Dim>::vertex_index_pair model<Dim>::polygon(const std::vector<vec_t> &local_vertices, const color &color)
 {
     std::vector<vertex_t> colored_vertices;

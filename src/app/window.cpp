@@ -8,7 +8,7 @@
 
 namespace lynx
 {
-template <typename Dim>
+template <Dimension Dim>
 window<Dim>::window(const std::uint32_t width, const std::uint32_t height, const char *name)
     : nameable(name), m_width(width), m_height(height)
 {
@@ -27,12 +27,12 @@ window<Dim>::window(const std::uint32_t width, const std::uint32_t height, const
         set_camera<perspective3D>(pixel_aspect(), glm::radians(60.f));
 }
 
-template <typename Dim> window<Dim>::~window()
+template <Dimension Dim> window<Dim>::~window()
 {
     close();
 }
 
-template <typename Dim> void window<Dim>::init()
+template <Dimension Dim> void window<Dim>::init()
 {
     KIT_CHECK_RETURN_VALUE(glfwInit(), GLFW_TRUE, CRITICAL, "GLFW failed to initialize")
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -46,7 +46,7 @@ template <typename Dim> void window<Dim>::init()
     m_renderer = kit::make_scope<renderer_t>(m_device, *this);
 }
 
-template <typename Dim> bool window<Dim>::display(const std::function<void(VkCommandBuffer)> &submission)
+template <Dimension Dim> bool window<Dim>::display(const std::function<void(VkCommandBuffer)> &submission)
 {
     KIT_PERF_FUNCTION()
     if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
@@ -69,19 +69,19 @@ template <typename Dim> bool window<Dim>::display(const std::function<void(VkCom
     return false;
 }
 
-template <typename Dim> void window<Dim>::close()
+template <Dimension Dim> void window<Dim>::close()
 {
     clear_render_data();
     glfwDestroyWindow(m_window);
     m_window = nullptr;
 }
 
-template <typename Dim> void window<Dim>::wait_for_device() const
+template <Dimension Dim> void window<Dim>::wait_for_device() const
 {
     vkDeviceWaitIdle(m_device->vulkan_device());
 }
 
-template <typename Dim> bool window<Dim>::closed()
+template <Dimension Dim> bool window<Dim>::closed()
 {
     if (!m_window)
         return true;
@@ -93,14 +93,14 @@ template <typename Dim> bool window<Dim>::closed()
     return false;
 }
 
-template <typename Dim> void window<Dim>::render(const VkCommandBuffer command_buffer) const
+template <Dimension Dim> void window<Dim>::render(const VkCommandBuffer command_buffer) const
 {
     KIT_PERF_PRETTY_FUNCTION()
     for (const auto &sys : m_render_systems)
         sys->render(command_buffer, *m_camera);
 }
 
-template <typename Dim> void window<Dim>::clear_render_data()
+template <Dimension Dim> void window<Dim>::clear_render_data()
 {
     KIT_PERF_FUNCTION()
     for (const auto &sys : m_render_systems)
@@ -109,51 +109,51 @@ template <typename Dim> void window<Dim>::clear_render_data()
         render_system_t::s_z_offset_counter2D = 0;
 }
 
-template <typename Dim> bool window<Dim>::was_resized() const
+template <Dimension Dim> bool window<Dim>::was_resized() const
 {
     return m_resized;
 }
-template <typename Dim> void window<Dim>::complete_resize()
+template <Dimension Dim> void window<Dim>::complete_resize()
 {
     m_resized = false;
 }
 
-template <typename Dim> void window<Dim>::make_context_current() const
+template <Dimension Dim> void window<Dim>::make_context_current() const
 {
     glfwMakeContextCurrent(m_window);
 }
 
-template <typename Dim> bool window<Dim>::maintain_camera_aspect_ratio() const
+template <Dimension Dim> bool window<Dim>::maintain_camera_aspect_ratio() const
 {
     return m_maintain_camera_aspect_ratio;
 }
-template <typename Dim> void window<Dim>::maintain_camera_aspect_ratio(const bool maintain)
+template <Dimension Dim> void window<Dim>::maintain_camera_aspect_ratio(const bool maintain)
 {
     m_maintain_camera_aspect_ratio = maintain;
 }
 
-template <typename Dim> void window<Dim>::resize(const std::uint32_t width, const std::uint32_t height)
+template <Dimension Dim> void window<Dim>::resize(const std::uint32_t width, const std::uint32_t height)
 {
     m_width = width;
     m_height = height;
     m_resized = true;
 }
 
-template <typename Dim> const color &window<Dim>::clear_color() const
+template <Dimension Dim> const color &window<Dim>::clear_color() const
 {
     return m_clear_color;
 }
-template <typename Dim> void window<Dim>::clear_color(const color &color)
+template <Dimension Dim> void window<Dim>::clear_color(const color &color)
 {
     m_clear_color = color;
 }
 
-template <typename Dim> void window<Dim>::push_event(const event_t &ev)
+template <Dimension Dim> void window<Dim>::push_event(const event_t &ev)
 {
     m_event_queue.push(ev);
 }
 
-template <typename Dim> event<Dim> window<Dim>::poll_event()
+template <Dimension Dim> event<Dim> window<Dim>::poll_event()
 {
     if (m_event_queue.empty())
     {
@@ -166,69 +166,69 @@ template <typename Dim> event<Dim> window<Dim>::poll_event()
     return ev;
 }
 
-template <typename Dim> const renderer<Dim> &window<Dim>::renderer() const
+template <Dimension Dim> const renderer<Dim> &window<Dim>::renderer() const
 {
     return *m_renderer;
 }
 
-template <typename Dim> const kit::ref<const lynx::device> &window<Dim>::device() const
+template <Dimension Dim> const kit::ref<const lynx::device> &window<Dim>::device() const
 {
     return m_device;
 }
-template <typename Dim>
+template <Dimension Dim>
 void window<Dim>::draw(const std::vector<vertex_t> &vertices, const topology tplg, const transform_t &transform)
 {
     render_system_from_topology<render_system_t>(tplg)->draw(vertices, transform);
 }
-template <typename Dim>
+template <Dimension Dim>
 void window<Dim>::draw(const std::vector<vertex_t> &vertices, const std::vector<std::uint32_t> &indices,
                        const topology tplg, const transform_t &transform)
 {
     render_system_from_topology<render_system_t>(tplg)->draw(vertices, indices, transform);
 }
-template <typename Dim> void window<Dim>::draw(const drawable_t &drawable)
+template <Dimension Dim> void window<Dim>::draw(const drawable_t &drawable)
 {
     drawable.draw(*this);
 }
 
-template <typename Dim> GLFWwindow *window<Dim>::glfw_window() const
+template <Dimension Dim> GLFWwindow *window<Dim>::glfw_window() const
 {
     return m_window;
 }
 
-template <typename Dim> std::uint32_t window<Dim>::screen_width() const
+template <Dimension Dim> std::uint32_t window<Dim>::screen_width() const
 {
     return m_width;
 }
-template <typename Dim> std::uint32_t window<Dim>::screen_height() const
+template <Dimension Dim> std::uint32_t window<Dim>::screen_height() const
 {
     return m_height;
 }
 
-template <typename Dim> std::uint32_t window<Dim>::pixel_width() const
+template <Dimension Dim> std::uint32_t window<Dim>::pixel_width() const
 {
     return m_renderer->swap_chain().width();
 }
-template <typename Dim> std::uint32_t window<Dim>::pixel_height() const
+template <Dimension Dim> std::uint32_t window<Dim>::pixel_height() const
 {
     return m_renderer->swap_chain().height();
 }
 
-template <typename Dim> float window<Dim>::screen_aspect() const
+template <Dimension Dim> float window<Dim>::screen_aspect() const
 {
     return (float)m_width / (float)m_height;
 }
-template <typename Dim> float window<Dim>::pixel_aspect() const
+template <Dimension Dim> float window<Dim>::pixel_aspect() const
 {
     return m_renderer->swap_chain().extent_aspect_ratio();
 }
 
-template <typename Dim> VkExtent2D window<Dim>::extent() const
+template <Dimension Dim> VkExtent2D window<Dim>::extent() const
 {
     return {m_width, m_height};
 }
 
-template <typename Dim> bool window<Dim>::should_close() const
+template <Dimension Dim> bool window<Dim>::should_close() const
 {
     return !m_window || glfwWindowShouldClose(m_window);
 }

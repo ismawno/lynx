@@ -13,7 +13,7 @@ namespace lynx
 {
 class device;
 
-template <typename Dim> class renderer : kit::non_copyable
+template <Dimension Dim> class renderer : kit::non_copyable
 {
   public:
     using window_t = window<Dim>;

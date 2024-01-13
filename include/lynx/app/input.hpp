@@ -17,8 +17,8 @@
 
 namespace lynx
 {
-template <typename Dim> struct event;
-template <typename Dim> class input
+template <Dimension Dim> struct event;
+template <Dimension Dim> class input
 {
   public:
     input() = delete;
@@ -185,7 +185,7 @@ template <typename Dim> class input
     static void install_callbacks(window_t *win);
 };
 
-template <typename Dim> struct event
+template <Dimension Dim> struct event
 {
     using input_t = input<Dim>;
     enum action_type

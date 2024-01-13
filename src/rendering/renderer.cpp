@@ -6,40 +6,40 @@
 
 namespace lynx
 {
-template <typename Dim>
+template <Dimension Dim>
 renderer<Dim>::renderer(const kit::ref<const device> &dev, window_t &win) : m_window(win), m_device(dev)
 {
     create_swap_chain();
     create_command_buffers();
 }
 
-template <typename Dim> renderer<Dim>::~renderer()
+template <Dimension Dim> renderer<Dim>::~renderer()
 {
     free_command_buffers();
 }
 
-template <typename Dim> bool renderer<Dim>::frame_in_progress() const
+template <Dimension Dim> bool renderer<Dim>::frame_in_progress() const
 {
     return m_frame_started;
 }
-template <typename Dim> VkCommandBuffer renderer<Dim>::current_command_buffer() const
+template <Dimension Dim> VkCommandBuffer renderer<Dim>::current_command_buffer() const
 {
     KIT_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve command buffer")
     return m_command_buffers[m_frame_index];
 }
 
-template <typename Dim> std::uint32_t renderer<Dim>::frame_index() const
+template <Dimension Dim> std::uint32_t renderer<Dim>::frame_index() const
 {
     KIT_ASSERT_ERROR(m_frame_started, "Frame must have started to retrieve frame index")
     return m_frame_index;
 }
 
-template <typename Dim> const swap_chain &renderer<Dim>::swap_chain() const
+template <Dimension Dim> const swap_chain &renderer<Dim>::swap_chain() const
 {
     return *m_swap_chain;
 }
 
-template <typename Dim> void renderer<Dim>::create_swap_chain()
+template <Dimension Dim> void renderer<Dim>::create_swap_chain()
 {
     VkExtent2D ext = m_window.extent();
     while (ext.width == 0 || ext.height == 0)
@@ -53,7 +53,7 @@ template <typename Dim> void renderer<Dim>::create_swap_chain()
     // create_pipeline(); // If render passes are not compatible
 }
 
-template <typename Dim> void renderer<Dim>::create_command_buffers()
+template <Dimension Dim> void renderer<Dim>::create_command_buffers()
 {
     VkCommandBufferAllocateInfo alloc_info{};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -65,13 +65,13 @@ template <typename Dim> void renderer<Dim>::create_command_buffers()
                            VK_SUCCESS, CRITICAL, "Failed to create command buffers")
 }
 
-template <typename Dim> void renderer<Dim>::free_command_buffers()
+template <Dimension Dim> void renderer<Dim>::free_command_buffers()
 {
     vkFreeCommandBuffers(m_device->vulkan_device(), m_device->command_pool(), (std::uint32_t)m_command_buffers.size(),
                          m_command_buffers.data());
 }
 
-template <typename Dim> VkCommandBuffer renderer<Dim>::begin_frame()
+template <Dimension Dim> VkCommandBuffer renderer<Dim>::begin_frame()
 {
     KIT_PERF_FUNCTION()
     KIT_ASSERT_ERROR(!m_frame_started, "Cannot begin a new frame when there is already one in progress")
@@ -94,7 +94,7 @@ template <typename Dim> VkCommandBuffer renderer<Dim>::begin_frame()
                            "Failed to begin command buffer")
     return m_command_buffers[m_frame_index];
 }
-template <typename Dim> void renderer<Dim>::end_frame()
+template <Dimension Dim> void renderer<Dim>::end_frame()
 {
     KIT_PERF_FUNCTION()
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
@@ -116,7 +116,7 @@ template <typename Dim> void renderer<Dim>::end_frame()
     m_frame_index = (m_frame_index + 1) % swap_chain::MAX_FRAMES_IN_FLIGHT;
 }
 
-template <typename Dim>
+template <Dimension Dim>
 void renderer<Dim>::begin_swap_chain_render_pass(VkCommandBuffer command_buffer, const color &clear_color)
 {
     KIT_ASSERT_ERROR(m_frame_started, "Cannot begin render pass if a frame is not in progress")
@@ -156,7 +156,7 @@ void renderer<Dim>::begin_swap_chain_render_pass(VkCommandBuffer command_buffer,
     vkCmdSetViewport(m_command_buffers[m_frame_index], 0, 1, &viewport);
     vkCmdSetScissor(m_command_buffers[m_frame_index], 0, 1, &scissor);
 }
-template <typename Dim> void renderer<Dim>::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
+template <Dimension Dim> void renderer<Dim>::end_swap_chain_render_pass(VkCommandBuffer command_buffer)
 {
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end render pass if a frame is not in progress")
     KIT_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
@@ -166,7 +166,7 @@ template <typename Dim> void renderer<Dim>::end_swap_chain_render_pass(VkCommand
     vkCmdEndRenderPass(m_command_buffers[m_frame_index]);
 }
 
-template <typename Dim>
+template <Dimension Dim>
 void renderer<Dim>::immediate_submission(const std::function<void(VkCommandBuffer)> &submission) const
 {
     const VkCommandBuffer command_buffer = m_device->begin_single_time_commands();

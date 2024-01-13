@@ -14,13 +14,13 @@
 
 namespace lynx
 {
-template <typename Dim> render_system<Dim>::~render_system()
+template <Dimension Dim> render_system<Dim>::~render_system()
 {
     if (m_device)
         vkDestroyPipelineLayout(m_device->vulkan_device(), m_pipeline_layout, nullptr);
 }
 
-template <typename Dim> void render_system<Dim>::init(const kit::ref<const device> &dev, VkRenderPass render_pass)
+template <Dimension Dim> void render_system<Dim>::init(const kit::ref<const device> &dev, VkRenderPass render_pass)
 {
     m_device = dev;
 
@@ -31,7 +31,7 @@ template <typename Dim> void render_system<Dim>::init(const kit::ref<const devic
     create_pipeline(render_pass, config);
 }
 
-template <typename Dim> void render_system<Dim>::create_pipeline_layout(const pipeline::config_info &config)
+template <Dimension Dim> void render_system<Dim>::create_pipeline_layout(const pipeline::config_info &config)
 {
     VkPushConstantRange push_constant_range{};
     push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -48,7 +48,7 @@ template <typename Dim> void render_system<Dim>::create_pipeline_layout(const pi
                            VK_SUCCESS, CRITICAL, "Failed to create pipeline layout")
 }
 
-template <typename Dim>
+template <Dimension Dim>
 void render_system<Dim>::create_pipeline(const VkRenderPass render_pass, pipeline::config_info &config)
 {
     KIT_ASSERT_ERROR(m_pipeline_layout, "Cannot create pipeline before pipeline layout!");
@@ -58,7 +58,7 @@ void render_system<Dim>::create_pipeline(const VkRenderPass render_pass, pipelin
     m_pipeline = kit::make_scope<pipeline>(m_device, config);
 }
 
-template <typename Dim> void render_system<Dim>::render(VkCommandBuffer command_buffer, const camera_t &cam) const
+template <Dimension Dim> void render_system<Dim>::render(VkCommandBuffer command_buffer, const camera_t &cam) const
 {
     KIT_PERF_PRETTY_FUNCTION()
     if (m_render_data.empty())
@@ -79,7 +79,7 @@ template <typename Dim> void render_system<Dim>::render(VkCommandBuffer command_
     }
 }
 
-template <typename Dim>
+template <Dimension Dim>
 typename render_system<Dim>::render_data render_system<Dim>::create_render_data(const model_t *mdl,
                                                                                 glm::mat4 &mdl_transform,
                                                                                 const bool unowned) const
@@ -97,12 +97,12 @@ typename render_system<Dim>::render_data render_system<Dim>::create_render_data(
     return {mdl, mdl_transform, unowned};
 }
 
-template <typename Dim> void render_system<Dim>::push_render_data(const render_data &rdata)
+template <Dimension Dim> void render_system<Dim>::push_render_data(const render_data &rdata)
 {
     m_render_data.push_back(rdata);
 }
 
-template <typename Dim> void render_system<Dim>::clear_render_data()
+template <Dimension Dim> void render_system<Dim>::clear_render_data()
 {
     for (const render_data &rdata : m_render_data)
     {
@@ -115,7 +115,7 @@ template <typename Dim> void render_system<Dim>::clear_render_data()
     m_render_data.clear();
 }
 
-template <typename Dim> void render_system<Dim>::pipeline_config(pipeline::config_info &config) const
+template <Dimension Dim> void render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
     pipeline::config_info::default_config(config);
     config.constant_range_size = sizeof(push_constant_data);
@@ -134,7 +134,7 @@ template <typename Dim> void render_system<Dim>::pipeline_config(pipeline::confi
     }
 }
 
-template <typename Dim>
+template <Dimension Dim>
 void render_system<Dim>::draw(const std::vector<vertex_t> &vertices, const transform_t &transform)
 {
     glm::mat4 mdl_mat = transform.center_scale_rotate_translate4();
@@ -142,7 +142,7 @@ void render_system<Dim>::draw(const std::vector<vertex_t> &vertices, const trans
     push_render_data(rdata);
 }
 
-template <typename Dim>
+template <Dimension Dim>
 void render_system<Dim>::draw(const std::vector<vertex_t> &vertices, const std::vector<std::uint32_t> &indices,
                               const transform_t &transform)
 {
@@ -151,36 +151,36 @@ void render_system<Dim>::draw(const std::vector<vertex_t> &vertices, const std::
     push_render_data(rdata);
 }
 
-template <typename Dim> void render_system<Dim>::draw(const drawable_t &drawable)
+template <Dimension Dim> void render_system<Dim>::draw(const drawable_t &drawable)
 {
     drawable.draw(*this);
 }
 
-template <typename Dim> void point_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
+template <Dimension Dim> void point_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
     render_system<Dim>::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
 }
 
-template <typename Dim> void line_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
+template <Dimension Dim> void line_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
     render_system<Dim>::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 }
 
-template <typename Dim> void line_strip_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
+template <Dimension Dim> void line_strip_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
     render_system<Dim>::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
 }
 
-template <typename Dim> void triangle_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
+template <Dimension Dim> void triangle_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
     render_system<Dim>::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 }
 
-template <typename Dim> void triangle_strip_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
+template <Dimension Dim> void triangle_strip_render_system<Dim>::pipeline_config(pipeline::config_info &config) const
 {
     render_system<Dim>::pipeline_config(config);
     config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
