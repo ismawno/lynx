@@ -16,6 +16,9 @@
 
 namespace lynx
 {
+template <typename L, typename Dim>
+concept DerivedFromLayer = std::is_base_of_v<layer<Dim>, L>;
+
 template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serializable, public kit::yaml::deserializable
 {
   public:
@@ -62,14 +65,13 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
     std::uint32_t framerate_cap() const;
     void limit_framerate(std::uint32_t framerate);
 
-    template <typename T, class... Args> T *push_layer(Args &&...args)
+    template <DerivedFromLayer<Dim> L, class... Args> L *push_layer(Args &&...args)
     {
-        static_assert(std::is_base_of_v<layer_t, T>, "Type must inherit from layer class");
         KIT_ASSERT_ERROR(!m_terminated, "Cannot push layers to a terminated app")
 
         context_t::set(m_window.get());
-        auto ly = kit::make_scope<T>(std::forward<Args>(args)...);
-        T *ptr = ly.get();
+        auto ly = kit::make_scope<L>(std::forward<Args>(args)...);
+        L *ptr = ly.get();
 #ifdef DEBUG
         for (const auto &old : m_layers)
         {
@@ -82,9 +84,8 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
         return ptr;
     }
 
-    template <typename T = layer_t> kit::scope<T> pop_layer(const std::string &name)
+    template <DerivedFromLayer<Dim> L = layer_t> kit::scope<L> pop_layer(const std::string &name)
     {
-        static_assert(std::is_base_of_v<layer_t, T>, "Type must inherit from layer class");
         KIT_ASSERT_ERROR(!m_terminated, "Cannot pop layers to a terminated app")
 
         context_t::set(m_window.get());
@@ -93,11 +94,11 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
             if ((*it)->id == name)
             {
                 (*it)->on_detach();
-                kit::scope<T> to_remove;
-                if constexpr (std::is_same_v<T, layer_t>)
+                kit::scope<L> to_remove;
+                if constexpr (std::is_same_v<L, layer_t>)
                     to_remove = std::move(*it);
                 else
-                    to_remove = kit::scope<T>(dynamic_cast<T *>(it->release()));
+                    to_remove = kit::scope<L>(dynamic_cast<L *>(it->release()));
                 m_layers.erase(it);
                 return to_remove;
             }
@@ -105,9 +106,8 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
         return nullptr;
     }
 
-    template <typename T> kit::scope<T> pop_layer(const T *ly)
+    template <DerivedFromLayer<Dim> T> kit::scope<T> pop_layer(const T *ly)
     {
-        static_assert(std::is_base_of_v<layer_t, T>, "Type must inherit from layer class");
         return pop_layer(ly->id);
     }
 
