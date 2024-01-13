@@ -32,9 +32,6 @@ template <typename Dim> class render_system
         const model_t *mdl;
         glm::mat4 mdl_transform;
         bool unowned;
-
-      private:
-        render_data() = default;
     };
 
     virtual ~render_system();

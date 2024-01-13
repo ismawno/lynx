@@ -1,6 +1,6 @@
 project "lynx"
 language "C++"
-cppdialect "C++17"
+cppdialect "c++20"
 
 staticruntime "off"
 kind "StaticLib"
