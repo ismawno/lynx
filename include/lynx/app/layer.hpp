@@ -12,6 +12,10 @@
 namespace lynx
 {
 template <Dimension Dim> class app;
+
+template <typename T, typename Dim>
+concept DerivedFromApp = Dimension<Dim> && std::is_base_of_v<app<Dim>, T>;
+
 template <Dimension Dim>
 class layer : public kit::identifiable<std::string>,
               public kit::toggleable,
@@ -25,9 +29,8 @@ class layer : public kit::identifiable<std::string>,
     layer(const std::string &name);
     virtual ~layer() = default;
 
-    template <typename T = app_t> T *parent() const
+    template <DerivedFromApp<Dim> T = app_t> T *parent() const
     {
-        static_assert(std::is_base_of_v<app_t, T>, "Type must inherit from app class");
         if constexpr (std::is_same_v<app_t, T>)
             return m_parent;
         else

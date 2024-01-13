@@ -24,6 +24,11 @@ namespace lynx
 {
 class device;
 
+template <typename T, typename Dim>
+concept DerivedFromCamera = Dimension<Dim> && std::is_base_of_v<typename Dim::camera_t, T>;
+template <typename T, typename Dim>
+concept DerivedFromRenderSystem = Dimension<Dim> && std::is_base_of_v<render_system<Dim>, T>;
+
 template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
 {
   public:
@@ -89,19 +94,18 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
               const transform_t &transform = {});
     void draw(const drawable_t &drawable);
 
-    template <typename T = camera_t> const T *camera() const
+    template <DerivedFromCamera<Dim> T = camera_t> const T *camera() const
     {
         return kit::const_get_casted_raw_ptr<T>(m_camera);
     }
 
-    template <typename T = camera_t> T *camera()
+    template <DerivedFromCamera<Dim> T = camera_t> T *camera()
     {
         return kit::get_casted_raw_ptr<T>(m_camera);
     }
 
-    template <typename T, class... Args> T *set_camera(Args &&...args)
+    template <DerivedFromCamera<Dim> T, class... Args> T *set_camera(Args &&...args)
     {
-        static_assert(std::is_base_of_v<camera_t, T>, "Type must inherit from camera");
         auto cam = kit::make_scope<T>(std::forward<Args>(args)...);
         T *ptr = cam.get();
         m_camera = std::move(cam);
@@ -110,10 +114,9 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
 
     GLFWwindow *glfw_window() const;
 
-    template <typename T, class... Args> T *add_render_system(Args &&...args)
+    template <DerivedFromRenderSystem<Dim> T, class... Args> T *add_render_system(Args &&...args)
     {
-        static_assert(std::is_base_of_v<render_system_t, T>, "Type must inherit from render_system");
-        KIT_ASSERT_ERROR(!render_system<T>(), "A system with the provided type already exists")
+        KIT_ASSERT_ERROR(!get_render_system<T>(), "A system with the provided type already exists")
 
         auto system = kit::make_scope<T>(std::forward<Args>(args)...);
         T *ptr = system.get();
@@ -123,9 +126,8 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
         return ptr;
     }
 
-    template <typename T> const T *render_system() const
+    template <DerivedFromRenderSystem<Dim> T> const T *get_render_system() const
     {
-        static_assert(std::is_base_of_v<render_system_t, T>, "Type must inherit from render_system");
         for (const auto &rs : m_render_systems)
         {
             auto cast = dynamic_cast<const T *>(rs.get());
@@ -135,9 +137,8 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
         return nullptr;
     }
 
-    template <typename T, typename B> T *render_system()
+    template <DerivedFromRenderSystem<Dim> T, typename B> T *get_render_system()
     {
-        static_assert(std::is_base_of_v<render_system_t, T>, "Type must inherit from render_system");
         for (const auto &rs : m_render_systems)
         {
             auto cast = dynamic_cast<T *>(rs.get());

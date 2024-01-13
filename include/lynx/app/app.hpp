@@ -17,7 +17,7 @@
 namespace lynx
 {
 template <typename L, typename Dim>
-concept DerivedFromLayer = std::is_base_of_v<layer<Dim>, L>;
+concept DerivedFromLayer = Dimension<Dim> && std::is_base_of_v<layer<Dim>, L>;
 
 template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serializable, public kit::yaml::deserializable
 {

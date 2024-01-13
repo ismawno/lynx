@@ -52,10 +52,10 @@ struct color
     static const color transparent;
 };
 
-template <std::size_t N> class gradient
+template <std::size_t N>
+    requires(N != 0)
+class gradient
 {
-    static_assert(N > 1, "N must be greater that one");
-
   public:
     template <class... Args> gradient(Args &&...args) : m_colors({std::forward<Args>(args)...})
     {
