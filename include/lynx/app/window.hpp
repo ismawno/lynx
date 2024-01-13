@@ -12,6 +12,7 @@
 #include "kit/memory/scope.hpp"
 #include "kit/interface/nameable.hpp"
 #include "kit/utility/utils.hpp"
+#include "kit/utility/type_constraints.hpp"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -23,12 +24,6 @@
 namespace lynx
 {
 class device;
-
-template <typename T, typename Dim>
-concept DerivedFromCamera = Dimension<Dim> && std::is_base_of_v<typename Dim::camera_t, T>;
-template <typename T, typename Dim>
-concept DerivedFromRenderSystem = Dimension<Dim> && std::is_base_of_v<render_system<Dim>, T>;
-
 template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
 {
   public:
@@ -63,11 +58,12 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
     void close();
     void wait_for_device() const;
 
-    template <typename T = render_system_t> const T *render_system_from_topology(topology tplg) const
+    template <kit::DerivedFrom<render_system_t> T = render_system_t>
+    const T *render_system_from_topology(topology tplg) const
     {
         return kit::const_get_casted_raw_ptr<T>(m_render_systems[(std::size_t)tplg]);
     }
-    template <typename T = render_system_t> T *render_system_from_topology(topology tplg)
+    template <kit::DerivedFrom<render_system_t> T = render_system_t> T *render_system_from_topology(topology tplg)
     {
         return kit::get_casted_raw_ptr<T>(m_render_systems[(std::size_t)tplg]);
     }
@@ -94,17 +90,17 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
               const transform_t &transform = {});
     void draw(const drawable_t &drawable);
 
-    template <DerivedFromCamera<Dim> T = camera_t> const T *camera() const
+    template <kit::DerivedFrom<camera_t> T = camera_t> const T *camera() const
     {
         return kit::const_get_casted_raw_ptr<T>(m_camera);
     }
 
-    template <DerivedFromCamera<Dim> T = camera_t> T *camera()
+    template <kit::DerivedFrom<camera_t> T = camera_t> T *camera()
     {
         return kit::get_casted_raw_ptr<T>(m_camera);
     }
 
-    template <DerivedFromCamera<Dim> T, class... Args> T *set_camera(Args &&...args)
+    template <kit::DerivedFrom<camera_t> T, class... Args> T *set_camera(Args &&...args)
     {
         auto cam = kit::make_scope<T>(std::forward<Args>(args)...);
         T *ptr = cam.get();
@@ -114,7 +110,7 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
 
     GLFWwindow *glfw_window() const;
 
-    template <DerivedFromRenderSystem<Dim> T, class... Args> T *add_render_system(Args &&...args)
+    template <kit::DerivedFrom<render_system_t> T, class... Args> T *add_render_system(Args &&...args)
     {
         KIT_ASSERT_ERROR(!get_render_system<T>(), "A system with the provided type already exists")
 
@@ -126,7 +122,7 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
         return ptr;
     }
 
-    template <DerivedFromRenderSystem<Dim> T> const T *get_render_system() const
+    template <kit::DerivedFrom<render_system_t> T> const T *get_render_system() const
     {
         for (const auto &rs : m_render_systems)
         {
@@ -137,7 +133,7 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
         return nullptr;
     }
 
-    template <DerivedFromRenderSystem<Dim> T, typename B> T *get_render_system()
+    template <kit::DerivedFrom<render_system_t> T, typename B> T *get_render_system()
     {
         for (const auto &rs : m_render_systems)
         {

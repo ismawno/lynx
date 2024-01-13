@@ -6,6 +6,7 @@
 #include "lynx/internal/dimension.hpp"
 #include "kit/profile/clock.hpp"
 #include "kit/serialization/yaml/serializer.hpp"
+#include "kit/utility/type_constraints.hpp"
 
 #ifdef LYNX_ENABLE_IMGUI
 #include <imgui.h>
@@ -16,9 +17,6 @@
 
 namespace lynx
 {
-template <typename L, typename Dim>
-concept DerivedFromLayer = Dimension<Dim> && std::is_base_of_v<layer<Dim>, L>;
-
 template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serializable, public kit::yaml::deserializable
 {
   public:
@@ -65,7 +63,7 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
     std::uint32_t framerate_cap() const;
     void limit_framerate(std::uint32_t framerate);
 
-    template <DerivedFromLayer<Dim> L, class... Args> L *push_layer(Args &&...args)
+    template <kit::DerivedFrom<layer_t> L, class... Args> L *push_layer(Args &&...args)
     {
         KIT_ASSERT_ERROR(!m_terminated, "Cannot push layers to a terminated app")
 
@@ -84,7 +82,7 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
         return ptr;
     }
 
-    template <DerivedFromLayer<Dim> L = layer_t> kit::scope<L> pop_layer(const std::string &name)
+    template <kit::DerivedFrom<layer_t> L = layer_t> kit::scope<L> pop_layer(const std::string &name)
     {
         KIT_ASSERT_ERROR(!m_terminated, "Cannot pop layers to a terminated app")
 
@@ -106,7 +104,7 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
         return nullptr;
     }
 
-    template <DerivedFromLayer<Dim> T> kit::scope<T> pop_layer(const T *ly)
+    template <kit::DerivedFrom<layer_t> T> kit::scope<T> pop_layer(const T *ly)
     {
         return pop_layer(ly->id);
     }
