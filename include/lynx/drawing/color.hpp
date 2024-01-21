@@ -1,5 +1,7 @@
 #pragma once
 
+#include "kit/utility/type_constraints.hpp"
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/vec4.hpp>
@@ -53,11 +55,13 @@ struct color
 };
 
 template <std::size_t N>
-    requires(N != 0)
+    requires(N > 1)
 class gradient
 {
   public:
-    template <class... Args> gradient(Args &&...args) : m_colors({std::forward<Args>(args)...})
+    template <class... ArrayArgs>
+        requires kit::NoCopyCtorOverride<gradient, ArrayArgs...>
+    gradient(ArrayArgs &&...args) : m_colors({std::forward<ArrayArgs>(args)...})
     {
     }
 
