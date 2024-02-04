@@ -2,7 +2,6 @@
 #include "lynx/rendering/renderer.hpp"
 #include "lynx/app/window.hpp"
 #include "lynx/rendering/device.hpp"
-#include "kit/profile/perf.hpp"
 
 namespace lynx
 {

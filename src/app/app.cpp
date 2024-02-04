@@ -2,7 +2,6 @@
 #include "lynx/app/app.hpp"
 #include "lynx/geometry/camera.hpp"
 #include "lynx/serialization/serialization.hpp"
-#include "kit/profile/perf.hpp"
 
 namespace lynx
 {

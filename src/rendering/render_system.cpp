@@ -4,7 +4,6 @@
 #include "lynx/geometry/vertex.hpp"
 #include "lynx/geometry/camera.hpp"
 #include "lynx/rendering/buffer.hpp"
-#include "kit/profile/perf.hpp"
 
 #define VERTEX_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.vert.spv"
 #define FRAGMENT_SHADER_2D_PATH LYNX_SHADER_PATH "bin/shader2D.frag.spv"

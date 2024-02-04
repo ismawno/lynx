@@ -1,6 +1,5 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/rendering/swap_chain.hpp"
-#include "kit/profile/perf.hpp"
 
 namespace lynx
 {

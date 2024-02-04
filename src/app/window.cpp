@@ -4,7 +4,6 @@
 #include "lynx/rendering/device.hpp"
 #include "lynx/drawing/model.hpp"
 #include "lynx/rendering/buffer.hpp"
-#include "kit/profile/perf.hpp"
 
 namespace lynx
 {

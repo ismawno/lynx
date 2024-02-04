@@ -1,6 +1,5 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/geometry/camera.hpp"
-#include "kit/profile/perf.hpp"
 
 namespace lynx
 {
