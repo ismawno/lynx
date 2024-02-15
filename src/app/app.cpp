@@ -44,10 +44,10 @@ template <Dimension Dim> bool app<Dim>::next_frame()
 
     if (m_min_frame_time > m_frame_time)
     {
-        kit::time::sleep(m_min_frame_time - m_frame_time);
+        kit::perf::time::sleep(m_min_frame_time - m_frame_time);
         m_frame_time = m_min_frame_time;
     }
-    const kit::clock frame_clock;
+    const kit::perf::clock frame_clock;
     m_ongoing_frame = true;
 
     context_t::set(m_window.get());
@@ -67,11 +67,11 @@ template <Dimension Dim> bool app<Dim>::next_frame()
             on_late_event(ev);
         }
 
-    const float delta_time = m_frame_time.as<kit::time::seconds, float>();
+    const float delta_time = m_frame_time.as<kit::perf::time::seconds, float>();
 
     {
         KIT_PERF_SCOPE("LYNX:On-update") // MARK PERF SCOPES WITH LYNX/PPX-APP WHATEVER
-        const kit::clock update_clock;
+        const kit::perf::clock update_clock;
 
         on_update(delta_time);
         for (const auto &ly : m_layers)
@@ -87,7 +87,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
 
     {
         KIT_PERF_SCOPE("LYNX:On-render")
-        const kit::clock render_clock;
+        const kit::perf::clock render_clock;
 
         on_render(delta_time);
         for (const auto &ly : m_layers)
@@ -152,15 +152,15 @@ template <Dimension Dim> window<Dim> *app<Dim>::window()
     return m_window.get();
 }
 
-template <Dimension Dim> kit::time app<Dim>::frame_time() const
+template <Dimension Dim> kit::perf::time app<Dim>::frame_time() const
 {
     return m_frame_time;
 }
-template <Dimension Dim> kit::time app<Dim>::update_time() const
+template <Dimension Dim> kit::perf::time app<Dim>::update_time() const
 {
     return m_update_time;
 }
-template <Dimension Dim> kit::time app<Dim>::render_time() const
+template <Dimension Dim> kit::perf::time app<Dim>::render_time() const
 {
     return m_render_time;
 }
@@ -193,13 +193,13 @@ template <Dimension Dim> layer<Dim> *app<Dim>::operator[](const std::string &nam
 
 template <Dimension Dim> std::uint32_t app<Dim>::framerate_cap() const
 {
-    const bool capped = m_min_frame_time.as<kit::time::nanoseconds, long long>() > 0;
-    return capped ? (std::uint32_t)(1.f / m_min_frame_time.as<kit::time::seconds, float>()) : 0;
+    const bool capped = m_min_frame_time.as<kit::perf::time::nanoseconds, long long>() > 0;
+    return capped ? (std::uint32_t)(1.f / m_min_frame_time.as<kit::perf::time::seconds, float>()) : 0;
 }
 
 template <Dimension Dim> void app<Dim>::limit_framerate(const std::uint32_t framerate)
 {
-    m_min_frame_time = kit::time::from<kit::time::seconds>(framerate > 0 ? (1.f / framerate) : 0.f);
+    m_min_frame_time = kit::perf::time::from<kit::perf::time::seconds>(framerate > 0 ? (1.f / framerate) : 0.f);
 }
 
 #ifdef LYNX_ENABLE_IMGUI

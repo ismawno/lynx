@@ -4,7 +4,7 @@
 #include "lynx/app/layer.hpp"
 #include "lynx/internal/context.hpp"
 #include "lynx/internal/dimension.hpp"
-#include "kit/profile/clock.hpp"
+#include "kit/profiling/clock.hpp"
 #include "kit/serialization/yaml/serializer.hpp"
 #include "kit/utility/type_constraints.hpp"
 
@@ -41,9 +41,9 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
     const window_t *window() const;
     window_t *window();
 
-    kit::time frame_time() const;
-    kit::time update_time() const;
-    kit::time render_time() const;
+    kit::perf::time frame_time() const;
+    kit::perf::time update_time() const;
+    kit::perf::time render_time() const;
 
     auto begin() const
     {
@@ -122,11 +122,11 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
 
     std::vector<kit::scope<layer_t>> m_layers;
     kit::scope<window_t> m_window;
-    kit::time m_frame_time;
-    kit::time m_update_time;
-    kit::time m_render_time;
+    kit::perf::time m_frame_time;
+    kit::perf::time m_update_time;
+    kit::perf::time m_render_time;
 
-    kit::time m_min_frame_time;
+    kit::perf::time m_min_frame_time;
 
 #ifdef LYNX_ENABLE_IMGUI
     VkDescriptorPool m_imgui_pool;

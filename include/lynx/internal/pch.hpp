@@ -26,7 +26,7 @@
 #endif
 #include <thread>
 #include "kit/debug/log.hpp"
-#include "kit/profile/perf.hpp"
+#include "kit/profiling/perf.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
