@@ -64,6 +64,9 @@ template <Dimension Dim> class thin_line : public line<Dim>
     void color2(const lynx::color &color2);
     void color(const lynx::color &color) override;
 
+    const transform_t *parent() const;
+    void parent(const transform_t *parent);
+
   private:
     vec_t m_p1;
     vec_t m_p2;
@@ -83,6 +86,7 @@ template <Dimension Dim> class line_strip : public drawable<Dim>
     using vec_t = typename Dim::vec_t;
     using window_t = window<Dim>;
     using model_t = typename Dim::model_t;
+    using transform_t = typename Dim::transform_t;
     using vertex_t = vertex<Dim>;
     using context_t = context<Dim>;
     using drawable_t = drawable<Dim>;
@@ -99,8 +103,12 @@ template <Dimension Dim> class line_strip : public drawable<Dim>
     const color &color() const;
     void color(const lynx::color &color);
 
+    const transform_t *parent() const;
+    void parent(const transform_t *parent);
+
   private:
     model_t m_model;
+    transform_t m_transform;
 };
 
 using line_strip2D = line_strip<dimension::two>;

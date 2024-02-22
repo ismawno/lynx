@@ -66,6 +66,14 @@ template <Dimension Dim> const color &thin_line<Dim>::color() const
 {
     return m_model.vertex(0).color;
 }
+template <Dimension Dim> const typename Dim::transform_t *thin_line<Dim>::parent() const
+{
+    return m_transform.parent;
+}
+template <Dimension Dim> void thin_line<Dim>::parent(const transform_t *parent)
+{
+    m_transform.parent = parent;
+}
 
 template <Dimension Dim> void thin_line<Dim>::color1(const lynx::color &color1)
 {
@@ -108,7 +116,16 @@ line_strip<Dim>::line_strip(const lynx::color &color) : line_strip({vec_t(-1.f),
 
 template <Dimension Dim> void line_strip<Dim>::draw(window_t &win) const
 {
-    drawable_t::default_draw_no_transform(win, &m_model, topology::LINE_STRIP);
+    drawable_t::default_draw(win, &m_model, m_transform.center_scale_rotate_translate4(), topology::LINE_STRIP);
+}
+
+template <Dimension Dim> const typename Dim::transform_t *line_strip<Dim>::parent() const
+{
+    return m_transform.parent;
+}
+template <Dimension Dim> void line_strip<Dim>::parent(const transform_t *parent)
+{
+    m_transform.parent = parent;
 }
 
 template <Dimension Dim> const vertex<Dim> &line_strip<Dim>::operator[](const std::size_t index) const
