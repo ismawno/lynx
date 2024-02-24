@@ -313,7 +313,7 @@ void device::has_gflw_required_instance_extensions() const
     for (const auto &required : req_extensions)
     {
         KIT_INFO("\t{0}", required)
-        KIT_ASSERT_CRITICAL(available.find(required) != available.end(), "Missing required glfw extension")
+        KIT_ASSERT_CRITICAL(available.contains(required), "Missing required glfw extension")
     }
 }
 #endif
