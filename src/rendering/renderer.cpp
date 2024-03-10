@@ -1,7 +1,6 @@
 #include "lynx/internal/pch.hpp"
 #include "lynx/rendering/renderer.hpp"
 #include "lynx/app/window.hpp"
-#include "lynx/rendering/device.hpp"
 
 namespace lynx
 {
@@ -163,14 +162,6 @@ template <Dimension Dim> void renderer<Dim>::end_swap_chain_render_pass(VkComman
     KIT_PERF_FUNCTION()
 
     vkCmdEndRenderPass(m_command_buffers[m_frame_index]);
-}
-
-template <Dimension Dim>
-void renderer<Dim>::immediate_submission(const std::function<void(VkCommandBuffer)> &submission) const
-{
-    const VkCommandBuffer command_buffer = m_device->begin_single_time_commands();
-    submission(command_buffer);
-    m_device->end_single_time_commands(command_buffer);
 }
 
 template class renderer<dimension::two>;

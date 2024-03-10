@@ -18,7 +18,6 @@
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <vulkan/vulkan.hpp>
-#include <functional>
 #include <queue>
 
 namespace lynx
@@ -51,7 +50,27 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
 
     VkExtent2D extent() const;
 
-    bool display(const std::function<void(VkCommandBuffer)> &submission = nullptr);
+    template <kit::Callable<VkCommandBuffer> F> bool display(F submission = [](VkCommandBuffer) {})
+    {
+        KIT_PERF_FUNCTION()
+        if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
+        {
+            if (m_maintain_camera_aspect_ratio)
+                m_camera->keep_aspect_ratio(m_renderer->swap_chain().extent_aspect_ratio());
+            m_camera->update_transformation_matrices();
+
+            m_renderer->begin_swap_chain_render_pass(command_buffer, m_clear_color);
+            render(command_buffer);
+            submission(command_buffer);
+
+            m_renderer->end_swap_chain_render_pass(command_buffer);
+            m_renderer->end_frame();
+
+            clear_render_data();
+            return true;
+        }
+        return false;
+    }
 
     bool should_close() const;
     bool closed();

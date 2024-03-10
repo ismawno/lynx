@@ -3,6 +3,7 @@
 #include "lynx/rendering/swap_chain.hpp"
 #include "lynx/drawing/color.hpp"
 #include "lynx/internal/dimension.hpp"
+#include "lynx/rendering/device.hpp"
 #include "kit/memory/ref.hpp"
 #include "kit/memory/scope.hpp"
 
@@ -11,7 +12,6 @@
 
 namespace lynx
 {
-class device;
 
 template <Dimension Dim> class renderer : kit::non_copyable
 {
@@ -27,7 +27,12 @@ template <Dimension Dim> class renderer : kit::non_copyable
     void begin_swap_chain_render_pass(VkCommandBuffer command_buffer, const color &clear_color);
     void end_swap_chain_render_pass(VkCommandBuffer command_buffer);
 
-    void immediate_submission(const std::function<void(VkCommandBuffer)> &submission) const;
+    template <kit::Callable<VkCommandBuffer> F> void immediate_submission(F submission) const
+    {
+        const VkCommandBuffer command_buffer = m_device->begin_single_time_commands();
+        submission(command_buffer);
+        m_device->end_single_time_commands(command_buffer);
+    }
 
     bool frame_in_progress() const;
     VkCommandBuffer current_command_buffer() const;

@@ -45,29 +45,6 @@ template <Dimension Dim> void window<Dim>::init()
     m_renderer = kit::make_scope<renderer_t>(m_device, *this);
 }
 
-template <Dimension Dim> bool window<Dim>::display(const std::function<void(VkCommandBuffer)> &submission)
-{
-    KIT_PERF_FUNCTION()
-    if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
-    {
-        if (m_maintain_camera_aspect_ratio)
-            m_camera->keep_aspect_ratio(m_renderer->swap_chain().extent_aspect_ratio());
-        m_camera->update_transformation_matrices();
-
-        m_renderer->begin_swap_chain_render_pass(command_buffer, m_clear_color);
-        render(command_buffer);
-        if (submission)
-            submission(command_buffer);
-
-        m_renderer->end_swap_chain_render_pass(command_buffer);
-        m_renderer->end_frame();
-
-        clear_render_data();
-        return true;
-    }
-    return false;
-}
-
 template <Dimension Dim> void window<Dim>::close()
 {
     clear_render_data();
