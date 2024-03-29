@@ -57,11 +57,13 @@ class shape2D : public shape<dimension::two>
 
     float outline_thickness = 0.f;
 
+  protected:
+    virtual void draw(window_t &win) const override;
+
   private:
     mutable model_t m_outline_model;
 
     void draw_outline_thickness(window_t &win) const;
-    void draw(window_t &win) const override;
 };
 
 using shape3D = shape<dimension::three>;
