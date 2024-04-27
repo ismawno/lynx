@@ -71,7 +71,7 @@ using shape3D = shape<dimension::three>;
 template <Dimension Dim> class rect : public Dim::shape_t
 {
   public:
-    using vec_t = typename Dim::vec_t;
+    using vec_t = glm::vec<Dim::N, float>;
     using shape_t = typename Dim::shape_t;
     using shape_t::transform;
 
@@ -86,7 +86,7 @@ using rect3D = rect<dimension::three>;
 template <Dimension Dim> class ellipse : public Dim::shape_t
 {
   public:
-    using vec_t = typename Dim::vec_t;
+    using vec_t = glm::vec<Dim::N, float>;
     using shape_t = typename Dim::shape_t;
     using shape_t::transform;
 
@@ -104,7 +104,7 @@ using ellipse3D = ellipse<dimension::three>;
 template <Dimension Dim> class polygon : public Dim::shape_t
 {
   public:
-    using vec_t = typename Dim::vec_t;
+    using vec_t = glm::vec<Dim::N, float>;
     using vertex_t = vertex<Dim>;
     using shape_t = typename Dim::shape_t;
 

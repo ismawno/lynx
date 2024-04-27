@@ -13,7 +13,7 @@ namespace lynx
 template <Dimension Dim> class camera
 {
   public:
-    using vec_t = typename Dim::vec_t;
+    using vec_t = glm::vec<Dim::N, float>;
     using transform_t = typename Dim::transform_t;
 
     virtual ~camera() = default;

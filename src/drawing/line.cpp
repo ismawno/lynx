@@ -36,11 +36,11 @@ template <Dimension Dim> typename Dim::transform_t thin_line<Dim>::as_transform(
     transform.scale.x = 0.5f * glm::length(dp);
     return transform;
 }
-template <Dimension Dim> const typename Dim::vec_t &thin_line<Dim>::p1() const
+template <Dimension Dim> const glm::vec<Dim::N, float> &thin_line<Dim>::p1() const
 {
     return m_p1;
 }
-template <Dimension Dim> const typename Dim::vec_t &thin_line<Dim>::p2() const
+template <Dimension Dim> const glm::vec<Dim::N, float> &thin_line<Dim>::p2() const
 {
     return m_p2;
 }

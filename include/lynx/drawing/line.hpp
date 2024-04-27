@@ -19,7 +19,7 @@ namespace lynx
 template <Dimension Dim> class line : public drawable<Dim>
 {
   public:
-    using vec_t = typename Dim::vec_t;
+    using vec_t = glm::vec<Dim::N, float>;
     virtual const vec_t &p1() const = 0;
     virtual const vec_t &p2() const = 0;
 
@@ -36,7 +36,7 @@ using line3D = line<dimension::three>;
 template <Dimension Dim> class thin_line : public line<Dim>
 {
   public:
-    using vec_t = typename Dim::vec_t;
+    using vec_t = glm::vec<Dim::N, float>;
     using window_t = window<Dim>;
     using transform_t = typename Dim::transform_t;
     using model_t = typename Dim::model_t;
@@ -83,7 +83,7 @@ using thin_line3D = thin_line<dimension::three>;
 template <Dimension Dim> class line_strip : public drawable<Dim>
 {
   public:
-    using vec_t = typename Dim::vec_t;
+    using vec_t = glm::vec<Dim::N, float>;
     using window_t = window<Dim>;
     using model_t = typename Dim::model_t;
     using transform_t = typename Dim::transform_t;

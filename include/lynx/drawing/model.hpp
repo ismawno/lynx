@@ -26,7 +26,7 @@ template <Dimension Dim> class model
   public:
     using vertex_t = vertex<Dim>;
     using vertex_buffer_t = vertex_buffer<Dim>;
-    using vec_t = typename Dim::vec_t;
+    using vec_t = glm::vec<Dim::N, float>;
 
     struct vertex_index_pair
     {

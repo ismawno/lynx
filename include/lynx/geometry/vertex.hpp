@@ -15,7 +15,7 @@ namespace lynx
 {
 template <Dimension Dim> struct vertex
 {
-    using vec_t = typename Dim::vec_t;
+    using vec_t = glm::vec<Dim::N, float>;
     vertex() = default;
     vertex(const vec_t &position, const color &color);
 
