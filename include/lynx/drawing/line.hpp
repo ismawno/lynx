@@ -43,8 +43,9 @@ template <Dimension Dim> class thin_line : public line<Dim>
     using context_t = context<Dim>;
     using drawable_t = drawable<Dim>;
 
-    thin_line(const vec_t &p1 = vec_t(-1.f), const vec_t &p2 = vec_t(1.f), const lynx::color &color1 = color::white,
-              const lynx::color &color2 = color::white);
+    thin_line(const vec_t &p1 = vec_t(-1.f), const vec_t &p2 = vec_t(1.f),
+              const lynx::color &color = lynx::color::white);
+    thin_line(const vec_t &p1, const vec_t &p2, const lynx::color &color1, const lynx::color &color2);
     thin_line(const lynx::color &color1, const lynx::color &color2);
     thin_line(const lynx::color &color);
 

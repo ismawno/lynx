@@ -7,6 +7,11 @@
 namespace lynx
 {
 template <Dimension Dim>
+thin_line<Dim>::thin_line(const vec_t &p1, const vec_t &p2, const lynx::color &color)
+    : m_p1(p1), m_p2(p2), m_transform(as_transform()), m_model(context_t::device(), model_t::line(color, color))
+{
+}
+template <Dimension Dim>
 thin_line<Dim>::thin_line(const vec_t &p1, const vec_t &p2, const lynx::color &color1, const lynx::color &color2)
     : m_p1(p1), m_p2(p2), m_transform(as_transform()), m_model(context_t::device(), model_t::line(color1, color2))
 {
