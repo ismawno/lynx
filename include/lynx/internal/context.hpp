@@ -1,7 +1,7 @@
 #pragma once
 
 #include "lynx/internal/dimension.hpp"
-#include "kit/memory/ref.hpp"
+#include "kit/memory/ptr/ref.hpp"
 #include <array>
 
 namespace lynx

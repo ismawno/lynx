@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kit/memory/ref.hpp"
+#include "kit/memory/ptr/ref.hpp"
 
 #include "lynx/internal/dimension.hpp"
 #include "lynx/rendering/device.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "kit/memory/ref.hpp"
-#include "kit/memory/scope.hpp"
+#include "kit/memory/ptr/ref.hpp"
+#include "kit/memory/ptr/scope.hpp"
 
 #include "lynx/rendering/device.hpp"
 #include "kit/interface/non_copyable.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "kit/memory/ref.hpp"
-#include "kit/memory/scope.hpp"
+#include "kit/memory/ptr/ref.hpp"
+#include "kit/memory/ptr/scope.hpp"
 #include "lynx/internal/dimension.hpp"
 #include "lynx/drawing/color.hpp"
 #include "lynx/buffer/vertex_buffer.hpp"

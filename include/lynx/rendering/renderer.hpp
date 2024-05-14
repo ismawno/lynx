@@ -4,8 +4,8 @@
 #include "lynx/drawing/color.hpp"
 #include "lynx/internal/dimension.hpp"
 #include "lynx/rendering/device.hpp"
-#include "kit/memory/ref.hpp"
-#include "kit/memory/scope.hpp"
+#include "kit/memory/ptr/ref.hpp"
+#include "kit/memory/ptr/scope.hpp"
 
 #include <vulkan/vulkan.hpp>
 #include <functional>
