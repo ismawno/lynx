@@ -13,7 +13,7 @@ end
 shaderpath = script_path() .. "shaders/"
 defines {'LYNX_SHADER_PATH="' .. shaderpath .. '"'}
 
-filter "system:macosx"
+filter "system:macosx or linux"
    buildoptions {
       "-Wall",
       "-Wextra",
