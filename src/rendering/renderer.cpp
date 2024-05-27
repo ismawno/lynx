@@ -130,8 +130,7 @@ void renderer<Dim>::begin_swap_chain_render_pass(VkCommandBuffer command_buffer,
     pass_info.renderArea.extent = m_swap_chain->extent();
 
     std::array<VkClearValue, 2> clear_values;
-    clear_values[0].color = {
-        {clear_color.normalized.r, clear_color.normalized.g, clear_color.normalized.b, clear_color.normalized.a}};
+    clear_values[0].color = {{clear_color.rgba.r, clear_color.rgba.g, clear_color.rgba.b, clear_color.rgba.a}};
     clear_values[1].depthStencil = {1, 0};
 
     pass_info.clearValueCount = 2;

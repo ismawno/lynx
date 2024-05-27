@@ -115,15 +115,6 @@ template <Dimension Dim> void window<Dim>::resize(const std::uint32_t width, con
     m_resized = true;
 }
 
-template <Dimension Dim> const color &window<Dim>::clear_color() const
-{
-    return m_clear_color;
-}
-template <Dimension Dim> void window<Dim>::clear_color(const color &color)
-{
-    m_clear_color = color;
-}
-
 template <Dimension Dim> void window<Dim>::push_event(const event_t &ev)
 {
     m_event_queue.push(ev);

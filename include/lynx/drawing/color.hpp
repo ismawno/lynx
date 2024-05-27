@@ -17,7 +17,7 @@ struct color
     color(std::uint32_t val);
 
     color(const glm::vec4 &rgba);
-    color(const glm::vec3 &rgb);
+    color(const glm::vec3 &rgb, float a = 1.f);
 
     color(float r, float g, float b, float a = 1.f);
     color(std::uint32_t r, std::uint32_t g, std::uint32_t b, std::uint32_t a = 255);
@@ -25,7 +25,10 @@ struct color
     color(const color &rgb, float a);
     color(const color &rgb, std::uint32_t a);
 
-    glm::vec4 normalized;
+    union {
+        glm::vec4 rgba;
+        glm::vec3 rgb;
+    };
 
     std::uint32_t r() const;
     std::uint32_t g() const;
@@ -42,6 +45,24 @@ struct color
     const float *ptr() const;
     float *ptr();
 
+    operator const glm::vec4 &() const;
+    operator const glm::vec3 &() const;
+
+    color &operator+=(const color &rhs);
+    color &operator-=(const color &rhs);
+    color &operator*=(const color &rhs);
+    color &operator/=(const color &rhs);
+    template <typename T> color &operator*=(const T &rhs)
+    {
+        rgb = glm::clamp(rgb * rhs, 0.f, 1.f);
+        return *this;
+    }
+    template <typename T> color &operator/=(const T &rhs)
+    {
+        rgb = glm::clamp(rgb / rhs, 0.f, 1.f);
+        return *this;
+    }
+
     static const color red;
     static const color green;
     static const color blue;
@@ -55,6 +76,30 @@ struct color
     static const color white;
     static const color transparent;
 };
+
+color operator+(const color &lhs, const color &rhs);
+color operator-(const color &lhs, const color &rhs);
+color operator*(const color &lhs, const color &rhs);
+color operator/(const color &lhs, const color &rhs);
+template <typename T> color operator*(const color &lhs, const T &rhs)
+{
+    return color{glm::clamp(lhs.rgb * rhs, 0.f, 1.f)};
+}
+template <typename T> color operator*(const T &lhs, const color &rhs)
+{
+    return color{glm::clamp(lhs * rhs.rgb, 0.f, 1.f)};
+}
+template <typename T> color operator/(const color &lhs, const T &rhs)
+{
+    return color{glm::clamp(lhs.rgb / rhs, 0.f, 1.f)};
+}
+template <typename T> color operator/(const T &lhs, const color &rhs)
+{
+    return color{glm::clamp(lhs / rhs.rgb, 0.f, 1.f)};
+}
+
+bool operator==(const color &lhs, const color &rhs);
+bool operator!=(const color &lhs, const color &rhs);
 
 template <std::size_t N>
     requires(N > 1)
@@ -89,7 +134,7 @@ class gradient
 
     color lerp(const float t, const std::size_t idx) const
     {
-        return color{m_colors[idx].normalized + (m_colors[idx + 1].normalized - m_colors[idx].normalized) * t};
+        return color{m_colors[idx].rgba + (m_colors[idx + 1].rgba - m_colors[idx].rgba) * t};
     }
 
     static float map(const float x, const float mm1, const float mx1, const float mm2, const float mx2)
