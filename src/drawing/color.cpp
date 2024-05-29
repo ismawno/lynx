@@ -113,12 +113,6 @@ void color::a(std::uint32_t a)
     rgba.a = to_float(a);
 }
 
-color color::grey_out(const color &c, float factor)
-{
-    KIT_ASSERT_ERROR(factor >= 0.f && factor <= 1.f, "Factor must lie in [0, 1]");
-    return color{glm::vec3{c.rgba} * (1.f - factor), c.rgba.a};
-}
-
 const float *color::ptr() const
 {
     return glm::value_ptr(rgba);

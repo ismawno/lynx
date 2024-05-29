@@ -40,8 +40,6 @@ struct color
     void b(std::uint32_t b);
     void a(std::uint32_t a);
 
-    static lynx::color grey_out(const lynx::color &c, float factor);
-
     const float *ptr() const;
     float *ptr();
 
