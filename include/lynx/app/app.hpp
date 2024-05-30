@@ -26,6 +26,16 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
     using input_t = input<Dim>;
     using event_t = event<Dim>;
 
+    enum class state
+    {
+        STARTING,
+        EVENT_PROCESSING,
+        UPDATING,
+        RENDERING,
+        SHUTTING_DOWN,
+        NONE
+    };
+
     template <class... WindowArgs> app(WindowArgs &&...args)
     {
         m_window = kit::make_scope<window_t>(std::forward<WindowArgs>(args)...);
@@ -37,6 +47,8 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
     void start();
     bool next_frame();
     void shutdown();
+
+    state current_state() const;
 
     const window_t *window() const;
     window_t *window();
@@ -127,6 +139,8 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
     kit::perf::time m_render_time;
 
     kit::perf::time m_min_frame_time;
+
+    state m_state = state::NONE;
 
 #ifdef LYNX_ENABLE_IMGUI
     VkDescriptorPool m_imgui_pool;

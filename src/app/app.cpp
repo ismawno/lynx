@@ -24,6 +24,7 @@ template <Dimension Dim> void app<Dim>::start()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot call start on a terminated app")
     KIT_ASSERT_ERROR(!m_started, "Cannot call start on a started app")
+    m_state = state::STARTING;
     m_started = true;
     context_t::set(m_window.get());
 #ifdef LYNX_ENABLE_IMGUI
@@ -34,6 +35,7 @@ template <Dimension Dim> void app<Dim>::start()
         if (ly->enabled)
             ly->on_start();
     on_late_start();
+    m_state = state::NONE;
 }
 
 template <Dimension Dim> bool app<Dim>::next_frame()
@@ -58,6 +60,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
         return false;
     }
 
+    m_state = state::EVENT_PROCESSING;
     while (const event ev = m_window->poll_event())
         if (!on_event(ev))
         {
@@ -68,9 +71,10 @@ template <Dimension Dim> bool app<Dim>::next_frame()
         }
 
     const float delta_time = m_frame_time.as<kit::perf::time::seconds, float>();
-
+    m_state = state::UPDATING;
     {
         KIT_PERF_SCOPE("LYNX:On-update") // MARK PERF SCOPES WITH LYNX/PPX-APP WHATEVER
+
         const kit::perf::clock update_clock;
 
         on_update(delta_time);
@@ -81,6 +85,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
         m_update_time = update_clock.elapsed();
     }
 
+    m_state = state::RENDERING;
 #ifdef LYNX_ENABLE_IMGUI
     imgui_begin_render();
 #endif
@@ -120,6 +125,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
 
 template <Dimension Dim> void app<Dim>::shutdown()
 {
+    m_state = state::SHUTTING_DOWN;
     context_t::set(m_window.get());
     if (m_ongoing_frame)
     {
@@ -140,6 +146,11 @@ template <Dimension Dim> void app<Dim>::shutdown()
 #endif
 
     m_terminated = true;
+}
+
+template <Dimension Dim> app<Dim>::state app<Dim>::current_state() const
+{
+    return m_state;
 }
 
 template <Dimension Dim> const window<Dim> *app<Dim>::window() const
