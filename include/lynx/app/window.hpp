@@ -39,7 +39,7 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
     window(std::uint32_t width, std::uint32_t height, const char *name);
     ~window();
 
-    color clear_color = {0.01f, 0.01f, 0.01f, 1.f};
+    color background_color = {0.01f, 0.01f, 0.01f, 1.f};
 
     std::uint32_t screen_width() const;
     std::uint32_t screen_height() const;
@@ -61,7 +61,7 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
                 m_camera->keep_aspect_ratio(m_renderer->swap_chain().extent_aspect_ratio());
             m_camera->update_transformation_matrices();
 
-            m_renderer->begin_swap_chain_render_pass(command_buffer, clear_color);
+            m_renderer->begin_swap_chain_render_pass(command_buffer, background_color);
             render(command_buffer);
             submission(command_buffer);
 
