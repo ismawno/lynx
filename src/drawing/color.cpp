@@ -17,23 +17,26 @@ const color color::white{255u};
 const color color::transparent{white, 0u};
 
 static constexpr float one_over_255 = 1.f / 255.f;
-static std::uint32_t to_int(const float val)
+static std::uint8_t to_int(const float val)
 {
-    return (std::uint32_t)(val * 255.f);
+    return (std::uint8_t)(val * 255.f);
 }
 
+static float to_float(const std::uint8_t val)
+{
+    return val * one_over_255;
+}
 static float to_float(const std::uint32_t val)
 {
     return val * one_over_255;
 }
 
-color::color(const float val) : rgba(val)
+color::color(const float val) : color(val, val, val, 1.f)
 {
     KIT_ASSERT_ERROR(val <= 1.f && val >= 0.f, "Color floating values must be in the range [0, 1]");
 }
-color::color(const std::uint32_t val) : rgba(val / 255.f)
+color::color(const std::uint32_t val) : color(val, val, val, 1u)
 {
-    KIT_ASSERT_ERROR(val < 256, "Color integer values must be in the range [0, 255]");
 }
 
 color::color(const glm::vec4 &rgba) : rgba(rgba)
@@ -75,42 +78,73 @@ color::color(const color &rgb, std::uint32_t a) : rgba(glm::vec3(rgb.rgba), to_f
     KIT_ASSERT_ERROR(a < 256, "Alpha value must be in the range [0, 255]");
 }
 
-std::uint32_t color::r() const
+std::uint8_t color::r() const
 {
     return to_int(rgba.r);
 }
-std::uint32_t color::g() const
+std::uint8_t color::g() const
 {
     return to_int(rgba.g);
 }
-std::uint32_t color::b() const
+std::uint8_t color::b() const
 {
     return to_int(rgba.b);
 }
-std::uint32_t color::a() const
+std::uint8_t color::a() const
 {
     return to_int(rgba.a);
 }
 
-void color::r(std::uint32_t r)
+void color::r(std::uint8_t r)
 {
-    KIT_ASSERT_ERROR(r < 256, "Color integer values must be in the range [0, 255]")
     rgba.r = to_float(r);
 }
-void color::g(std::uint32_t g)
+void color::g(std::uint8_t g)
 {
-    KIT_ASSERT_ERROR(g < 256, "Color integer values must be in the range [0, 255]")
     rgba.g = to_float(g);
 }
-void color::b(std::uint32_t b)
+void color::b(std::uint8_t b)
 {
-    KIT_ASSERT_ERROR(b < 256, "Color integer values must be in the range [0, 255]")
     rgba.b = to_float(b);
 }
-void color::a(std::uint32_t a)
+void color::a(std::uint8_t a)
 {
-    KIT_ASSERT_ERROR(a < 256, "Color integer values must be in the range [0, 255]")
     rgba.a = to_float(a);
+}
+
+std::uint32_t color::to_hex_int(const bool alpha) const
+{
+    if (alpha)
+        return (r() << 24) | (g() << 16) | (b() << 8) | a();
+    return (r() << 16) | (g() << 8) | b();
+}
+std::string color::to_hex_str(const bool alpha) const
+{
+    std::stringstream ss;
+    ss << std::hex << to_hex_int(alpha);
+    std::string hex = ss.str();
+    if (alpha)
+        while (hex.size() < 8)
+            hex = "0" + hex;
+    else
+        while (hex.size() < 6)
+            hex = "0" + hex;
+    return hex;
+}
+
+color color::from_hex(const std::uint32_t hex, const bool alpha)
+{
+    if (alpha)
+        return {hex >> 24, (hex >> 16) & 0xFF, (hex >> 8) & 0xFF, hex & 0xFF};
+    return {hex >> 16, (hex >> 8) & 0xFF, hex & 0xFF};
+}
+color color::from_hex(const std::string &hex, const bool alpha)
+{
+    std::uint32_t val;
+    std::stringstream ss;
+    ss << std::hex << hex;
+    ss >> val;
+    return from_hex(val, alpha);
 }
 
 const float *color::ptr() const

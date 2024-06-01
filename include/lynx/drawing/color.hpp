@@ -30,15 +30,21 @@ struct color
         glm::vec3 rgb;
     };
 
-    std::uint32_t r() const;
-    std::uint32_t g() const;
-    std::uint32_t b() const;
-    std::uint32_t a() const;
+    std::uint8_t r() const;
+    std::uint8_t g() const;
+    std::uint8_t b() const;
+    std::uint8_t a() const;
 
-    void r(std::uint32_t r);
-    void g(std::uint32_t g);
-    void b(std::uint32_t b);
-    void a(std::uint32_t a);
+    void r(std::uint8_t r);
+    void g(std::uint8_t g);
+    void b(std::uint8_t b);
+    void a(std::uint8_t a);
+
+    std::uint32_t to_hex_int(bool alpha = true) const;
+    std::string to_hex_str(bool alpha = true) const;
+
+    static color from_hex(std::uint32_t hex, bool alpha = true);
+    static color from_hex(const std::string &hex, bool alpha = true);
 
     const float *ptr() const;
     float *ptr();

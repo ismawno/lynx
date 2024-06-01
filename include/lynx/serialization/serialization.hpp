@@ -5,6 +5,29 @@
 #include "kit/serialization/yaml/glm.hpp"
 #include "lynx/app/app.hpp"
 
+template <> struct kit::yaml::codec<lynx::color>
+{
+    static YAML::Node encode(const lynx::color &color)
+    {
+        YAML::Node node;
+        node = "#" + color.to_hex_str();
+        return node;
+    }
+    static bool decode(const YAML::Node &node, lynx::color &color)
+    {
+        if (!node.IsScalar())
+            return false;
+        std::string hex = node.as<std::string>();
+        if (hex[0] == '#')
+            hex = hex.substr(1);
+        if (hex.size() != 6 && hex.size() != 8)
+            return false;
+
+        color = lynx::color::from_hex(hex, hex.size() == 8);
+        return true;
+    }
+};
+
 template <lynx::Dimension Dim> struct kit::yaml::codec<lynx::layer<Dim>>
 {
     static YAML::Node encode(const lynx::layer<Dim> &layer)
@@ -28,7 +51,7 @@ template <lynx::Dimension Dim> struct kit::yaml::codec<lynx::app<Dim>>
     static YAML::Node encode(const lynx::app<Dim> &app)
     {
         YAML::Node node;
-        node["Background color"] = app.window()->background_color.rgba;
+        node["Background color"] = app.window()->background_color;
         for (const auto &layer : app)
             node[layer->id] = *layer;
         return node;
@@ -38,7 +61,7 @@ template <lynx::Dimension Dim> struct kit::yaml::codec<lynx::app<Dim>>
         if (!node.IsMap())
             return false;
 
-        app.window()->background_color = lynx::color(node["Background color"].as<glm::vec4>());
+        app.window()->background_color = node["Background color"].as<lynx::color>();
         for (const auto &layer : app)
             node[layer->id].template as<lynx::layer<Dim>>(*layer);
 
