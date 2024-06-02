@@ -79,6 +79,8 @@ struct color
     static const color purple;
     static const color white;
     static const color transparent;
+
+    static const std::unordered_map<std::string, color> map;
 };
 
 color operator+(const color &lhs, const color &rhs);

@@ -16,6 +16,11 @@ const color color::purple{191u, 64u, 191u};
 const color color::white{255u};
 const color color::transparent{white, 0u};
 
+const std::unordered_map<std::string, color> color::map{
+    {"red", red},   {"green", green},   {"blue", blue},     {"magenta", magenta},
+    {"cyan", cyan}, {"orange", orange}, {"yellow", yellow}, {"black", black},
+    {"pink", pink}, {"purple", purple}, {"white", white},   {"transparent", transparent}};
+
 static constexpr float one_over_255 = 1.f / 255.f;
 static std::uint8_t to_int(const float val)
 {

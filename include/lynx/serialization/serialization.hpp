@@ -35,9 +35,14 @@ template <> struct kit::yaml::codec<lynx::color>
         }
         if (!node.IsScalar())
             return false;
-        std::string hex = node.as<std::string>();
-        if (hex[0] == '#')
-            hex = hex.substr(1);
+        const std::string scalar = node.as<std::string>();
+        if (scalar[0] != '#')
+        {
+            color = lynx::color::map.at(scalar);
+            return true;
+        }
+
+        const std::string hex = scalar.substr(1);
         if (hex.size() != 6 && hex.size() != 8)
             return false;
 
