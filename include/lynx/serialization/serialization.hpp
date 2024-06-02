@@ -38,7 +38,10 @@ template <> struct kit::yaml::codec<lynx::color>
         const std::string scalar = node.as<std::string>();
         if (scalar[0] != '#')
         {
-            color = lynx::color::map.at(scalar);
+            const auto it = lynx::color::map.find(scalar);
+            if (it == lynx::color::map.end())
+                return false;
+            color = it->second;
             return true;
         }
 
