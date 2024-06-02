@@ -7,11 +7,11 @@
 
 template <> struct kit::yaml::codec<lynx::color>
 {
-    static bool is_float(const std::string &str)
+    static bool is_integer(const std::string &str)
     {
         std::istringstream iss(str);
-        float f;
-        iss >> std::noskipws >> f;
+        std::uint32_t i;
+        iss >> std::noskipws >> i;
         return iss.eof() && !iss.fail();
     }
     static YAML::Node encode(const lynx::color &color)
@@ -24,9 +24,9 @@ template <> struct kit::yaml::codec<lynx::color>
     {
         if (node.IsSequence())
         {
-            if (node.size() != 4 || node.size() != 3)
+            if (node.size() != 4 && node.size() != 3)
                 return false;
-            if (is_float(node[0].Scalar()))
+            if (!is_integer(node[0].Scalar()))
                 color = node.size() == 4 ? lynx::color(node.as<glm::vec4>()) : lynx::color(node.as<glm::vec3>());
             else
                 color = lynx::color(node[0].as<std::uint32_t>(), node[1].as<std::uint32_t>(),
