@@ -40,7 +40,7 @@ color::color(const float val) : color(val, val, val, 1.f)
 {
     KIT_ASSERT_ERROR(val <= 1.f && val >= 0.f, "Color floating values must be in the range [0, 1]");
 }
-color::color(const std::uint32_t val) : color(val, val, val, 1u)
+color::color(const std::uint32_t val) : color(val, val, val, 255u)
 {
 }
 
