@@ -36,10 +36,7 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
         NONE
     };
 
-    template <class... WindowArgs> app(WindowArgs &&...args)
-    {
-        m_window = kit::make_scope<window_t>(std::forward<WindowArgs>(args)...);
-    }
+    app(const typename window_t::specs &spc);
     virtual ~app();
 
     void run();

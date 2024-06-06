@@ -36,7 +36,14 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
     using context_t = context<Dim>;
     using input_t = input<Dim>;
 
-    window(std::uint32_t width, std::uint32_t height, const char *name);
+    struct specs
+    {
+        const char *name;
+        std::uint32_t width;
+        std::uint32_t height;
+    };
+
+    window(const specs &spc);
     ~window();
 
     color background_color = {0.01f, 0.01f, 0.01f, 1.f};

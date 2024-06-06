@@ -8,8 +8,7 @@
 namespace lynx
 {
 template <Dimension Dim>
-window<Dim>::window(const std::uint32_t width, const std::uint32_t height, const char *name)
-    : nameable(name), m_width(width), m_height(height)
+window<Dim>::window(const specs &spc) : nameable(spc.name), m_width(spc.width), m_height(spc.height)
 {
     init();
     input_t::install_callbacks(this);

@@ -5,6 +5,9 @@
 
 namespace lynx
 {
+template <Dimension Dim> app<Dim>::app(const typename window_t::specs &spc) : m_window(kit::make_scope<window_t>(spc))
+{
+}
 
 template <Dimension Dim> app<Dim>::~app()
 {
