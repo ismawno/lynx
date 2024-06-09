@@ -38,9 +38,9 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
 
     struct specs
     {
-        const char *name;
-        std::uint32_t width;
-        std::uint32_t height;
+        const char *name = "Lynx window";
+        std::uint32_t width = 800;
+        std::uint32_t height = 600;
     };
 
     window(const specs &spc);
