@@ -45,7 +45,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
 {
     KIT_ASSERT_ERROR(!m_terminated, "Cannot fetch next frame on a terminated app")
     KIT_ASSERT_ERROR(m_started, "App must be started first by calling start() before fetching the next frame")
-    KIT_PERF_SCOPE("LYNX:Frame")
+    KIT_PERF_SCOPE("LYNX::Frame")
 
     if (m_min_frame_time > m_frame_time)
     {
@@ -76,7 +76,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
     const float delta_time = m_frame_time.as<kit::perf::time::seconds, float>();
     m_state = state::UPDATING;
     {
-        KIT_PERF_SCOPE("LYNX:On-update") // MARK PERF SCOPES WITH LYNX/PPX-APP WHATEVER
+        KIT_PERF_SCOPE("LYNX::On-update") // MARK PERF SCOPES WITH LYNX/PPX-APP WHATEVER
 
         const kit::perf::clock update_clock;
 
@@ -94,7 +94,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
 #endif
 
     {
-        KIT_PERF_SCOPE("LYNX:On-render")
+        KIT_PERF_SCOPE("LYNX::On-render")
         const kit::perf::clock render_clock;
 
         on_render(delta_time);
