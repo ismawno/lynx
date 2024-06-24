@@ -69,6 +69,7 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
     const layer_t *operator[](const std::string &name) const;
     layer_t *operator[](const std::string &name);
 
+    std::uint32_t framerate() const;
     std::uint32_t framerate_cap() const;
     void limit_framerate(std::uint32_t framerate);
 

@@ -205,6 +205,14 @@ template <Dimension Dim> layer<Dim> *app<Dim>::operator[](const std::string &nam
     return nullptr;
 }
 
+template <Dimension Dim> std::uint32_t app<Dim>::framerate() const
+{
+    const float frame_time = m_frame_time.as<kit::perf::time::seconds, float>();
+    if (kit::approaches_zero(frame_time))
+        return 0;
+    return (std::uint32_t)(1.f / frame_time);
+}
+
 template <Dimension Dim> std::uint32_t app<Dim>::framerate_cap() const
 {
     const bool capped = m_min_frame_time.as<kit::perf::time::nanoseconds, long long>() > 0;
