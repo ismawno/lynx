@@ -89,7 +89,7 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
     template <kit::DerivedFrom<render_system_t> T = render_system_t>
     const T *render_system_from_topology(topology tplg) const
     {
-        return kit::const_get_casted_raw_ptr<T>(m_render_systems[(std::size_t)tplg]);
+        return kit::get_casted_raw_ptr<const T>(m_render_systems[(std::size_t)tplg]);
     }
     template <kit::DerivedFrom<render_system_t> T = render_system_t> T *render_system_from_topology(topology tplg)
     {
@@ -117,7 +117,7 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable
 
     template <kit::DerivedFrom<camera_t> T = camera_t> const T *camera() const
     {
-        return kit::const_get_casted_raw_ptr<T>(m_camera);
+        return kit::get_casted_raw_ptr<const T>(m_camera);
     }
 
     template <kit::DerivedFrom<camera_t> T = camera_t> T *camera()
