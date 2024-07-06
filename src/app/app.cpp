@@ -35,7 +35,7 @@ template <Dimension Dim> void app<Dim>::start()
 #endif
     on_start();
     for (const auto &ly : m_layers)
-        if (ly->enabled())
+        if (ly->enabled()) [[likely]]
             ly->on_start();
     on_late_start();
     m_state = state::NONE;
@@ -82,7 +82,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
 
         on_update(delta_time);
         for (const auto &ly : m_layers)
-            if (ly->enabled())
+            if (ly->enabled()) [[likely]]
                 ly->on_update(delta_time);
         on_late_update(delta_time);
         m_update_time = update_clock.elapsed();
@@ -99,7 +99,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
 
         on_render(delta_time);
         for (const auto &ly : m_layers)
-            if (ly->enabled())
+            if (ly->enabled()) [[likely]]
                 ly->on_render(delta_time);
         on_late_render(delta_time);
         m_render_time = render_clock.elapsed();
@@ -114,7 +114,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
         imgui_submit_command(cmd);
 #endif
         for (const auto &ly : m_layers)
-            if (ly->enabled())
+            if (ly->enabled()) [[likely]]
                 ly->on_command_submission(cmd);
     };
     KIT_CHECK_RETURN_VALUE(m_window->display(submission), true, CRITICAL,
@@ -145,7 +145,7 @@ template <Dimension Dim> void app<Dim>::shutdown()
 
     on_shutdown();
     for (const auto &ly : m_layers)
-        if (ly->enabled())
+        if (ly->enabled()) [[likely]]
             ly->on_shutdown();
     on_late_shutdown();
 
