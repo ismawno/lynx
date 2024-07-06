@@ -49,21 +49,21 @@ template <Dimension Dim> class thin_line : public line<Dim>
     thin_line(const lynx::color &color1, const lynx::color &color2);
     thin_line(const lynx::color &color);
 
-    void draw(window_t &win) const override;
+    void draw(window_t &win) const override final;
 
-    const vec_t &p1() const override;
-    const vec_t &p2() const override;
+    const vec_t &p1() const override final;
+    const vec_t &p2() const override final;
 
-    void p1(const vec_t &p1) override;
-    void p2(const vec_t &p2) override;
+    void p1(const vec_t &p1) override final;
+    void p2(const vec_t &p2) override final;
 
     const lynx::color &color1() const;
     const lynx::color &color2() const;
-    const lynx::color &color() const override;
+    const lynx::color &color() const override final;
 
     void color1(const lynx::color &color1);
     void color2(const lynx::color &color2);
-    void color(const lynx::color &color) override;
+    void color(const lynx::color &color) override final;
 
     const transform_t *parent() const;
     void parent(const transform_t *parent);

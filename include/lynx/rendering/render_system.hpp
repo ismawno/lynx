@@ -68,27 +68,27 @@ template <Dimension Dim> class render_system
 using render_system2D = render_system<dimension::three>;
 using render_system3D = render_system<dimension::three>;
 
-template <Dimension Dim> class point_render_system : public render_system<Dim>
+template <Dimension Dim> class point_render_system final : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <Dimension Dim> class line_render_system : public render_system<Dim>
+template <Dimension Dim> class line_render_system final : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <Dimension Dim> class line_strip_render_system : public render_system<Dim>
+template <Dimension Dim> class line_strip_render_system final : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <Dimension Dim> class triangle_render_system : public render_system<Dim>
+template <Dimension Dim> class triangle_render_system final : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };
 
-template <Dimension Dim> class triangle_strip_render_system : public render_system<Dim>
+template <Dimension Dim> class triangle_strip_render_system final : public render_system<Dim>
 {
     void pipeline_config(pipeline::config_info &config) const override;
 };

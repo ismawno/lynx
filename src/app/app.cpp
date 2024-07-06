@@ -126,6 +126,11 @@ template <Dimension Dim> bool app<Dim>::next_frame()
     return !m_window->closed() && !m_to_finish_next_frame;
 }
 
+const char *app<dimension::two>::name() const
+{
+    return m_window->name;
+}
+
 template <Dimension Dim> void app<Dim>::shutdown()
 {
     m_state = state::SHUTTING_DOWN;

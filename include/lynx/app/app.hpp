@@ -45,6 +45,7 @@ template <Dimension Dim> class app : kit::non_copyable, public kit::yaml::serial
     bool next_frame();
     void shutdown();
 
+    const char *name() const;
     state current_state() const;
 
     const window_t *window() const;

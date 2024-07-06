@@ -44,7 +44,7 @@ class camera3D : public camera<dimension::three>
     void point_to(const glm::vec3 &position);
 };
 
-class orthographic2D : public camera2D
+class orthographic2D final : public camera2D
 {
   public:
     orthographic2D() = default;
@@ -59,7 +59,7 @@ class orthographic2D : public camera2D
     void update_transformation_matrices() override;
 };
 
-class orthographic3D : public camera3D
+class orthographic3D final : public camera3D
 {
   public:
     orthographic3D() = default;
@@ -76,7 +76,7 @@ class orthographic3D : public camera3D
     void update_transformation_matrices() override;
 };
 
-class perspective3D : public camera3D
+class perspective3D final : public camera3D
 {
   public:
     perspective3D() = default;

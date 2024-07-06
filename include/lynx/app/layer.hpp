@@ -25,8 +25,6 @@ class layer : public kit::identifiable<std::string>,
     using event_t = event<Dim>;
 
     layer(const std::string &name);
-    virtual ~layer() = default;
-
     template <kit::DerivedFrom<app_t> T = app_t> T *parent() const
     {
         if constexpr (std::is_same_v<app_t, T>)
@@ -34,6 +32,8 @@ class layer : public kit::identifiable<std::string>,
         else
             return dynamic_cast<T *>(m_parent);
     }
+
+    KIT_TOGGLEABLE_FINAL_DEFAULT_SETTER()
 
 #ifdef KIT_USE_YAML_CPP
     virtual YAML::Node encode() const override;
