@@ -36,7 +36,7 @@ template <Dimension Dim> void window<Dim>::init()
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-    m_window = glfwCreateWindow((int)m_width, (int)m_height, name, nullptr, nullptr);
+    m_window = glfwCreateWindow((int)m_width, (int)m_height, m_name, nullptr, nullptr);
     glfwSetWindowUserPointer(m_window, this);
 
     context_t::set(this);

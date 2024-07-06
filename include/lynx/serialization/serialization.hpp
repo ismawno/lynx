@@ -59,14 +59,14 @@ template <lynx::Dimension Dim> struct kit::yaml::codec<lynx::layer<Dim>>
     static YAML::Node encode(const lynx::layer<Dim> &layer)
     {
         YAML::Node node;
-        node["Enabled"] = layer.enabled;
+        node["Enabled"] = layer.enabled();
         return node;
     }
     static bool decode(const YAML::Node &node, lynx::layer<Dim> &layer)
     {
         if (!node.IsMap())
             return false;
-        layer.enabled = node["Enabled"].as<bool>();
+        layer.enabled(node["Enabled"].as<bool>());
 
         return true;
     }
@@ -79,7 +79,7 @@ template <lynx::Dimension Dim> struct kit::yaml::codec<lynx::app<Dim>>
         YAML::Node node;
         node["Background color"] = app.window()->background_color;
         for (const auto &layer : app)
-            node[layer->id] = *layer;
+            node[layer->id()] = *layer;
         return node;
     }
     static bool decode(const YAML::Node &node, lynx::app<Dim> &app)
@@ -89,7 +89,7 @@ template <lynx::Dimension Dim> struct kit::yaml::codec<lynx::app<Dim>>
 
         app.window()->background_color = node["Background color"].as<lynx::color>();
         for (const auto &layer : app)
-            node[layer->id].template as<lynx::layer<Dim>>(*layer);
+            node[layer->id()].template as<lynx::layer<Dim>>(*layer);
 
         return true;
     }

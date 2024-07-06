@@ -35,7 +35,7 @@ template <Dimension Dim> void app<Dim>::start()
 #endif
     on_start();
     for (const auto &ly : m_layers)
-        if (ly->enabled)
+        if (ly->enabled())
             ly->on_start();
     on_late_start();
     m_state = state::NONE;
@@ -68,7 +68,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
         if (!on_event(ev))
         {
             for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it)
-                if ((*it)->enabled && (*it)->on_event(ev))
+                if ((*it)->enabled() && (*it)->on_event(ev))
                     break;
             on_late_event(ev);
         }
@@ -82,7 +82,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
 
         on_update(delta_time);
         for (const auto &ly : m_layers)
-            if (ly->enabled)
+            if (ly->enabled())
                 ly->on_update(delta_time);
         on_late_update(delta_time);
         m_update_time = update_clock.elapsed();
@@ -99,7 +99,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
 
         on_render(delta_time);
         for (const auto &ly : m_layers)
-            if (ly->enabled)
+            if (ly->enabled())
                 ly->on_render(delta_time);
         on_late_render(delta_time);
         m_render_time = render_clock.elapsed();
@@ -114,7 +114,7 @@ template <Dimension Dim> bool app<Dim>::next_frame()
         imgui_submit_command(cmd);
 #endif
         for (const auto &ly : m_layers)
-            if (ly->enabled)
+            if (ly->enabled())
                 ly->on_command_submission(cmd);
     };
     KIT_CHECK_RETURN_VALUE(m_window->display(submission), true, CRITICAL,
@@ -126,9 +126,9 @@ template <Dimension Dim> bool app<Dim>::next_frame()
     return !m_window->closed() && !m_to_finish_next_frame;
 }
 
-const char *app<dimension::two>::name() const
+template <Dimension Dim> const char *app<Dim>::name() const
 {
-    return m_window->name;
+    return m_window->name();
 }
 
 template <Dimension Dim> void app<Dim>::shutdown()
@@ -145,7 +145,7 @@ template <Dimension Dim> void app<Dim>::shutdown()
 
     on_shutdown();
     for (const auto &ly : m_layers)
-        if (ly->enabled)
+        if (ly->enabled())
             ly->on_shutdown();
     on_late_shutdown();
 
@@ -198,14 +198,14 @@ template <Dimension Dim> layer<Dim> &app<Dim>::operator[](std::size_t index)
 template <Dimension Dim> const layer<Dim> *app<Dim>::operator[](const std::string &name) const
 {
     for (const auto &l : m_layers)
-        if (l->id == name)
+        if (l->id() == name)
             return l.get();
     return nullptr;
 }
 template <Dimension Dim> layer<Dim> *app<Dim>::operator[](const std::string &name)
 {
     for (const auto &l : m_layers)
-        if (l->id == name)
+        if (l->id() == name)
             return l.get();
     return nullptr;
 }
