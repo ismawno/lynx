@@ -89,19 +89,19 @@ color operator*(const color &lhs, const color &rhs);
 color operator/(const color &lhs, const color &rhs);
 template <typename T> color operator*(const color &lhs, const T &rhs)
 {
-    return color{glm::clamp(lhs.rgb * rhs, 0.f, 1.f)};
+    return color{glm::clamp(lhs.rgb * rhs, 0.f, 1.f), lhs.rgba.a};
 }
 template <typename T> color operator*(const T &lhs, const color &rhs)
 {
-    return color{glm::clamp(lhs * rhs.rgb, 0.f, 1.f)};
+    return color{glm::clamp(lhs * rhs.rgb, 0.f, 1.f), rhs.rgba.a};
 }
 template <typename T> color operator/(const color &lhs, const T &rhs)
 {
-    return color{glm::clamp(lhs.rgb / rhs, 0.f, 1.f)};
+    return color{glm::clamp(lhs.rgb / rhs, 0.f, 1.f), lhs.rgba.a};
 }
 template <typename T> color operator/(const T &lhs, const color &rhs)
 {
-    return color{glm::clamp(lhs / rhs.rgb, 0.f, 1.f)};
+    return color{glm::clamp(lhs / rhs.rgb, 0.f, 1.f), rhs.rgba.a};
 }
 
 bool operator==(const color &lhs, const color &rhs);
