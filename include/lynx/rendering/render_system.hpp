@@ -29,9 +29,8 @@ template <Dimension Dim> class render_system
 
     struct render_data
     {
-        const model_t *mdl;
+        kit::ref<const model_t> mdl;
         glm::mat4 mdl_transform;
-        bool unowned;
     };
 
     virtual ~render_system();
@@ -39,7 +38,7 @@ template <Dimension Dim> class render_system
     void init(const kit::ref<const device> &dev, VkRenderPass render_pass);
     void render(VkCommandBuffer command_buffer, const camera_t &cam) const;
 
-    render_data create_render_data(const model_t *mdl, glm::mat4 &transform, bool unowned = false) const;
+    render_data create_render_data(const kit::ref<const model_t> &mdl, glm::mat4 &transform) const;
     void push_render_data(const render_data &rdata);
     void clear_render_data();
 

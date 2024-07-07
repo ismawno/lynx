@@ -79,21 +79,16 @@ template <Dimension Dim> void render_system<Dim>::render(VkCommandBuffer command
 }
 
 template <Dimension Dim>
-typename render_system<Dim>::render_data render_system<Dim>::create_render_data(const model_t *mdl,
-                                                                                glm::mat4 &mdl_transform,
-                                                                                const bool unowned) const
+typename render_system<Dim>::render_data render_system<Dim>::create_render_data(const kit::ref<const model_t> &mdl,
+                                                                                glm::mat4 &mdl_transform) const
 {
     KIT_ASSERT_CRITICAL(mdl, "Model cannot be a null pointer")
-#ifdef DEBUG
-    mdl->to_be_rendered = true;
-#endif
-
     if constexpr (std::is_same_v<Dim, dimension::two>)
     {
         const float z_offset = 1.f - ++s_z_offset_counter2D * std::numeric_limits<float>::epsilon();
         mdl_transform[3][2] = z_offset;
     }
-    return {mdl, mdl_transform, unowned};
+    return {mdl, mdl_transform};
 }
 
 template <Dimension Dim> void render_system<Dim>::push_render_data(const render_data &rdata)
@@ -103,14 +98,6 @@ template <Dimension Dim> void render_system<Dim>::push_render_data(const render_
 
 template <Dimension Dim> void render_system<Dim>::clear_render_data()
 {
-    for (const render_data &rdata : m_render_data)
-    {
-#ifdef DEBUG
-        rdata.mdl->to_be_rendered = false;
-#endif
-        if (rdata.unowned)
-            delete rdata.mdl;
-    }
     m_render_data.clear();
 }
 
@@ -137,7 +124,8 @@ template <Dimension Dim>
 void render_system<Dim>::draw(const std::vector<vertex_t> &vertices, const transform_t &transform)
 {
     glm::mat4 mdl_mat = transform.center_scale_rotate_translate4();
-    const render_data rdata = create_render_data(new model_t(m_device, vertices), mdl_mat, true);
+    const auto model = kit::make_ref<model_t>(m_device, vertices);
+    const render_data rdata = create_render_data(model, mdl_mat);
     push_render_data(rdata);
 }
 
@@ -146,7 +134,8 @@ void render_system<Dim>::draw(const std::vector<vertex_t> &vertices, const std::
                               const transform_t &transform)
 {
     glm::mat4 mdl_mat = transform.center_scale_rotate_translate4();
-    const render_data rdata = create_render_data(new model_t(m_device, vertices, indices), mdl_mat, true);
+    const auto model = kit::make_ref<model_t>(m_device, vertices, indices);
+    const render_data rdata = create_render_data(model, mdl_mat);
     push_render_data(rdata);
 }
 

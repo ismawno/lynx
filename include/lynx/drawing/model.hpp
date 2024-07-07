@@ -43,11 +43,10 @@ template <Dimension Dim> class model
     model(const model &other);
     model &operator=(const model &other);
 
-#ifdef DEBUG
-    virtual ~model();
-#else
+    model(model &&other) = default;
+    model &operator=(model &&other) = default;
+
     virtual ~model() = default;
-#endif
 
     void bind(VkCommandBuffer command_buffer) const;
     void draw(VkCommandBuffer command_buffer) const;
@@ -74,10 +73,6 @@ template <Dimension Dim> class model
     static vertex_index_pair circle(std::uint32_t partitions, const color &color);
     static vertex_index_pair polygon(const std::vector<vertex_t> &local_vertices, const color &center_color);
     static vertex_index_pair polygon(const std::vector<vec_t> &local_vertices, const color &color);
-
-#ifdef DEBUG
-    mutable bool to_be_rendered = false;
-#endif
 
   protected:
     model() = default;

@@ -15,11 +15,10 @@
 
 namespace lynx
 {
-template <Dimension Dim> class shape : public drawable<Dim>
+template <Dimension Dim> class shape : public drawable<Dim>, public modelable<Dim>
 {
   public:
     using transform_t = typename Dim::transform_t;
-    using model_t = typename Dim::model_t;
     using window_t = window<Dim>;
     using context_t = context<Dim>;
     using drawable_t = drawable<Dim>;
@@ -27,7 +26,7 @@ template <Dimension Dim> class shape : public drawable<Dim>
 
     template <class... ModelArgs>
     shape(topology tplg, ModelArgs &&...args)
-        : m_model(context_t::device(), std::forward<ModelArgs>(args)...), m_topology(tplg)
+        : modelable<Dim>(context_t::device(), std::forward<ModelArgs>(args)...), m_topology(tplg)
     {
     }
 
@@ -37,7 +36,6 @@ template <Dimension Dim> class shape : public drawable<Dim>
     transform_t transform{};
 
   protected:
-    model_t m_model;
     topology m_topology;
     virtual void draw(window_t &win) const override;
 };
@@ -45,12 +43,20 @@ template <Dimension Dim> class shape : public drawable<Dim>
 class shape2D : public shape<dimension::two>
 {
   public:
+    using model_t = model<dimension::two>;
+
     template <class... ModelArgs>
     shape2D(topology tplg, ModelArgs &&...args)
         : shape(tplg, std::forward<ModelArgs>(args)...),
-          m_outline_model(context_t::device(), std::forward<ModelArgs>(args)...)
+          m_outline_model(kit::make_ref<model_t>(context_t::device(), std::forward<ModelArgs>(args)...))
     {
     }
+
+    shape2D(const shape2D &other);
+    shape2D &operator=(const shape2D &other);
+
+    shape2D(shape2D &&other) = default;
+    shape2D &operator=(shape2D &&other) = default;
 
     const lynx::color &outline_color() const;
     void outline_color(const lynx::color &color);
@@ -61,7 +67,7 @@ class shape2D : public shape<dimension::two>
     virtual void draw(window_t &win) const override;
 
   private:
-    mutable model_t m_outline_model;
+    kit::ref<model_t> m_outline_model;
 
     void draw_outline_thickness(window_t &win) const;
 };

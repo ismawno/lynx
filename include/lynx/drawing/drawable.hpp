@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lynx/internal/dimension.hpp"
+#include "kit/memory/ptr/ref.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -8,6 +9,25 @@
 
 namespace lynx
 {
+
+template <Dimension Dim> class modelable
+{
+  protected:
+    using model_t = typename Dim::model_t;
+
+    template <class... ModelArgs>
+    modelable(ModelArgs &&...args) : m_model(kit::make_ref<model_t>(std::forward<ModelArgs>(args)...))
+    {
+    }
+
+    modelable(const modelable &other);
+    modelable &operator=(const modelable &other);
+
+    modelable(modelable &&other) = default;
+    modelable &operator=(modelable &&other) = default;
+
+    kit::ref<model_t> m_model;
+};
 
 enum class topology
 {
@@ -33,8 +53,8 @@ template <Dimension Dim> class drawable
         KIT_ERROR("To draw to an arbitrary render system, the draw render system method must be overriden")
     }
 
-    static void default_draw(window_t &win, const model_t *mdl, glm::mat4 transform, topology tplg);
-    static void default_draw_no_transform(window_t &win, const model_t *mdl, topology tplg);
+    static void default_draw(window_t &win, const kit::ref<const model_t> &mdl, glm::mat4 transform, topology tplg);
+    static void default_draw_no_transform(window_t &win, const kit::ref<const model_t> &mdl, topology tplg);
 };
 
 using drawable2D = drawable<dimension::two>;

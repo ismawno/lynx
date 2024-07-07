@@ -8,28 +8,44 @@ namespace lynx
 {
 template <Dimension Dim> const color &shape<Dim>::color() const
 {
-    return m_model.vertex(0).color;
+    return this->m_model->vertex(0).color;
 }
 template <Dimension Dim> void shape<Dim>::color(const lynx::color &color)
 {
-    vertex_t *vdata = m_model.vertex_data();
-    for (std::size_t i = 0; i < m_model.vertex_count(); i++)
+    vertex_t *vdata = this->m_model->vertex_data();
+    for (std::size_t i = 0; i < this->m_model->vertex_count(); i++)
         vdata[i].color = color;
 }
 
 template <Dimension Dim> void shape<Dim>::draw(window_t &win) const
 {
-    drawable_t::default_draw(win, &m_model, transform.center_scale_rotate_translate4(), m_topology);
+    drawable_t::default_draw(win, this->m_model, transform.center_scale_rotate_translate4(), m_topology);
+}
+
+shape2D::shape2D(const shape2D &other) : shape(other)
+{
+    if (other.m_outline_model)
+        m_outline_model = kit::make_ref<model2D>(*other.m_outline_model);
+}
+
+shape2D &shape2D::operator=(const shape2D &other)
+{
+    if (this == &other)
+        return *this;
+    shape::operator=(other);
+    if (other.m_outline_model)
+        m_outline_model = kit::make_ref<model2D>(*other.m_outline_model);
+    return *this;
 }
 
 const color &shape2D::outline_color() const
 {
-    return m_outline_model.vertex(0).color;
+    return m_outline_model->vertex(0).color;
 }
 void shape2D::outline_color(const lynx::color &color)
 {
-    vertex2D *vdata = m_outline_model.vertex_data();
-    for (std::size_t i = 0; i < m_outline_model.vertex_count(); i++)
+    vertex2D *vdata = m_outline_model->vertex_data();
+    for (std::size_t i = 0; i < m_outline_model->vertex_count(); i++)
         vdata[i].color = color;
 }
 
@@ -38,9 +54,9 @@ void shape2D::draw_outline_thickness(window_t &win) const
     kit::transform2D<float> outline_transform = transform;
     glm::vec2 mm{FLT_MAX}, mx{-FLT_MAX};
 
-    for (std::size_t i = 0; i < m_outline_model.vertex_count(); i++)
+    for (std::size_t i = 0; i < m_outline_model->vertex_count(); i++)
     {
-        const glm::vec2 &vertex = m_outline_model.vertex(i).position;
+        const glm::vec2 &vertex = m_outline_model->vertex(i).position;
         mm.x = glm::min(mm.x, vertex.x);
         mm.y = glm::min(mm.y, vertex.y);
         mx.x = glm::max(mx.x, vertex.x);
@@ -51,7 +67,7 @@ void shape2D::draw_outline_thickness(window_t &win) const
     outline_transform.position +=
         kit::transform2D<float>::rotation_matrix(transform.rotation) * outline_transform.origin;
     outline_transform.scale = transform.scale + (2.f * outline_thickness) / (mx - mm);
-    drawable::default_draw(win, &m_outline_model, outline_transform.center_scale_rotate_translate4(), m_topology);
+    drawable::default_draw(win, m_outline_model, outline_transform.center_scale_rotate_translate4(), m_topology);
 }
 
 void shape2D::draw(window_t &win) const
@@ -130,27 +146,27 @@ polygon<Dim>::polygon(const lynx::color &color) : polygon({vec_t(0.f), vec_t(0.f
 
 template <Dimension Dim> const vertex<Dim> &polygon<Dim>::operator[](const std::size_t index) const
 {
-    KIT_ASSERT_ERROR(index < m_model.vertex_count() - 1,
+    KIT_ASSERT_ERROR(index < this->m_model->vertex_count() - 1,
                      "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
-                     m_model.vertex_count() - 1)
-    return m_model.vertex(index + 1); // +1 to account for center vertex
+                     this->m_model->vertex_count() - 1)
+    return this->m_model->vertex(index + 1); // +1 to account for center vertex
 }
 template <Dimension Dim> vertex<Dim> &polygon<Dim>::operator[](const std::size_t index)
 {
-    KIT_ASSERT_ERROR(index < m_model.vertex_count() - 1,
+    KIT_ASSERT_ERROR(index < this->m_model->vertex_count() - 1,
                      "Index exceeds model's vertices count! Index: {0}, vertices: {1}", index,
-                     m_model.vertex_count() - 1)
-    return m_model.vertex_data()[index + 1]; // +1 to account for center vertex
+                     this->m_model->vertex_count() - 1)
+    return this->m_model->vertex_data()[index + 1]; // +1 to account for center vertex
 }
 
 template <Dimension Dim> const lynx::color &polygon<Dim>::center_color() const
 {
-    return m_model.vertex(0).color;
+    return this->m_model->vertex(0).color;
 }
 
 template <Dimension Dim> void polygon<Dim>::center_color(const lynx::color &color)
 {
-    m_model.vertex_data()[0].color = color;
+    this->m_model->vertex_data()[0].color = color;
 }
 
 template <Dimension Dim> std::size_t polygon<Dim>::size() const

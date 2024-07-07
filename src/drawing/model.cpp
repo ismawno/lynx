@@ -66,15 +66,6 @@ template <Dimension Dim> void model<Dim>::copy(const model &other)
     m_index_data = other.has_index_buffers() ? m_index_buffer->data() : nullptr;
 }
 
-#ifdef DEBUG
-template <Dimension Dim> model<Dim>::~model()
-{
-    KIT_ASSERT_CRITICAL(!to_be_rendered,
-                        "Model has been destroyed before being rendered! Any drawable entity must remain alive until "
-                        "the end of the frame once it has been submitted for drawing")
-}
-#endif
-
 template <Dimension Dim> void model<Dim>::bind(VkCommandBuffer command_buffer) const
 {
     const std::array<VkBuffer, 1> buffers = {m_vertex_buffer->vulkan_buffer()};
