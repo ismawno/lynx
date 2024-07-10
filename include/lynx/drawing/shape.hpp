@@ -19,6 +19,7 @@ template <Dimension Dim> class shape : public drawable<Dim>, public modelable<Di
 {
   public:
     using transform_t = typename Dim::transform_t;
+    using model_t = typename Dim::model_t;
     using window_t = window<Dim>;
     using context_t = context<Dim>;
     using drawable_t = drawable<Dim>;
@@ -43,8 +44,6 @@ template <Dimension Dim> class shape : public drawable<Dim>, public modelable<Di
 class shape2D : public shape<dimension::two>
 {
   public:
-    using model_t = model<dimension::two>;
-
     template <class... ModelArgs>
     shape2D(topology tplg, ModelArgs &&...args)
         : shape(tplg, std::forward<ModelArgs>(args)...),
