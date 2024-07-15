@@ -59,10 +59,10 @@ void render_system<Dim>::create_pipeline(const VkRenderPass render_pass, pipelin
 
 template <Dimension Dim> void render_system<Dim>::render(VkCommandBuffer command_buffer, const camera_t &cam) const
 {
-    KIT_PERF_SCOPE("render_system::render")
     if (m_render_data.empty())
         return;
 
+    KIT_PERF_SCOPE("render_system::render")
     m_pipeline->bind(command_buffer);
     const glm::mat4 &proj = cam.projection();
     for (const render_data &rdata : m_render_data)
