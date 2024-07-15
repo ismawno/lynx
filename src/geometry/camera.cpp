@@ -86,7 +86,7 @@ void orthographic2D::size(const float size)
 
 void orthographic2D::update_transformation_matrices()
 {
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("orthographic2D::update_transformation_matrices")
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
     m_projection = transform.inverse_scale_center_rotate_translate4();
@@ -118,7 +118,7 @@ orthographic3D::orthographic3D(const glm::vec3 &position, const glm::vec3 &size,
 
 void orthographic3D::update_transformation_matrices()
 {
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("orthographic3D::update_transformation_matrices")
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
     m_projection = transform.inverse_scale_center_rotate_translate4();
@@ -160,7 +160,7 @@ void perspective3D::keep_aspect_ratio(const float aspect)
 
 void perspective3D::update_transformation_matrices()
 {
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("perspective3D::update_transformation_matrices")
     if (m_y_flipped)
         transform.scale.y = -transform.scale.y;
     const float half_tan_fovy = tanf(0.5f * fov);

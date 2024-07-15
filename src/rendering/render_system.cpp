@@ -59,7 +59,7 @@ void render_system<Dim>::create_pipeline(const VkRenderPass render_pass, pipelin
 
 template <Dimension Dim> void render_system<Dim>::render(VkCommandBuffer command_buffer, const camera_t &cam) const
 {
-    KIT_PERF_PRETTY_FUNCTION()
+    KIT_PERF_SCOPE("render_system::render")
     if (m_render_data.empty())
         return;
 

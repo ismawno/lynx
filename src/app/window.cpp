@@ -70,14 +70,14 @@ template <Dimension Dim> bool window<Dim>::closed()
 
 template <Dimension Dim> void window<Dim>::render(const VkCommandBuffer command_buffer) const
 {
-    KIT_PERF_PRETTY_FUNCTION()
+    KIT_PERF_SCOPE("window::render")
     for (const auto &sys : m_render_systems)
         sys->render(command_buffer, *m_camera);
 }
 
 template <Dimension Dim> void window<Dim>::clear_render_data()
 {
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("window::clear_render_data")
     for (const auto &sys : m_render_systems)
         sys->clear_render_data();
     if constexpr (std::is_same_v<Dim, dimension::two>)

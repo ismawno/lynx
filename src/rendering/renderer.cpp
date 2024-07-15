@@ -71,7 +71,7 @@ template <Dimension Dim> void renderer<Dim>::free_command_buffers()
 
 template <Dimension Dim> VkCommandBuffer renderer<Dim>::begin_frame()
 {
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("renderer::begin_frame")
     KIT_ASSERT_ERROR(!m_frame_started, "Cannot begin a new frame when there is already one in progress")
 
     const VkResult result = m_swap_chain->acquire_next_image(&m_image_index);
@@ -94,7 +94,7 @@ template <Dimension Dim> VkCommandBuffer renderer<Dim>::begin_frame()
 }
 template <Dimension Dim> void renderer<Dim>::end_frame()
 {
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("renderer::end_frame")
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end a frame when there is no frame in progress")
     KIT_CHECK_RETURN_VALUE(vkEndCommandBuffer(m_command_buffers[m_frame_index]), VK_SUCCESS, CRITICAL,
                            "Failed to end command buffer")
@@ -120,7 +120,7 @@ void renderer<Dim>::begin_swap_chain_render_pass(VkCommandBuffer command_buffer,
     KIT_ASSERT_ERROR(m_frame_started, "Cannot begin render pass if a frame is not in progress")
     KIT_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
                      "Cannot begin render pass with a command buffer from another frame")
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("renderer::begin_swap_chain_render_pass")
 
     VkRenderPassBeginInfo pass_info{};
     pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -158,7 +158,7 @@ template <Dimension Dim> void renderer<Dim>::end_swap_chain_render_pass(VkComman
     KIT_ASSERT_ERROR(m_frame_started, "Cannot end render pass if a frame is not in progress")
     KIT_ASSERT_ERROR(m_command_buffers[m_frame_index] == command_buffer,
                      "Cannot end render pass with a command buffer from another frame")
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("renderer::end_swap_chain_render_pass")
 
     vkCmdEndRenderPass(m_command_buffers[m_frame_index]);
 }
