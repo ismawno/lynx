@@ -61,7 +61,7 @@ template <Dimension Dim> class window : kit::non_copyable, public kit::nameable<
 
     template <kit::Callable<VkCommandBuffer> F> bool display(F submission = [](VkCommandBuffer) {})
     {
-        KIT_PERF_SCOPE("window::display")
+        KIT_PERF_SCOPE("lynx::window::display")
         if (VkCommandBuffer command_buffer = m_renderer->begin_frame())
         {
             if (m_maintain_camera_aspect_ratio)

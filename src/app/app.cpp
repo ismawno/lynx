@@ -291,7 +291,7 @@ template <Dimension Dim> void app<Dim>::imgui_init()
 
 template <Dimension Dim> void app<Dim>::imgui_begin_render()
 {
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("lynx::app::imgui_begin_render")
     ImGui::SetCurrentContext(m_imgui_context);
 #ifdef LYNX_ENABLE_IMPLOT
     ImPlot::SetCurrentContext(m_implot_context);
@@ -306,14 +306,14 @@ template <Dimension Dim> void app<Dim>::imgui_begin_render()
 
 template <Dimension Dim> void app<Dim>::imgui_end_render()
 {
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("lynx::app::imgui_end_render")
     ImGui::PopID();
     ImGui::Render();
 }
 
 template <Dimension Dim> void app<Dim>::imgui_submit_command(const VkCommandBuffer command_buffer)
 {
-    KIT_PERF_FUNCTION()
+    KIT_PERF_SCOPE("lynx::app::imgui_submit_command")
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), command_buffer);
     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {

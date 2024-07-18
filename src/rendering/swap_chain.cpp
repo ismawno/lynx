@@ -54,7 +54,7 @@ swap_chain::~swap_chain()
 
 VkResult swap_chain::acquire_next_image(std::uint32_t *image_index) const
 {
-    KIT_PERF_SCOPE("swap_chain::acquire_next_image")
+    KIT_PERF_SCOPE("lynx::swap_chain::acquire_next_image")
     vkWaitForFences(m_device->vulkan_device(), 1, &m_in_flight_fences[m_current_frame], VK_TRUE,
                     std::numeric_limits<uint64_t>::max());
 
@@ -67,7 +67,7 @@ VkResult swap_chain::acquire_next_image(std::uint32_t *image_index) const
 
 VkResult swap_chain::submit_command_buffers(const VkCommandBuffer *buffers, const std::uint32_t *image_index)
 {
-    KIT_PERF_SCOPE("swap_chain::submit_command_buffers")
+    KIT_PERF_SCOPE("lynx::swap_chain::submit_command_buffers")
     if (m_images_in_flight[*image_index] != VK_NULL_HANDLE)
         vkWaitForFences(m_device->vulkan_device(), 1, &m_images_in_flight[*image_index], VK_TRUE, UINT64_MAX);
 
