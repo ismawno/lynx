@@ -24,7 +24,7 @@ template <> struct kit::yaml::codec<lynx::color>
     {
         if (node.IsSequence())
         {
-            if (node.size() != 4 && node.size() != 3)
+            if (node.size() < 4 && node.size() < 3)
                 return false;
             if (!is_integer(node[0].Scalar()))
                 color = node.size() == 4 ? lynx::color(node.as<glm::vec4>()) : lynx::color(node.as<glm::vec3>());
