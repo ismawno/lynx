@@ -5,9 +5,12 @@
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
+// #define GLM_FORCE_AVX2
+#include <glm/glm.hpp>
+#include <glm/gtx/norm.hpp>
+#include <glm/geometric.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include <vulkan/vulkan.hpp>
 
